@@ -1,0 +1,3 @@
+test('base', () => {
+  // test code
+});
