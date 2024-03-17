@@ -1,5 +1,9 @@
 # use-travel
 
+![Node CI](https://github.com/unadlib/use-travel/workflows/Node%20CI/badge.svg)
+[![npm](https://img.shields.io/npm/v/use-travel.svg)](https://www.npmjs.com/package/use-travel)
+![license](https://img.shields.io/npm/l/use-travel)
+
 A React hook for state time travel with undo, redo, and reset functionalities.
 
 ### Installation
