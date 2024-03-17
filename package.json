@@ -1,6 +1,6 @@
 {
   "name": "use-travel",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A React hook for state time travel with undo, redo, and reset functionalities.",
   "main": "dist/index.cjs.js",
   "unpkg": "dist/index.umd.js",
@@ -43,8 +43,10 @@
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.2",
+    "@testing-library/react": "^14.2.1",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.5",
+    "@types/react": "^18.2.66",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
     "commitizen": "^4.3.0",
@@ -57,6 +59,8 @@
     "jest-environment-jsdom": "^29.5.0",
     "mutative": "^1.0.3",
     "prettier": "^2.8.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "rimraf": "^4.4.0",
     "rollup": "^3.20.0",
     "rollup-plugin-terser": "^7.0.0",
@@ -81,6 +85,11 @@
     }
   },
   "peerDependencies": {
-    "mutative": "^1.0.3"
+    "@types/react": "^18.0 || ^17.0",
+    "mutative": "^1.0.3",
+    "react": "^18.0 || ^17.0"
+  },
+  "dependencies": {
+    "use-mutative": "^1.0.0"
   }
 }
