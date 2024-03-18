@@ -6,6 +6,10 @@
 
 A React hook for state time travel with undo, redo, and reset functionalities.
 
+### Motivation
+
+`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/unadlib/mutative) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
+
 ### Installation
 
 ```bash
