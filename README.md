@@ -23,17 +23,36 @@ yarn add use-travel mutative
 - High performance
 - Mark function for custom immutability
 
-### TODO
-
-- [ ] add `archive` functionality
-
 ### API
 
-```jsx
+### Options
+
+| Options          | type          | description                           | default                          |
+| ---------------- | ------------- | ------------------------------------- | -------------------------------- |
+| `maxHistory`     | number        | The maximum number of history to keep | 10                               |
+| `initialPatches` | TravelPatches | The initial patches                   | {patches: [],inversePatches: []} |
+
+### Return
+
+| Return                | type                       | description                                                        |
+| --------------------- | -------------------------- | ------------------------------------------------------------------ |
+| `state`               | T                          | The current state                                                  |
+| `setState`            | Dispatch<T>                | The state setter, support mutation update or return immutable data |
+| `controls.back`       | () => void                 | Go back to the previous state                                      |
+| `controls.forward`    | () => void                 | Go forward to the next state                                       |
+| `controls.reset`      | () => void                 | Reset the state to the initial state                               |
+| `controls.canUndo`    | () => boolean              | Check if can go back to the previous state                         |
+| `controls.canRedo`    | () => boolean              | Check if can go forward to the next state                          |
+| `controls.getHistory` | () => T[]                  | Get the history of the state                                       |
+| `controls.patches`    | TravelPatches[]            | Get the patches history of the state                               |
+| `controls.position`   | number                     | Get the current position of the state                              |
+| `controls.go`         | (position: number) => void | Go to the specific position of the state                           |
+
+```tsx
 import { useTravel } from 'use-travel';
 
 const App = () => {
-  const [state, setState, controls]} = useTravel(0, {
+  const [state, setState, controls] = useTravel(0, {
     maxHistory: 10,
     initialPatches: [],
   });
@@ -42,8 +61,12 @@ const App = () => {
       <div>{state}</div>
       <button onClick={() => setState(state + 1)}>Increment</button>
       <button onClick={() => setState(state - 1)}>Decrement</button>
-      <button onClick={controls.back} disabled={!controls.canUndo()}>Undo</button>
-      <button onClick={controls.forward} disabled={!controls.canRedo()}>Redo</button>
+      <button onClick={controls.back} disabled={!controls.canUndo()}>
+        Undo
+      </button>
+      <button onClick={controls.forward} disabled={!controls.canRedo()}>
+        Redo
+      </button>
       <button onClick={controls.reset}>Reset</button>
       {controls.getHistory().map((state, index) => (
         <div key={index}>{state}</div>
@@ -52,10 +75,22 @@ const App = () => {
         <div key={index}>{patch}</div>
       ))}
       <div>{controls.position}</div>
-      <button onClick={() => {
-        controls.go(1);
-      }}>Go</button>
+      <button
+        onClick={() => {
+          controls.go(1);
+        }}
+      >
+        Go
+      </button>
     </div>
   );
-}
+};
 ```
+
+### TODO
+
+- [ ] add `archive` functionality
+
+## License
+
+`use-travel` is [MIT licensed](https://github.com/unadlib/use-travel/blob/main/LICENSE).

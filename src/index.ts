@@ -17,7 +17,6 @@ type TravelPatches = {
 type Options<A extends boolean, F extends boolean> = {
   maxHistory?: number;
   initialPatches?: TravelPatches;
-  autoArchive?: A;
 } & MutativeOptions<true, F>;
 
 type InitialValue<I extends any> = I extends (...args: any) => infer R ? R : I;
