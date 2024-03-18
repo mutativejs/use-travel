@@ -130,13 +130,13 @@ describe('useTravel', () => {
     [nextState, setState, controls] = result.current;
 
     act(() =>
-    setState((draft) => {
-      draft.todos.push({
-        name: 'todo 5',
-      });
-    })
-  );
-  [nextState, setState, controls] = result.current;
+      setState((draft) => {
+        draft.todos.push({
+          name: 'todo 5',
+        });
+      })
+    );
+    [nextState, setState, controls] = result.current;
 
     expect(nextState).toEqual({
       todos: [
@@ -154,7 +154,55 @@ describe('useTravel', () => {
         },
       ],
     });
-    console.log(controls.patches.patches.length, 'CCCC');
+
+    expect(controls.getHistory()).toEqual([
+      {
+        todos: [],
+      },
+      {
+        todos: [
+          {
+            name: 'todo 1',
+          },
+          {
+            name: 'todo 2',
+          },
+        ],
+      },
+      {
+        todos: [
+          {
+            name: 'todo 1',
+          },
+          {
+            name: 'todo 2',
+          },
+          {
+            name: 'todo 4',
+          },
+        ],
+      },
+      {
+        todos: [
+          {
+            name: 'todo 1',
+          },
+          {
+            name: 'todo 2',
+          },
+          {
+            name: 'todo 4',
+          },
+          {
+            name: 'todo 5',
+          },
+        ],
+      },
+    ]);
+
+    act(() => controls.go(1));
+    [nextState, setState, controls] = result.current;
+
     expect(controls.getHistory()).toEqual([
       {
         todos: [],

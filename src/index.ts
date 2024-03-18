@@ -144,21 +144,19 @@ export const useTravel = <S, A extends boolean, F extends boolean>(
             currentState as object,
             allPatches.patches[i]
           ) as S;
+          console.log('i', i, JSON.stringify(currentState));
           history.push(currentState);
         }
         currentState = state as any;
-        const inversePatches = allPatches.inversePatches;
-        const stateIndex =
-          inversePatches.length === cachedPosition
-            ? inversePatches.length - 1
-            : inversePatches.length - cachedPosition - 1;
-        for (let i = stateIndex; i > -1; i--) {
+        for (let i = cachedPosition - 1; i > -1; i--) {
           currentState = apply(
             currentState as object,
             allPatches.inversePatches[i]
           ) as S;
+          console.log('j', i, JSON.stringify(currentState));
           history.unshift(currentState);
         }
+        console.log('history', JSON.stringify(history));
         return history;
       },
       patches: allPatches,
