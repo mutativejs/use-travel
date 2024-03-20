@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   type Options as MutativeOptions,
   type Patches,
@@ -80,6 +80,7 @@ export const useTravel = <S, A extends boolean, F extends boolean>(
   initialState: S,
   { maxHistory = 10, initialPatches, ...options }: Options<A, F> = {}
 ) => {
+  const resetRef = useRef(false);
   const [position, setPosition] = useMutative(-1);
   const [allPatches, setAllPatches] = useMutative(
     () =>
@@ -94,6 +95,10 @@ export const useTravel = <S, A extends boolean, F extends boolean>(
   });
   useEffect(() => {
     if (position === -1 && patches.length > 0) {
+      if (resetRef.current) {
+        resetRef.current = false;
+        return;
+      }
       setAllPatches((_allPatches) => {
         _allPatches.patches.push(patches);
         _allPatches.inversePatches.push(inversePatches);
@@ -134,18 +139,21 @@ export const useTravel = <S, A extends boolean, F extends boolean>(
         )
       );
     };
+    let cachedHistory: (F extends true
+      ? Immutable<InitialValue<S>>
+      : InitialValue<S>)[];
     return {
       position: cachedPosition,
       getHistory: () => {
-        const history = [state];
+        if (cachedHistory) return cachedHistory;
+        cachedHistory = [state];
         let currentState = state as any;
         for (let i = cachedPosition; i < allPatches.patches.length; i++) {
           currentState = apply(
             currentState as object,
             allPatches.patches[i]
           ) as S;
-          console.log('i', i, JSON.stringify(currentState));
-          history.push(currentState);
+          cachedHistory.push(currentState);
         }
         currentState = state as any;
         for (let i = cachedPosition - 1; i > -1; i--) {
@@ -153,11 +161,9 @@ export const useTravel = <S, A extends boolean, F extends boolean>(
             currentState as object,
             allPatches.inversePatches[i]
           ) as S;
-          console.log('j', i, JSON.stringify(currentState));
-          history.unshift(currentState);
+          cachedHistory.unshift(currentState);
         }
-        console.log('history', JSON.stringify(history));
-        return history;
+        return cachedHistory;
       },
       patches: allPatches,
       back: (amount = 1) => {
@@ -172,6 +178,7 @@ export const useTravel = <S, A extends boolean, F extends boolean>(
           () => initialPatches ?? { patches: [], inversePatches: [] }
         );
         setState(() => initialState);
+        resetRef.current = true;
       },
       go,
       canBack: () => cachedPosition > 0,

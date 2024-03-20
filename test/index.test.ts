@@ -8,6 +8,8 @@ describe('useTravel', () => {
     );
     let [nextState, setState, controls] = result.current;
     expect(nextState).toEqual({ todos: [] });
+    expect(controls.getHistory()).toEqual([{ todos: [] }]);
+
     act(() =>
       setState((draft) => {
         draft.todos.push({
@@ -29,6 +31,19 @@ describe('useTravel', () => {
         },
       ],
     });
+    expect(controls.getHistory()).toEqual([
+      { todos: [] },
+      {
+        todos: [
+          {
+            name: 'todo 1',
+          },
+          {
+            name: 'todo 2',
+          },
+        ],
+      },
+    ]);
 
     act(() =>
       setState((draft) => {
@@ -251,6 +266,7 @@ describe('useTravel', () => {
     act(() => controls.reset());
     [nextState, setState, controls] = result.current;
     expect(nextState).toEqual({ todos: [] });
+    expect(controls.getHistory()).toEqual([{ todos: [] }]);
   });
 
   it('[useTravel] with normal init state', () => {
