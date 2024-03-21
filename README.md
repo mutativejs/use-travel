@@ -47,10 +47,10 @@ const App = () => {
       <div>{state}</div>
       <button onClick={() => setState(state + 1)}>Increment</button>
       <button onClick={() => setState(state - 1)}>Decrement</button>
-      <button onClick={controls.back} disabled={!controls.canBack()}>
+      <button onClick={() => controls.back()} disabled={!controls.canBack()}>
         Undo
       </button>
-      <button onClick={controls.forward} disabled={!controls.canForward()}>
+      <button onClick={() => controls.forward()} disabled={!controls.canForward()}>
         Redo
       </button>
       <button onClick={controls.reset}>Reset</button>
@@ -58,7 +58,7 @@ const App = () => {
         <div key={index}>{state}</div>
       ))}
       {controls.patches.patches.map((patch, index) => (
-        <div key={index}>{patch}</div>
+        <div key={index}>{JSON.stringify(patch)}</div>
       ))}
       <div>{controls.position}</div>
       <button
