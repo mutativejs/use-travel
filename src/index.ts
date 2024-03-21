@@ -14,7 +14,7 @@ type TravelPatches = {
   inversePatches: Patches[];
 };
 
-type Options<A extends boolean, F extends boolean> = {
+type Options<F extends boolean> = {
   maxHistory?: number;
   initialPatches?: TravelPatches;
 } & MutativeOptions<true, F>;
@@ -76,9 +76,9 @@ type Result<S, F extends boolean> = [
 /**
  * A hook to travel in the history of a state
  */
-export const useTravel = <S, A extends boolean, F extends boolean>(
+export const useTravel = <S, F extends boolean>(
   initialState: S,
-  { maxHistory = 10, initialPatches, ...options }: Options<A, F> = {}
+  { maxHistory = 10, initialPatches, ...options }: Options<F> = {}
 ) => {
   const resetRef = useRef(false);
   const [position, setPosition] = useMutative(-1);
