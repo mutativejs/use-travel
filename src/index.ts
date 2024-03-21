@@ -99,7 +99,7 @@ export const useTravel = <S, F extends boolean>(
       setState(nextState);
       setPosition(position + 1);
       setAllPatches((_allPatches) => {
-        const notLast = position < allPatches.patches.length;
+        const notLast = position < _allPatches.patches.length;
         // Remove all patches after the current position
         if (notLast) {
           _allPatches.patches.splice(

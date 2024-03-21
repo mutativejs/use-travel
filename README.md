@@ -31,30 +31,33 @@ yarn add use-travel mutative
 
 You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back`, `forward`, `reset`, `canUndo`, `canRedo`, `getHistory`, `patches`, `position`, and `go`.
 
-```tsx
+```jsx
 import { useTravel } from 'use-travel';
 
 const App = () => {
   const [state, setState, controls] = useTravel(0, {
     maxHistory: 10,
-    initialPatches: [],
+    initialPatches: {
+      patches: [],
+      inversePatches: [],
+    },
   });
   return (
     <div>
       <div>{state}</div>
       <button onClick={() => setState(state + 1)}>Increment</button>
       <button onClick={() => setState(state - 1)}>Decrement</button>
-      <button onClick={controls.back} disabled={!controls.canUndo()}>
+      <button onClick={controls.back} disabled={!controls.canBack()}>
         Undo
       </button>
-      <button onClick={controls.forward} disabled={!controls.canRedo()}>
+      <button onClick={controls.forward} disabled={!controls.canForward()}>
         Redo
       </button>
       <button onClick={controls.reset}>Reset</button>
       {controls.getHistory().map((state, index) => (
         <div key={index}>{state}</div>
       ))}
-      {controls.patches.map((patch, index) => (
+      {controls.patches.patches.map((patch, index) => (
         <div key={index}>{patch}</div>
       ))}
       <div>{controls.position}</div>
@@ -69,7 +72,6 @@ const App = () => {
   );
 };
 ```
-
 
 ### Options
 
