@@ -50,7 +50,10 @@ const App = () => {
       <button onClick={() => controls.back()} disabled={!controls.canBack()}>
         Undo
       </button>
-      <button onClick={() => controls.forward()} disabled={!controls.canForward()}>
+      <button
+        onClick={() => controls.forward()}
+        disabled={!controls.canForward()}
+      >
         Redo
       </button>
       <button onClick={controls.reset}>Reset</button>
@@ -89,8 +92,8 @@ const App = () => {
 | `controls.back`       | () => void                 | Go back to the previous state                                      |
 | `controls.forward`    | () => void                 | Go forward to the next state                                       |
 | `controls.reset`      | () => void                 | Reset the state to the initial state                               |
-| `controls.canUndo`    | () => boolean              | Check if can go back to the previous state                         |
-| `controls.canRedo`    | () => boolean              | Check if can go forward to the next state                          |
+| `controls.canBack`    | () => boolean              | Check if can go back to the previous state                         |
+| `controls.canForward` | () => boolean              | Check if can go forward to the next state                          |
 | `controls.getHistory` | () => T[]                  | Get the history of the state                                       |
 | `controls.patches`    | TravelPatches[]            | Get the patches history of the state                               |
 | `controls.position`   | number                     | Get the current position of the state                              |
