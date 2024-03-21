@@ -29,7 +29,7 @@ yarn add use-travel mutative
 
 ### API
 
-You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back`, `forward`, `reset`, `canUndo`, `canRedo`, `getHistory`, `patches`, `position`, and `go`.
+You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back`, `forward`, `reset`, `canBack`, `canForward`, `getHistory`, `patches`, `position`, and `go`.
 
 ```jsx
 import { useTravel } from 'use-travel';
