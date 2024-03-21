@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   type Options as MutativeOptions,
   type Patches,
   type Draft,
   type Immutable,
   apply,
-  rawReturn,
+  create,
 } from 'mutative';
 import { useMutative } from 'use-mutative';
 
@@ -80,8 +80,7 @@ export const useTravel = <S, F extends boolean>(
   initialState: S,
   { maxHistory = 10, initialPatches, ...options }: Options<F> = {}
 ) => {
-  const resetRef = useRef(false);
-  const [position, setPosition] = useMutative(-1);
+  const [position, setPosition] = useState(0);
   const [allPatches, setAllPatches] = useMutative(
     () =>
       (initialPatches ?? {
@@ -89,17 +88,29 @@ export const useTravel = <S, F extends boolean>(
         inversePatches: [],
       }) as TravelPatches
   );
-  const [state, setState, patches, inversePatches] = useMutative(initialState, {
-    ...options,
-    enablePatches: true,
-  });
-  useEffect(() => {
-    if (position === -1 && patches.length > 0) {
-      if (resetRef.current) {
-        resetRef.current = false;
-        return;
-      }
+  const [state, setState] = useState(initialState);
+  const cachedSetState = useCallback(
+    (updater: any) => {
+      const [nextState, patches, inversePatches] = (
+        typeof updater === 'function'
+          ? create(state, updater, { ...options, enablePatches: true })
+          : create(state, () => updater, { ...options, enablePatches: true })
+      ) as [S, Patches<true>, Patches<true>];
+      setState(nextState);
+      setPosition(position + 1);
       setAllPatches((_allPatches) => {
+        const notLast = position < allPatches.patches.length;
+        // Remove all patches after the current position
+        if (notLast) {
+          _allPatches.patches.splice(
+            position,
+            _allPatches.patches.length - position
+          );
+          _allPatches.inversePatches.splice(
+            position,
+            _allPatches.inversePatches.length - position
+          );
+        }
         _allPatches.patches.push(patches);
         _allPatches.inversePatches.push(inversePatches);
         if (maxHistory < _allPatches.patches.length) {
@@ -109,15 +120,12 @@ export const useTravel = <S, F extends boolean>(
           );
         }
       });
-    }
-  }, [maxHistory, patches, inversePatches, position]);
-  const cachedPosition = useMemo(
-    () => (position === -1 ? allPatches.patches.length : position),
-    [position, allPatches.patches.length]
+    },
+    [state, position]
   );
   const cachedTravels = useMemo(() => {
     const go = (nextPosition: number) => {
-      const back = nextPosition < cachedPosition;
+      const back = nextPosition < position;
       if (nextPosition > allPatches.patches.length) {
         console.warn(`Can't go forward to position ${nextPosition}`);
         nextPosition = allPatches.patches.length;
@@ -126,29 +134,26 @@ export const useTravel = <S, F extends boolean>(
         console.warn(`Can't go back to position ${nextPosition}`);
         nextPosition = 0;
       }
-      if (nextPosition === cachedPosition) return;
-      setPosition(nextPosition);
-      setState(() =>
-        rawReturn(
+      if (nextPosition === position) return;
+      setState(
+        () =>
           apply(
             state as object,
             back
               ? allPatches.inversePatches.slice(nextPosition).flat().reverse()
               : allPatches.patches.slice(position, nextPosition).flat()
-          )
-        )
+          ) as S
       );
+      setPosition(nextPosition);
     };
-    let cachedHistory: (F extends true
-      ? Immutable<InitialValue<S>>
-      : InitialValue<S>)[];
+    let cachedHistory: S[];
     return {
-      position: cachedPosition,
+      position,
       getHistory: () => {
         if (cachedHistory) return cachedHistory;
         cachedHistory = [state];
         let currentState = state as any;
-        for (let i = cachedPosition; i < allPatches.patches.length; i++) {
+        for (let i = position; i < allPatches.patches.length; i++) {
           currentState = apply(
             currentState as object,
             allPatches.patches[i]
@@ -156,7 +161,7 @@ export const useTravel = <S, F extends boolean>(
           cachedHistory.push(currentState);
         }
         currentState = state as any;
-        for (let i = cachedPosition - 1; i > -1; i--) {
+        for (let i = position - 1; i > -1; i--) {
           currentState = apply(
             currentState as object,
             allPatches.inversePatches[i]
@@ -167,25 +172,24 @@ export const useTravel = <S, F extends boolean>(
       },
       patches: allPatches,
       back: (amount = 1) => {
-        go(cachedPosition - amount);
+        go(position - amount);
       },
       forward: (amount = 1) => {
-        go(cachedPosition + amount);
+        go(position + amount);
       },
       reset: () => {
-        setPosition(-1);
+        setPosition(0);
         setAllPatches(
           () => initialPatches ?? { patches: [], inversePatches: [] }
         );
         setState(() => initialState);
-        resetRef.current = true;
       },
       go,
-      canBack: () => cachedPosition > 0,
-      canForward: () => cachedPosition < allPatches.patches.length,
+      canBack: () => position > 0,
+      canForward: () => position < allPatches.patches.length,
     };
   }, [
-    cachedPosition,
+    position,
     allPatches,
     setPosition,
     setAllPatches,
@@ -193,21 +197,5 @@ export const useTravel = <S, F extends boolean>(
     initialState,
     state,
   ]);
-  const cachedSetState = useCallback(
-    (value: StateValue<S>) => {
-      setPosition(-1);
-      if (position !== -1) {
-        setAllPatches((_allPatches) => {
-          _allPatches.patches = _allPatches.patches.slice(0, position);
-          _allPatches.inversePatches = _allPatches.inversePatches.slice(
-            0,
-            position
-          );
-        });
-      }
-      setState(value);
-    },
-    [setState, setPosition, position, setAllPatches]
-  );
   return [state, cachedSetState, cachedTravels] as Result<S, F>;
 };
