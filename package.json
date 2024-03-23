@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "test": "jest",
+    "test:coverage": "jest --coverage && coveralls < coverage/lcov.info",
     "clean": "rimraf dist",
     "build": "yarn clean && tsc --skipLibCheck && yarn build:prod",
     "build:prod": "NODE_ENV=production rollup --config --bundleConfigAsCjs",
@@ -50,6 +51,7 @@
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
     "commitizen": "^4.3.0",
+    "coveralls": "^3.1.1",
     "eslint": "^8.36.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.8.0",
