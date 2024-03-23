@@ -23,7 +23,8 @@ yarn add use-travel mutative
 
 ### Features
 
-- Undo/Redo/Reset
+- Undo/Redo/Reset/Go/Archive functionalities
+- Mutations update immutable data
 - Small size for time travel with Patches history
 - Customizable history size
 - Customizable initial patches
@@ -37,7 +38,7 @@ yarn add use-travel mutative
 
 ### API
 
-You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back`, `forward`, `reset`, `canBack`, `canForward`, `getHistory`, `patches`, `position`, `archive`, and `go`.
+You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back()`, `forward()`, `reset()`, `canBack()`, `canForward()`, `getHistory()`, `patches`, `position`, `archive()`, and `go()`.
 
 ```jsx
 import { useTravel } from 'use-travel';
@@ -95,20 +96,20 @@ const App = () => {
 
 ### Return
 
-| Return                | type                       | description                                                            |
-| --------------------- | -------------------------- | ---------------------------------------------------------------------- |
-| `state`               | Value<S, F>                | The current state                                                      |
-| `setState`            | Updater<InitialValue<S>>   | The state setter, support mutation update or return immutable data     |
-| `controls.back`       | () => void                 | Go back to the previous state                                          |
-| `controls.forward`    | () => void                 | Go forward to the next state                                           |
-| `controls.reset`      | () => void                 | Reset the state to the initial state                                   |
-| `controls.canBack`    | () => boolean              | Check if can go back to the previous state                             |
-| `controls.canForward` | () => boolean              | Check if can go forward to the next state                              |
-| `controls.getHistory` | () => T[]                  | Get the history of the state                                           |
-| `controls.patches`    | TravelPatches[]            | Get the patches history of the state                                   |
-| `controls.position`   | number                     | Get the current position of the state                                  |
-| `controls.go`         | (position: number) => void | Go to the specific position of the state                               |
-| `controls.archive`    | () => void                 | Archive the current state(the `autoArchive` options should be `false`) |
+| Return                | type                           | description                                                            |
+| --------------------- | ------------------------------ | ---------------------------------------------------------------------- |
+| `state`               | Value<S, F>                    | The current state                                                      |
+| `setState`            | Updater<InitialValue<S>>       | The state setter, support mutation update or return immutable data     |
+| `controls.back`       | (amount?: number) => void      | Go back to the previous state                                          |
+| `controls.forward`    | (amount?: number) => void      | Go forward to the next state                                           |
+| `controls.reset`      | () => void                     | Reset the state to the initial state                                   |
+| `controls.canBack`    | () => boolean                  | Check if can go back to the previous state                             |
+| `controls.canForward` | () => boolean                  | Check if can go forward to the next state                              |
+| `controls.getHistory` | () => T[]                      | Get the history of the state                                           |
+| `controls.patches`    | TravelPatches[]                | Get the patches history of the state                                   |
+| `controls.position`   | number                         | Get the current position of the state                                  |
+| `controls.go`         | (nextPosition: number) => void | Go to the specific position of the state                               |
+| `controls.archive`    | () => void                     | Archive the current state(the `autoArchive` options should be `false`) |
 
 > `TravelPatches` is the type of patches history, it includes `patches` and `inversePatches`.
 
