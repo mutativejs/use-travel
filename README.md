@@ -32,7 +32,8 @@ yarn add use-travel mutative
 
 ### Example
 
-<iframe src="https://stackblitz.com/edit/react-xfw3uk?embed=1&file=src%2FApp.js"></iframe>
+- [Basic](https://stackblitz.com/edit/react-xfw3uk?file=src%2FApp.js)
+- [Manual Time Travel](https://stackblitz.com/edit/react-3mnzq9?file=src%2FApp.js)
 
 ### API
 
