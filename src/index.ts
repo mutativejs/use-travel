@@ -212,7 +212,10 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       tempPatchesDraft.inversePatches.length = 0;
     });
   };
-  const shouldArchive = useMemo(() => !autoArchive && tempPatches.patches.length, [tempPatches]);
+  const shouldArchive = useMemo(
+    () => !autoArchive && tempPatches.patches.length,
+    [tempPatches]
+  );
   const _allPatches = useMemo(() => {
     let mergedPatches = allPatches;
     if (shouldArchive) {
@@ -303,15 +306,11 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         setTempPatches(() => ({ patches: [], inversePatches: [] }));
       },
       go,
-      canBack: () => {
-        return position > 0;
-      },
-      canForward: () => {
-        if (shouldArchive) {
-          return position < _allPatches.patches.length - 1;
-        }
-        return position < allPatches.patches.length;
-      },
+      canBack: () => position > 0,
+      canForward: () =>
+        shouldArchive
+          ? position < _allPatches.patches.length - 1
+          : position < allPatches.patches.length,
       archive,
     };
   }, [
