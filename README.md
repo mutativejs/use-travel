@@ -11,6 +11,8 @@ A React hook for state time travel with undo, redo, and reset functionalities.
 
 `use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/unadlib/mutative) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
 
+It's suitable for building any time travel feature in your application.
+
 ### Installation
 
 ```bash
@@ -90,8 +92,8 @@ const App = () => {
 
 | Return                | type                       | description                                                            |
 | --------------------- | -------------------------- | ---------------------------------------------------------------------- |
-| `state`               | T                          | The current state                                                      |
-| `setState`            | Dispatch<T>                | The state setter, support mutation update or return immutable data     |
+| `state`               | Value<S, F>                | The current state                                                      |
+| `setState`            | Updater<InitialValue<S>>   | The state setter, support mutation update or return immutable data     |
 | `controls.back`       | () => void                 | Go back to the previous state                                          |
 | `controls.forward`    | () => void                 | Go forward to the next state                                           |
 | `controls.reset`      | () => void                 | Reset the state to the initial state                                   |
