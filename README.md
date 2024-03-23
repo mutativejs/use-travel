@@ -79,11 +79,12 @@ const App = () => {
 
 ### Options
 
-| Options          | type          | description                           | default                          |
-| ---------------- | ------------- | ------------------------------------- | -------------------------------- |
-| `maxHistory`     | number        | The maximum number of history to keep | 10                               |
-| `initialPatches` | TravelPatches | The initial patches                   | {patches: [],inversePatches: []} |
-| `autoArchive`    | boolean       | Auto archive the state                | true                             |
+| Options           | type          | description                           | default                          |
+| ----------------- | ------------- | ------------------------------------- | -------------------------------- |
+| `maxHistory`      | number        | The maximum number of history to keep | 10                               |
+| `initialPatches`  | TravelPatches | The initial patches                   | {patches: [],inversePatches: []} |
+| `initialPosition` | number        | The initial position of the state     | 0                                |
+| `autoArchive`     | boolean       | Auto archive the state                | true                             |
 
 ### Return
 
@@ -101,6 +102,19 @@ const App = () => {
 | `controls.position`   | number                     | Get the current position of the state                                  |
 | `controls.go`         | (position: number) => void | Go to the specific position of the state                               |
 | `controls.archive`    | () => void                 | Archive the current state(the `autoArchive` options should be `false`) |
+
+> `TravelPatches` is the type of patches history, it includes `patches` and `inversePatches`.
+
+If you want to control the state travel manually, you can set the `autoArchive` option to `false`, and use the `controls.archive` function to archive the state.
+
+If you want to persist the state, you can use `state`/`controls.patches`/`controls.position` to save the travel history. Then, read the persistent data as `initialState`, `initialPatches`, and `initialPosition` when initializing the state, like this:
+
+```jsx
+const [state, setState, controls] = useTravel(initialState, {
+  initialPatches,
+  initialPosition,
+});
+```
 
 ## License
 
