@@ -1,6 +1,7 @@
 # use-travel
 
 ![Node CI](https://github.com/unadlib/use-travel/workflows/Node%20CI/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/unadlib/use-travel/badge.svg?branch=main)](https://coveralls.io/github/unadlib/use-travel?branch=main)
 [![npm](https://img.shields.io/npm/v/use-travel.svg)](https://www.npmjs.com/package/use-travel)
 ![license](https://img.shields.io/npm/l/use-travel)
 
