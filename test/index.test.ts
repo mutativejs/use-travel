@@ -1095,7 +1095,7 @@ describe('useTravel', () => {
     expect(controls.getHistory()).toEqual([3, 4, 5, 6]);
     expect(controls.canBack()).toBe(true);
     expect(controls.canForward()).toBe(false);
-    (global as any).x = true;
+
     act(() => controls.back());
     [nextState, setState, controls] = result.current;
     expect(nextState).toEqual(5);
@@ -1196,5 +1196,14 @@ describe('useTravel', () => {
     expect(controls.getHistory()).toEqual([3, 4, 5, 6]);
     expect(controls.canBack()).toBe(true);
     expect(controls.canForward()).toBe(true);
+
+    act(() => setState(() => 7));
+    [nextState, setState, controls] = result.current;
+
+    expect(nextState).toEqual(7);
+    expect(controls.position).toEqual(3);
+    expect(controls.getHistory()).toEqual([3, 4, 5, 7]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
   });
 });
