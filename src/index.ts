@@ -249,18 +249,12 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
             state as object,
             back
               ? _allPatches.inversePatches
-                  .slice(
-                    _allPatches.inversePatches.length - maxHistory,
-                    _allPatches.inversePatches.length
-                  )
+                  .slice(-maxHistory)
                   .slice(nextPosition)
                   .flat()
                   .reverse()
               : _allPatches.patches
-                  .slice(
-                    _allPatches.inversePatches.length - maxHistory,
-                    _allPatches.inversePatches.length
-                  )
+                  .slice(-maxHistory)
                   .slice(position, nextPosition)
                   .flat()
           ) as S
