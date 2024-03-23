@@ -30,6 +30,10 @@ yarn add use-travel mutative
 - High performance
 - Mark function for custom immutability
 
+### Example
+
+<iframe src="https://stackblitz.com/edit/react-xfw3uk?embed=1&file=src%2FApp.js"></iframe>
+
 ### API
 
 You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back`, `forward`, `reset`, `canBack`, `canForward`, `getHistory`, `patches`, `position`, `archive`, and `go`.
