@@ -112,9 +112,9 @@ const App = () => {
 
 > `TravelPatches` is the type of patches history, it includes `patches` and `inversePatches`.
 
-If you want to control the state travel manually, you can set the `autoArchive` option to `false`, and use the `controls.archive` function to archive the state.
+> If you want to control the state travel manually, you can set the `autoArchive` option to `false`, and use the `controls.archive` function to archive the state.
 
-If you want to persist the state, you can use `state`/`controls.patches`/`controls.position` to save the travel history. Then, read the persistent data as `initialState`, `initialPatches`, and `initialPosition` when initializing the state, like this:
+> If you want to persist the state, you can use `state`/`controls.patches`/`controls.position` to save the travel history. Then, read the persistent data as `initialState`, `initialPatches`, and `initialPosition` when initializing the state, like this:
 
 ```jsx
 const [state, setState, controls] = useTravel(initialState, {
