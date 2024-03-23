@@ -212,9 +212,8 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       tempPatchesDraft.inversePatches.length = 0;
     });
   };
-
+  const shouldArchive = useMemo(() => !autoArchive && tempPatches.patches.length, [tempPatches]);
   const _allPatches = useMemo(() => {
-    const shouldArchive = !(autoArchive || !tempPatches.patches.length);
     let mergedPatches = allPatches;
     if (shouldArchive) {
       mergedPatches = {
@@ -225,12 +224,11 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       mergedPatches.inversePatches.push(tempPatches.inversePatches.flat());
     }
     return mergedPatches;
-  }, [allPatches, tempPatches]);
+  }, [allPatches, tempPatches, shouldArchive]);
 
   const cachedTravels = useMemo(() => {
     const go = (nextPosition: number) => {
       const back = nextPosition < position;
-      const shouldArchive = !(autoArchive || !tempPatches.patches.length);
       if (shouldArchive) {
         archive();
       }
@@ -267,13 +265,13 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       getHistory: () => {
         if (cachedHistory) return cachedHistory;
         cachedHistory = [state];
-        let currentState = state as any;
+        let currentState = state;
         const patches =
           !autoArchive && _allPatches.patches.length > maxHistory
             ? _allPatches.patches.slice(_allPatches.patches.length - maxHistory)
             : _allPatches.patches;
         const inversePatches =
-          !autoArchive && _allPatches.patches.length > maxHistory
+          !autoArchive && _allPatches.inversePatches.length > maxHistory
             ? _allPatches.inversePatches.slice(
                 _allPatches.inversePatches.length - maxHistory
               )
@@ -282,7 +280,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
           currentState = apply(currentState as object, patches[i]) as S;
           cachedHistory.push(currentState);
         }
-        currentState = state as any;
+        currentState = state;
         for (let i = position - 1; i > -1; i--) {
           currentState = apply(currentState as object, inversePatches[i]) as S;
           cachedHistory.unshift(currentState);
@@ -309,7 +307,6 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         return position > 0;
       },
       canForward: () => {
-        const shouldArchive = !(autoArchive || !tempPatches.patches.length);
         if (shouldArchive) {
           return position < _allPatches.patches.length - 1;
         }
@@ -327,6 +324,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     state,
     tempPatches,
     _allPatches,
+    shouldArchive,
   ]);
   return [state, cachedSetState, cachedTravels] as Result<S, F, A>;
 };
