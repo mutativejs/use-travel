@@ -1,6 +1,6 @@
 {
   "name": "use-travel",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A React hook for state time travel with undo, redo, and reset functionalities.",
   "main": "dist/index.cjs.js",
   "unpkg": "dist/index.umd.js",
