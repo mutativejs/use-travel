@@ -1425,5 +1425,64 @@ describe('useTravel', () => {
         ],
       }
     `);
+
+    act(() => controls.archive());
+    [nextState, setState, controls] = result.current;
+
+    expect(nextState).toEqual(8);
+    expect(controls.position).toEqual(3);
+    expect(controls.getHistory()).toEqual([3, 4, 5, 8]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.patches).toMatchInlineSnapshot(`
+      {
+        "inversePatches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 3,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+        ],
+        "patches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 8,
+            },
+          ],
+        ],
+      }
+    `);
   });
 });
