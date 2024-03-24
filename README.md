@@ -38,7 +38,7 @@ yarn add use-travel mutative
 
 ### API
 
-You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back()`, `forward()`, `reset()`, `canBack()`, `canForward()`, `getHistory()`, `patches`, `position`, `archive()`, and `go()`.
+You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back()`, `forward()`, `reset()`, `canBack()`, `canForward()`, `canArchive()`, `getHistory()`, `patches`, `position`, `archive()`, and `go()`.
 
 ```jsx
 import { useTravel } from 'use-travel';
@@ -105,6 +105,7 @@ const App = () => {
 | `controls.reset`      | () => void                     | Reset the state to the initial state                                   |
 | `controls.canBack`    | () => boolean                  | Check if can go back to the previous state                             |
 | `controls.canForward` | () => boolean                  | Check if can go forward to the next state                              |
+| `controls.canArchive` | () => boolean                  | Check if can archive the current state                                 |
 | `controls.getHistory` | () => T[]                      | Get the history of the state                                           |
 | `controls.patches`    | TravelPatches[]                | Get the patches history of the state                                   |
 | `controls.position`   | number                         | Get the current position of the state                                  |

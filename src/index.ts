@@ -88,6 +88,10 @@ type Result<S, F extends boolean, A extends boolean> = [
          * Archive the current state
          */
         archive: () => void;
+        /**
+         * Check if it's possible to archive the current state
+         */
+        canArchive: () => boolean;
       }
     : Controls<S, F>
 ];
@@ -221,7 +225,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     });
   };
   const shouldArchive = useMemo(
-    () => !autoArchive && tempPatches.patches.length,
+    () => !autoArchive && !!tempPatches.patches.length,
     [tempPatches]
   );
   const _allPatches = useMemo(() => {
@@ -232,7 +236,9 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         inversePatches: allPatches.inversePatches.concat(),
       };
       mergedPatches.patches.push(tempPatches.patches.flat());
-      mergedPatches.inversePatches.push(tempPatches.inversePatches.flat().reverse());
+      mergedPatches.inversePatches.push(
+        tempPatches.inversePatches.flat().reverse()
+      );
     }
     return mergedPatches;
   }, [allPatches, tempPatches, shouldArchive]);
@@ -322,6 +328,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         shouldArchive
           ? position < _allPatches.patches.length - 1
           : position < allPatches.patches.length,
+      canArchive: () => shouldArchive,
       archive,
     };
   }, [
