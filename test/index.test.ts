@@ -416,7 +416,9 @@ describe('useTravel', () => {
     //@ts-expect-error
     act(() => controls.archive());
     [nextState, setState, controls] = result.current;
-    expect(fnWarning).toHaveBeenCalledWith(`Auto archive is enabled, no need to archive manually`);
+    expect(fnWarning).toHaveBeenCalledWith(
+      `Auto archive is enabled, no need to archive manually`
+    );
   });
 
   it('[useTravel] with normal init state and disable autoArchive', () => {
@@ -450,7 +452,7 @@ describe('useTravel', () => {
         },
       ],
     });
-    expect(controls.patches.patches.length).toBe(0);
+    expect(controls.patches.patches.length).toBe(1);
     expect(controls.position).toBe(1);
     expect(controls.getHistory()).toEqual([
       { todos: [] },
@@ -475,7 +477,7 @@ describe('useTravel', () => {
     );
     [nextState, setState, controls] = result.current;
 
-    expect(controls.patches.patches.length).toBe(0);
+    expect(controls.patches.patches.length).toBe(1);
     expect(controls.position).toBe(1);
     expect(controls.getHistory()).toEqual([
       { todos: [] },
@@ -1024,7 +1026,6 @@ describe('useTravel', () => {
     expect(controls.position).toEqual(2);
     expect(controls.getHistory()).toEqual([0, 1, 2]);
 
-
     act(() => controls.archive());
     [nextState, setState, controls] = result.current;
     expect(nextState).toEqual(2);
@@ -1036,7 +1037,6 @@ describe('useTravel', () => {
     expect(nextState).toEqual(3);
     expect(controls.position).toEqual(3);
     expect(controls.getHistory()).toEqual([0, 1, 2, 3]);
-
 
     act(() => controls.archive());
     [nextState, setState, controls] = result.current;
@@ -1196,6 +1196,56 @@ describe('useTravel', () => {
     expect(controls.getHistory()).toEqual([3, 4, 5, 6]);
     expect(controls.canBack()).toBe(true);
     expect(controls.canForward()).toBe(true);
+    expect(controls.patches).toMatchInlineSnapshot(`
+      {
+        "inversePatches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 3,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+        ],
+        "patches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 6,
+            },
+          ],
+        ],
+      }
+    `);
 
     act(() => setState(() => 7));
     [nextState, setState, controls] = result.current;
@@ -1205,5 +1255,124 @@ describe('useTravel', () => {
     expect(controls.getHistory()).toEqual([3, 4, 5, 7]);
     expect(controls.canBack()).toBe(true);
     expect(controls.canForward()).toBe(false);
+    expect(controls.patches).toMatchInlineSnapshot(`
+      {
+        "inversePatches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 3,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+        ],
+        "patches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 7,
+            },
+          ],
+        ],
+      }
+    `);
+
+    act(() => setState(() => 8));
+    [nextState, setState, controls] = result.current;
+
+    expect(nextState).toEqual(8);
+    expect(controls.position).toEqual(3);
+    expect(controls.getHistory()).toEqual([3, 4, 5, 8]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.patches).toMatchInlineSnapshot(`
+      {
+        "inversePatches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 3,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 7,
+            },
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+        ],
+        "patches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 7,
+            },
+            {
+              "op": "replace",
+              "path": [],
+              "value": 8,
+            },
+          ],
+        ],
+      }
+    `);
   });
 });

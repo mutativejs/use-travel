@@ -224,7 +224,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         inversePatches: allPatches.inversePatches.concat(),
       };
       mergedPatches.patches.push(tempPatches.patches.flat());
-      mergedPatches.inversePatches.push(tempPatches.inversePatches.flat());
+      mergedPatches.inversePatches.push(tempPatches.inversePatches.flat().reverse());
     }
     return mergedPatches;
   }, [allPatches, tempPatches, shouldArchive]);
@@ -290,7 +290,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         }
         return cachedHistory;
       },
-      patches: allPatches,
+      patches: shouldArchive ? _allPatches : allPatches,
       back: (amount = 1) => {
         go(position - amount);
       },
