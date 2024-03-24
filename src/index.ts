@@ -252,6 +252,9 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         nextPosition = 0;
       }
       if (nextPosition === position) return;
+      if (shouldArchive) {
+        _allPatches.inversePatches.slice(-1)[0].reverse();
+      }
       setState(
         () =>
           apply(

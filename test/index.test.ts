@@ -1485,4 +1485,39 @@ describe('useTravel', () => {
       }
     `);
   });
+
+  it('[useTravel] - back() with autoArchive: false', () => {
+    let { result } = renderHook(() =>
+      useTravel(0, {
+        maxHistory: 3,
+        autoArchive: false,
+      })
+    );
+    let [nextState, setState, controls] = result.current;
+    expect(nextState).toEqual(0);
+    expect(controls.position).toEqual(0);
+    expect(controls.getHistory()).toEqual([0]);
+
+    act(() => setState(() => 1));
+    [nextState, setState, controls] = result.current;
+    expect(nextState).toEqual(1);
+    expect(controls.position).toEqual(1);
+    expect(controls.getHistory()).toEqual([0, 1]);
+
+    act(() => setState(() => 2));
+    [nextState, setState, controls] = result.current;
+    expect(nextState).toEqual(2);
+    expect(controls.position).toEqual(1);
+    expect(controls.getHistory()).toEqual([0, 2]);
+
+
+    // act(() => controls.archive());
+    // [nextState, setState, controls] = result.current;
+
+    act(() => controls.back());
+    [nextState, setState, controls] = result.current;
+    expect(nextState).toEqual(0);
+    expect(controls.position).toEqual(0);
+    expect(controls.getHistory()).toEqual([0, 2]);
+  });
 });
