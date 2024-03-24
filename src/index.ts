@@ -198,8 +198,16 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     }
     if (!tempPatches.patches.length) return;
     setAllPatches((allPatchesDraft) => {
-      allPatchesDraft.patches.push(tempPatches.patches.flat());
-      allPatchesDraft.inversePatches.push(tempPatches.inversePatches.flat());
+      // All patches will be merged, it helps to minimize the patch structure
+      const [, patches, inversePatches] = create(
+        state as object,
+        (draft) => apply(draft, tempPatches.inversePatches.flat().reverse()),
+        {
+          enablePatches: true,
+        }
+      );
+      allPatchesDraft.patches.push(inversePatches);
+      allPatchesDraft.inversePatches.push(patches);
       if (maxHistory < allPatchesDraft.patches.length) {
         allPatchesDraft.patches = allPatchesDraft.patches.slice(-maxHistory);
         allPatchesDraft.inversePatches = allPatchesDraft.inversePatches.slice(

@@ -1169,6 +1169,57 @@ describe('useTravel', () => {
     expect(controls.canBack()).toBe(true);
     expect(controls.canForward()).toBe(true);
 
+    expect(controls.patches).toMatchInlineSnapshot(`
+      {
+        "inversePatches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 3,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+        ],
+        "patches": [
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 4,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 5,
+            },
+          ],
+          [
+            {
+              "op": "replace",
+              "path": [],
+              "value": 6,
+            },
+          ],
+        ],
+      }
+    `);
+
     result = renderHook(() =>
       useTravel(nextState, {
         maxHistory: 3,
