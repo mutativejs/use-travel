@@ -85,16 +85,16 @@ const App = () => {
 };
 ```
 
-### Options
+### Parameters
 
-| Options           | type          | description                           | default                          |
+| Parameter         | type          | description                           | default                          |
 | ----------------- | ------------- | ------------------------------------- | -------------------------------- |
 | `maxHistory`      | number        | The maximum number of history to keep | 10                               |
 | `initialPatches`  | TravelPatches | The initial patches                   | {patches: [],inversePatches: []} |
 | `initialPosition` | number        | The initial position of the state     | 0                                |
 | `autoArchive`     | boolean       | Auto archive the state                | true                             |
 
-### Return
+### Returns
 
 | Return                | type                           | description                                                            |
 | --------------------- | ------------------------------ | ---------------------------------------------------------------------- |
