@@ -15,6 +15,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage && coveralls < coverage/lcov.info",
@@ -92,6 +95,6 @@
     "react": "^18.0 || ^17.0"
   },
   "dependencies": {
-    "use-mutative": "^1.0.0"
+    "use-mutative": "^1.1.0"
   }
 }
