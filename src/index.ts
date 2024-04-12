@@ -193,7 +193,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         });
       }
     },
-    [state, position, setTempPatches]
+    [allPatches, state, position, setTempPatches]
   );
   const archive = () => {
     if (autoArchive) {
