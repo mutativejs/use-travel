@@ -91,10 +91,10 @@
   },
   "peerDependencies": {
     "@types/react": "^18.0 || ^17.0",
-    "mutative": "^1.0.4",
+    "mutative": "^1.0.5",
     "react": "^18.0 || ^17.0"
   },
   "dependencies": {
-    "use-mutative": "^1.1.1"
+    "use-mutative": "^1.1.2"
   }
 }
