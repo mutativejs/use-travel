@@ -28,14 +28,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/unadlib/use-travel.git"
+    "url": "git+https://github.com/mutativejs/use-travel.git"
   },
   "author": "unadlib",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unadlib/use-travel/issues"
+    "url": "https://github.com/mutativejs/use-travel/issues"
   },
-  "homepage": "https://github.com/unadlib/use-travel#readme",
+  "homepage": "https://github.com/mutativejs/use-travel#readme",
   "keywords": [
     "use-undo",
     "undo",

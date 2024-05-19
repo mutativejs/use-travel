@@ -1,7 +1,7 @@
 # use-travel
 
-![Node CI](https://github.com/unadlib/use-travel/workflows/Node%20CI/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/unadlib/use-travel/badge.svg?branch=main)](https://coveralls.io/github/unadlib/use-travel?branch=main)
+![Node CI](https://github.com/mutativejs/use-travel/workflows/Node%20CI/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/mutativejs/use-travel/badge.svg?branch=main)](https://coveralls.io/github/mutativejs/use-travel?branch=main)
 [![npm](https://img.shields.io/npm/v/use-travel.svg)](https://www.npmjs.com/package/use-travel)
 ![license](https://img.shields.io/npm/l/use-travel)
 
@@ -9,7 +9,7 @@ A React hook for state time travel with undo, redo, reset and archive functional
 
 ### Motivation
 
-`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/unadlib/mutative) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
+`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/mutativejs/mutative) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
 
 It's suitable for building any time travel feature in your application.
 
@@ -127,4 +127,4 @@ const [state, setState, controls] = useTravel(initialState, {
 
 ## License
 
-`use-travel` is [MIT licensed](https://github.com/unadlib/use-travel/blob/main/LICENSE).
+`use-travel` is [MIT licensed](https://github.com/mutativejs/use-travel/blob/main/LICENSE).
