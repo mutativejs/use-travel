@@ -25,7 +25,7 @@ yarn add use-travel mutative
 
 - Undo/Redo/Reset/Go/Archive functionalities
 - Mutations update immutable data
-- Small size for time travel with Patches history
+- Small size for time travel with JSON Patch history
 - Customizable history size
 - Customizable initial patches
 - High performance
