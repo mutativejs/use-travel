@@ -4041,10 +4041,10 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-mutative@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/mutative/-/mutative-1.0.8.tgz#5dfc7a74bdda8acc5b3c1d91aba47d95f2b2dd3a"
-  integrity sha512-bVVGCfEQTJDbsa+L1LX3jJftFnWZWfH0XIM+h/rJYnjgof3ZimBSuF/mOrh/NJI7H4pWGoji+DDuurPGpUZofw==
+mutative@^1.0.10:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/mutative/-/mutative-1.0.10.tgz#d4c349867463e70e9c34718a65cefad479f28eb0"
+  integrity sha512-YD4MEleW9vJyIVEItz6x71fWdJ9qea3+R8hxtNiei8cQ7BGLM1c9Q6zCJ7SuLzorBhd2PBHN+xUEwEahxMI34w==
 
 mute-stream@0.0.8:
   version "0.0.8"
@@ -5185,10 +5185,10 @@ url-parse@^1.5.3:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
 
-use-mutative@^1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/use-mutative/-/use-mutative-1.1.6.tgz#6229a818daa88c08ee02d2ec5f72049029cb8d5a"
-  integrity sha512-mMrB1DobbIXScbHvRTlY/VoD1ZTiwsXx+1wAdy8hJWFHzJtBF/upq65ZwxIQZiu74ScDqtagcaW7Pk6KVdmCug==
+use-mutative@^1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/use-mutative/-/use-mutative-1.1.7.tgz#6b2e42496fd2e6f2e4cb17f65021dd34a465314f"
+  integrity sha512-J/67xcwJagLeBd4cKXRhDCz9MLSmGIA1zZIbUViSZOLGIvgKX4GhaYUt3wnhySgLkVSckwMoJgrV1H5rjsWcJQ==
 
 util-deprecate@^1.0.1:
   version "1.0.2"
