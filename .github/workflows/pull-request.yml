@@ -1,6 +1,6 @@
 on: ["pull_request"]
 
-name: Test Coveralls
+name: Test Coverage
 
 jobs:
 
@@ -19,10 +19,9 @@ jobs:
     - name: yarn install, yarn test:coverage
       run: |
         yarn install
-        echo repo_token: ${{ secrets.COVERALLS_REPO_TOKEN }} > .coveralls.yml
-        yarn test:coverage
+        yarn test --coverage
 
-    - name: Coveralls
+    - name: Coverage
       uses: romeovs/lcov-reporter-action@v0.4.0
       with:
         lcov-file: ./coverage/lcov.info
