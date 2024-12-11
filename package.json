@@ -91,11 +91,11 @@
     }
   },
   "peerDependencies": {
-    "@types/react": "^18.0 || ^17.0",
+    "@types/react": "^17.0 || ^18.0 || ^19.0",
     "mutative": "^1.0",
-    "react": "^18.0 || ^17.0"
+    "react": "^17.0 || ^18.0 || ^19.0"
   },
   "dependencies": {
-    "use-mutative": "^1.1.8"
+    "use-mutative": "^1.2.0"
   }
 }
