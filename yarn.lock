@@ -5483,10 +5483,10 @@ url-parse@^1.5.3:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
 
-use-mutative@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/use-mutative/-/use-mutative-1.2.0.tgz#260fdaace917ab01789b5c3a9a32e526dc33e8da"
-  integrity sha512-pckbyvPjiL8+5zSx+YRzQjdJ+LAkX1k0zjStR5HRLJr1sWN29Iich2+fHa5TmlYjycE7sYU87TqqoMkiosr/2g==
+use-mutative@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/use-mutative/-/use-mutative-1.2.1.tgz#ee86017899f48027bf87b9d42c6c3a237997a536"
+  integrity sha512-cXvnAWmCxjcxYNitIwLJJEmjLISQTIfj0T88xfk1xNM0knmnOfEQPeU4+CDWBAcK0IXP7ey8fKeGc0seh+5OBA==
 
 util-deprecate@^1.0.1:
   version "1.0.2"
