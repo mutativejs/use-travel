@@ -93,7 +93,7 @@ type Result<S, F extends boolean, A extends boolean> = [
          */
         canArchive: () => boolean;
       }
-    : Controls<S, F>
+    : Controls<S, F>,
 ];
 
 /**
@@ -116,7 +116,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       ({
         patches: [],
         inversePatches: [],
-      } as TravelPatches)
+      }) as TravelPatches
   );
   const [allPatches, setAllPatches] = useMutative(
     () =>
@@ -154,9 +154,8 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
           allPatchesDraft.patches.push(patches);
           allPatchesDraft.inversePatches.push(inversePatches);
           if (maxHistory < allPatchesDraft.patches.length) {
-            allPatchesDraft.patches = allPatchesDraft.patches.slice(
-              -maxHistory
-            );
+            allPatchesDraft.patches =
+              allPatchesDraft.patches.slice(-maxHistory);
             allPatchesDraft.inversePatches =
               allPatchesDraft.inversePatches.slice(-maxHistory);
           }
@@ -214,9 +213,8 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       allPatchesDraft.inversePatches.push(patches);
       if (maxHistory < allPatchesDraft.patches.length) {
         allPatchesDraft.patches = allPatchesDraft.patches.slice(-maxHistory);
-        allPatchesDraft.inversePatches = allPatchesDraft.inversePatches.slice(
-          -maxHistory
-        );
+        allPatchesDraft.inversePatches =
+          allPatchesDraft.inversePatches.slice(-maxHistory);
       }
     });
     setTempPatches((tempPatchesDraft) => {
