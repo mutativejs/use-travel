@@ -252,6 +252,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     setAllPatches((allPatchesDraft) => {
       // All patches will be merged, it helps to minimize the patch structure
       const [, patches, inversePatches] = create(
+        // where the state is updated via the setState callback and immediately executes archive().
         (updatedState ?? state) as object,
         (draft) =>
           apply(draft, currentTempPatches.inversePatches.flat().reverse()),
