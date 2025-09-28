@@ -1,4 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from 'react';
 import {
   type Options as MutativeOptions,
   type Patches,
@@ -7,7 +14,6 @@ import {
   apply,
   create,
 } from 'mutative';
-import { useMutative } from 'use-mutative';
 
 type TravelPatches = {
   patches: Patches[];
@@ -96,6 +102,41 @@ type Result<S, F extends boolean, A extends boolean> = [
     : Controls<S, F>,
 ];
 
+type RefStateAction<T> = T | ((current: T) => T | void);
+
+const cloneTravelPatches = (base?: TravelPatches): TravelPatches => ({
+  patches: base ? base.patches.map((patch) => patch) : [],
+  inversePatches: base ? base.inversePatches.map((patch) => patch) : [],
+});
+
+const useRefState = <T>(
+  initializer: () => T
+): [MutableRefObject<T>, (updater: RefStateAction<T>) => void, number] => {
+  const ref = useRef<T>(null as unknown as T);
+  const initialized = useRef(false);
+  if (!initialized.current) {
+    ref.current = initializer();
+    initialized.current = true;
+  }
+  const [version, bumpVersion] = useReducer((v: number) => v + 1, 0);
+  const setRef = useCallback(
+    (updater: RefStateAction<T>) => {
+      const currentValue = ref.current;
+      if (typeof updater === 'function') {
+        const result = (updater as (value: T) => T | void)(currentValue);
+        if (result !== undefined) {
+          ref.current = result as T;
+        }
+      } else {
+        ref.current = updater;
+      }
+      bumpVersion();
+    },
+    [bumpVersion]
+  );
+  return [ref, setRef, version];
+};
+
 /**
  * A hook to travel in the history of a state
  */
@@ -110,21 +151,12 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     autoArchive = true,
     ...options
   } = _options;
+  let updatedState: S | null = null;
   const [position, setPosition] = useState(initialPosition);
-  const [tempPatches, setTempPatches] = useMutative(
-    () =>
-      ({
-        patches: [],
-        inversePatches: [],
-      }) as TravelPatches
-  );
-  const [allPatches, setAllPatches] = useMutative(
-    () =>
-      (initialPatches ?? {
-        patches: [],
-        inversePatches: [],
-      }) as TravelPatches
-  );
+  const [tempPatchesRef, setTempPatches, tempPatchesVersion] =
+    useRefState<TravelPatches>(() => cloneTravelPatches());
+  const [allPatchesRef, setAllPatches, allPatchesVersion] =
+    useRefState<TravelPatches>(() => cloneTravelPatches(initialPatches));
   const [state, setState] = useState(initialState);
   const cachedSetState = useCallback(
     (updater: any) => {
@@ -134,9 +166,13 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
           : create(state, () => updater, { ...options, enablePatches: true })
       ) as [S, Patches<true>, Patches<true>];
       setState(nextState);
+      const currentAllPatches = allPatchesRef.current;
+      const currentTempPatches = tempPatchesRef.current;
       if (autoArchive) {
         setPosition(
-          maxHistory < allPatches.patches.length + 1 ? maxHistory : position + 1
+          maxHistory < currentAllPatches.patches.length + 1
+            ? maxHistory
+            : position + 1
         );
         setAllPatches((allPatchesDraft) => {
           const notLast = position < allPatchesDraft.patches.length;
@@ -163,21 +199,22 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       } else {
         const notLast =
           position <
-          allPatches.patches.length + Number(!!tempPatches.patches.length);
+          currentAllPatches.patches.length +
+            Number(!!currentTempPatches.patches.length);
         // Remove all patches after the current position
         if (notLast) {
-          allPatches.patches.splice(
+          currentAllPatches.patches.splice(
             position,
-            allPatches.patches.length - position
+            currentAllPatches.patches.length - position
           );
-          allPatches.inversePatches.splice(
+          currentAllPatches.inversePatches.splice(
             position,
-            allPatches.inversePatches.length - position
+            currentAllPatches.inversePatches.length - position
           );
         }
-        if (!tempPatches.patches.length || notLast) {
+        if (!currentTempPatches.patches.length || notLast) {
           setPosition(
-            maxHistory < allPatches.patches.length + 1
+            maxHistory < currentAllPatches.patches.length + 1
               ? maxHistory
               : position + 1
           );
@@ -191,20 +228,34 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
           tempPatchesDraft.inversePatches.push(inversePatches);
         });
       }
+      updatedState = nextState;
     },
-    [allPatches, state, position, setTempPatches]
+    [
+      autoArchive,
+      maxHistory,
+      options,
+      position,
+      setAllPatches,
+      setPosition,
+      setTempPatches,
+      setState,
+      state,
+    ]
   );
-  const archive = () => {
+  const archive = useCallback(() => {
     if (autoArchive) {
       console.warn('Auto archive is enabled, no need to archive manually');
       return;
     }
-    if (!tempPatches.patches.length) return;
+    const currentTempPatches = tempPatchesRef.current;
+    if (!currentTempPatches.patches.length) return;
     setAllPatches((allPatchesDraft) => {
       // All patches will be merged, it helps to minimize the patch structure
       const [, patches, inversePatches] = create(
-        state as object,
-        (draft) => apply(draft, tempPatches.inversePatches.flat().reverse()),
+        // where the state is updated via the setState callback and immediately executes archive().
+        (updatedState ?? state) as object,
+        (draft) =>
+          apply(draft, currentTempPatches.inversePatches.flat().reverse()),
         {
           enablePatches: true,
         }
@@ -221,25 +272,20 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       tempPatchesDraft.patches.length = 0;
       tempPatchesDraft.inversePatches.length = 0;
     });
-  };
-  const shouldArchive = useMemo(
-    () => !autoArchive && !!tempPatches.patches.length,
-    [tempPatches]
-  );
+  }, [autoArchive, maxHistory, setAllPatches, setTempPatches, state]);
+  const shouldArchive = !autoArchive && !!tempPatchesRef.current.patches.length;
   const _allPatches = useMemo(() => {
-    let mergedPatches = allPatches;
-    if (shouldArchive) {
-      mergedPatches = {
-        patches: allPatches.patches.concat(),
-        inversePatches: allPatches.inversePatches.concat(),
-      };
-      mergedPatches.patches.push(tempPatches.patches.flat());
-      mergedPatches.inversePatches.push(
-        tempPatches.inversePatches.flat().reverse()
-      );
+    const base = allPatchesRef.current;
+    if (!shouldArchive) {
+      return base;
     }
-    return mergedPatches;
-  }, [allPatches, tempPatches, shouldArchive]);
+    return {
+      patches: base.patches.concat([tempPatchesRef.current.patches.flat()]),
+      inversePatches: base.inversePatches.concat([
+        tempPatchesRef.current.inversePatches.flat().reverse(),
+      ]),
+    };
+  }, [allPatchesVersion, shouldArchive, tempPatchesVersion]);
 
   const cachedTravels = useMemo(() => {
     const go = (nextPosition: number) => {
@@ -305,7 +351,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
         }
         return cachedHistory;
       },
-      patches: shouldArchive ? _allPatches : allPatches,
+      patches: shouldArchive ? _allPatches : allPatchesRef.current,
       back: (amount = 1) => {
         go(position - amount);
       },
@@ -314,32 +360,35 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
       },
       reset: () => {
         setPosition(initialPosition);
-        setAllPatches(
-          () => initialPatches ?? { patches: [], inversePatches: [] }
-        );
+        setAllPatches(() => cloneTravelPatches(initialPatches));
         setState(() => initialState);
-        setTempPatches(() => ({ patches: [], inversePatches: [] }));
+        setTempPatches(() => cloneTravelPatches());
       },
       go,
       canBack: () => position > 0,
       canForward: () =>
         shouldArchive
           ? position < _allPatches.patches.length - 1
-          : position < allPatches.patches.length,
+          : position < allPatchesRef.current.patches.length,
       canArchive: () => shouldArchive,
       archive,
     };
   }, [
-    position,
-    allPatches,
-    setPosition,
-    setAllPatches,
-    setState,
+    archive,
+    allPatchesVersion,
+    autoArchive,
+    initialPatches,
+    initialPosition,
     initialState,
-    state,
-    tempPatches,
-    _allPatches,
+    maxHistory,
+    position,
+    setAllPatches,
+    setPosition,
+    setState,
+    setTempPatches,
     shouldArchive,
+    state,
+    _allPatches,
   ]);
   return [state, cachedSetState, cachedTravels] as Result<S, F, A>;
 };
