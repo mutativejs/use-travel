@@ -1698,16 +1698,16 @@ describe('useTravel', () => {
     [state, setState, controls] = result.current;
 
     expect(state).toBe(114);
-    expect(controls.position).toBe(4); // position should still be 4
+    expect(controls.position).toBe(5);
     expect(controls.canArchive()).toBe(true); // should be able to archive
-    expect(controls.getHistory()).toEqual([0, 1, 2, 7, 114]); // the history should show the temporary state
+    expect(controls.getHistory()).toEqual([0, 1, 2, 7, 14, 114]); // the history should show the temporary state
 
     // test the navigation with temporary state
     act(() => controls.back());
     [state, setState, controls] = result.current;
 
-    expect(state).toBe(7);
-    expect(controls.position).toBe(3);
+    expect(state).toBe(14);
+    expect(controls.position).toBe(4);
     expect(controls.canArchive()).toBe(false); // the temporary state should be automatically archived
 
     // test the reset function

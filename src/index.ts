@@ -151,6 +151,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     autoArchive = true,
     ...options
   } = _options;
+  let updatedState: S | null = null;
   const [position, setPosition] = useState(initialPosition);
   const [tempPatchesRef, setTempPatches, tempPatchesVersion] =
     useRefState<TravelPatches>(() => cloneTravelPatches());
@@ -227,6 +228,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
           tempPatchesDraft.inversePatches.push(inversePatches);
         });
       }
+      updatedState = nextState;
     },
     [
       autoArchive,
@@ -250,7 +252,7 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     setAllPatches((allPatchesDraft) => {
       // All patches will be merged, it helps to minimize the patch structure
       const [, patches, inversePatches] = create(
-        state as object,
+        (updatedState ?? state) as object,
         (draft) =>
           apply(draft, currentTempPatches.inversePatches.flat().reverse()),
         {
