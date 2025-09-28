@@ -1559,4 +1559,165 @@ describe('useTravel', () => {
     expect(controls.canForward()).toBe(false);
     expect(controls.canArchive()).toBe(false);
   });
+
+  it('[useTravel] basic test with autoArchive: false', () => {
+    const { result } = renderHook(() =>
+      useTravel(0, {
+        maxHistory: 10,
+        initialPatches: {
+          patches: [],
+          inversePatches: [],
+        },
+        autoArchive: false,
+      })
+    );
+
+    let [state, setState, controls] = result.current;
+
+    // initial state
+    expect(state).toBe(0);
+    expect(controls.position).toBe(0);
+    expect(controls.getHistory()).toEqual([0]);
+    expect(controls.canBack()).toBe(false);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(false);
+
+    // simulate the first click of Increment button
+    act(() => {
+      setState(state + 1); // 0 + 1 = 1
+      controls.archive();
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(1);
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([0, 1]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(false);
+
+    // simulate the second click of Increment button
+    act(() => {
+      setState(state + 1); // 1 + 1 = 2
+      controls.archive();
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(2);
+    expect(controls.position).toBe(2);
+    expect(controls.getHistory()).toEqual([0, 1, 2]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+
+    // simulate the click of Decrement button
+    act(() => {
+      setState(state - 1); // 2 - 1 = 1
+      controls.archive();
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(1);
+    expect(controls.position).toBe(3);
+    expect(controls.getHistory()).toEqual([0, 1, 2, 1]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+
+    // test the back function
+    act(() => controls.back());
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(2);
+    expect(controls.position).toBe(2);
+    expect(controls.getHistory()).toEqual([0, 1, 2, 1]);
+
+    // test the again back function
+    act(() => controls.back());
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(1);
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([0, 1, 2, 1]);
+
+    // test the forward function
+    act(() => controls.forward());
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(2);
+    expect(controls.position).toBe(2);
+    expect(controls.getHistory()).toEqual([0, 1, 2, 1]);
+
+    // test the modify state from the middle position
+    act(() => {
+      setState(state + 5); // 2 + 5 = 7
+      controls.archive();
+    });
+    [state, setState, controls] = result.current;
+
+    // here may expose bug: the history after the modify state from the middle position
+    expect(state).toBe(7);
+    expect(controls.position).toBe(3);
+    // the history should be truncated and add new state
+    expect(controls.getHistory()).toEqual([0, 1, 2, 7]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+
+    // test the state after multiple continuous operations
+    act(() => {
+      setState(state * 2); // 7 * 2 = 14
+      controls.archive();
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(14);
+    expect(controls.position).toBe(4);
+    expect(controls.getHistory()).toEqual([0, 1, 2, 7, 14]);
+
+    // test the correctness of patches
+    expect(controls.patches.patches.length).toBe(4);
+    expect(controls.patches.inversePatches.length).toBe(4);
+
+    // test the back to the initial position
+    act(() => controls.go(0));
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(0);
+    expect(controls.position).toBe(0);
+
+    // test the forward to the various states from the initial position
+    act(() => controls.go(4));
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(14);
+    expect(controls.position).toBe(4);
+
+    // test the case without calling archive
+    act(() => {
+      setState(state + 100); // 14 + 100 = 114
+      // this time without calling controls.archive()
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(114);
+    expect(controls.position).toBe(4); // position should still be 4
+    expect(controls.canArchive()).toBe(true); // should be able to archive
+    expect(controls.getHistory()).toEqual([0, 1, 2, 7, 114]); // the history should show the temporary state
+
+    // test the navigation with temporary state
+    act(() => controls.back());
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(7);
+    expect(controls.position).toBe(3);
+    expect(controls.canArchive()).toBe(false); // the temporary state should be automatically archived
+
+    // test the reset function
+    act(() => controls.reset());
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(0);
+    expect(controls.position).toBe(0);
+    expect(controls.getHistory()).toEqual([0]);
+    expect(controls.patches.patches).toEqual([]);
+    expect(controls.patches.inversePatches).toEqual([]);
+  });
 });
