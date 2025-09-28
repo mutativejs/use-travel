@@ -1720,4 +1720,64 @@ describe('useTravel', () => {
     expect(controls.patches.patches).toEqual([]);
     expect(controls.patches.inversePatches).toEqual([]);
   });
+
+  it('[useTravel] basic test with autoArchive: false and temporary state', () => {
+    const { result } = renderHook(() =>
+      useTravel(0, {
+        maxHistory: 10,
+        initialPatches: {
+          patches: [],
+          inversePatches: [],
+        },
+        autoArchive: false,
+      })
+    );
+
+    let [state, setState, controls] = result.current;
+
+    // initial state
+    expect(state).toBe(0);
+    expect(controls.position).toBe(0);
+    expect(controls.getHistory()).toEqual([0]);
+    expect(controls.canBack()).toBe(false);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(false);
+
+    // simulate the first click of Increment button
+    act(() => {
+      setState(state + 1);
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(1);
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([0, 1]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(true);
+
+    act(() => {
+      setState(state + 1);
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(2);
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([0, 2]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(true);
+
+    act(() => {
+      controls.archive();
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toBe(2);
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([0, 2]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(false);
+  });
 });
