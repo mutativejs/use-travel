@@ -85,21 +85,21 @@ interface Controls<S, F extends boolean> {
   canForward: () => boolean;
 }
 
+type ManualControls<S, F extends boolean> = Controls<S, F> & {
+  /**
+   * Archive the current state
+   */
+  archive: () => void;
+  /**
+   * Check if it's possible to archive the current state
+   */
+  canArchive: () => boolean;
+};
+
 type Result<S, F extends boolean, A extends boolean> = [
   Value<S, F>,
   Updater<InitialValue<S>>,
-  A extends false
-    ? Controls<S, F> & {
-        /**
-         * Archive the current state
-         */
-        archive: () => void;
-        /**
-         * Check if it's possible to archive the current state
-         */
-        canArchive: () => boolean;
-      }
-    : Controls<S, F>,
+  A extends false ? ManualControls<S, F> : Controls<S, F>,
 ];
 
 type RefStateAction<T> = T | ((current: T) => T | void);
@@ -140,10 +140,21 @@ const useRefState = <T>(
 /**
  * A hook to travel in the history of a state
  */
-export const useTravel = <S, F extends boolean, A extends boolean>(
+export function useTravel<S, F extends boolean>(
+  initialState: S
+): [Value<S, F>, Updater<InitialValue<S>>, Controls<S, F>];
+export function useTravel<S, F extends boolean>(
+  initialState: S,
+  options: Omit<Options<F, true>, 'autoArchive'> & { autoArchive?: true }
+): [Value<S, F>, Updater<InitialValue<S>>, Controls<S, F>];
+export function useTravel<S, F extends boolean>(
+  initialState: S,
+  options: Omit<Options<F, false>, 'autoArchive'> & { autoArchive: false }
+): [Value<S, F>, Updater<InitialValue<S>>, ManualControls<S, F>];
+export function useTravel<S, F extends boolean, A extends boolean>(
   initialState: S,
   _options: Options<F, A> = {}
-) => {
+): Result<S, F, A> {
   const {
     maxHistory = 10,
     initialPatches,
@@ -391,4 +402,4 @@ export const useTravel = <S, F extends boolean, A extends boolean>(
     _allPatches,
   ]);
   return [state, cachedSetState, cachedTravels] as Result<S, F, A>;
-};
+}
