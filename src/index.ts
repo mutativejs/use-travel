@@ -15,12 +15,12 @@ import {
   create,
 } from 'mutative';
 
-type TravelPatches = {
+export type TravelPatches = {
   patches: Patches[];
   inversePatches: Patches[];
 };
 
-type Options<F extends boolean, A extends boolean> = {
+export type Options<F extends boolean, A extends boolean> = {
   /**
    * The maximum number of history to keep, by default `10`
    */
@@ -46,7 +46,7 @@ type Value<S, F extends boolean> = F extends true
   ? Immutable<InitialValue<S>>
   : InitialValue<S>;
 
-interface Controls<S, F extends boolean> {
+export interface Controls<S, F extends boolean> {
   /**
    * The current position in the history
    */
