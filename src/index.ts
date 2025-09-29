@@ -171,6 +171,9 @@ export function useTravel<S, F extends boolean, A extends boolean>(
   const [state, setState] = useState(initialState);
   const cachedSetState = useCallback(
     (updater: any) => {
+      if (updatedState !== null) {
+        throw new Error('setState cannot be called multiple times.');
+      }
       const [nextState, patches, inversePatches] = (
         typeof updater === 'function'
           ? create(state, updater, { ...options, enablePatches: true })

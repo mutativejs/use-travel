@@ -13,7 +13,7 @@ A React hook for state time travel with undo, redo, reset and archive functional
 
 ### Motivation
 
-`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/mutativejs/mutative) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
+`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/unadlib/mutative) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
 
 It's suitable for building any time travel feature in your application.
 
@@ -29,7 +29,7 @@ yarn add use-travel mutative
 
 - Undo/Redo/Reset/Go/Archive functionalities
 - Mutations update immutable data
-- Small size for time travel with Patches history
+- Small size for time travel with JSON Patch history
 - Customizable history size
 - Customizable initial patches
 - High performance
@@ -91,12 +91,15 @@ const App = () => {
 
 ### Parameters
 
-| Parameter         | type          | description                           | default                          |
-| ----------------- | ------------- | ------------------------------------- | -------------------------------- |
-| `maxHistory`      | number        | The maximum number of history to keep | 10                               |
-| `initialPatches`  | TravelPatches | The initial patches                   | {patches: [],inversePatches: []} |
-| `initialPosition` | number        | The initial position of the state     | 0                                |
-| `autoArchive`     | boolean       | Auto archive the state                | true                             |
+| Parameter          | type          | description                                                                                                              | default                          |
+| ------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
+| `maxHistory`       | number        | The maximum number of history to keep                                                                                    | 10                               |
+| `initialPatches`   | TravelPatches | The initial patches                                                                                                      | {patches: [],inversePatches: []} |
+| `initialPosition`  | number        | The initial position of the state                                                                                        | 0                                |
+| `autoArchive`      | boolean       | Auto archive the state                                                                                                   | true                             |
+| `enableAutoFreeze` | boolean       | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options) | false                            |
+| `strict`           | boolean       | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | false                            |
+| `mark`             | Mark<O, F>[]  | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | () => void                       |
 
 ### Returns
 
@@ -115,6 +118,39 @@ const App = () => {
 | `controls.position`   | number                         | Get the current position of the state                                  |
 | `controls.go`         | (nextPosition: number) => void | Go to the specific position of the state                               |
 | `controls.archive`    | () => void                     | Archive the current state(the `autoArchive` options should be `false`) |
+
+> `setState` can only be called once within the same synchronous call stack (for example, inside a single event handler). Subsequent calls throw an error so each undo step maps to exactly one update. Batch multiple mutations inside one updater callback (mutating the draft) or finish all updates before calling `archive()` when `autoArchive` is disabled.
+
+```jsx
+const App = () => {
+  const [state, setState, controls] = useTravel({ count: 0, todo: [] });
+  return (
+    <div>
+      <div>{state.count}</div>
+      <button
+        onClick={() => {
+          setState((draft) => {
+            draft.count += 1;
+          });
+          // ❌ This will throw an error, because setState can only be called once within the same synchronous call stack
+          setState((draft) => {
+            draft.todo.push({ id: 1, text: 'Buy' });
+          });
+          controls.archive();
+
+          // ✅ This will work
+          setState((draft) => {
+            draft.count += 1;
+            draft.todo.push({ id: 1, text: 'Buy' });
+          });
+        }}
+      >
+        Update
+      </button>
+    </div>
+  );
+};
+```
 
 > `TravelPatches` is the type of patches history, it includes `patches` and `inversePatches`.
 
