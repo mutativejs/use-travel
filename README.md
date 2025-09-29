@@ -87,12 +87,15 @@ const App = () => {
 
 ### Parameters
 
-| Parameter         | type          | description                           | default                          |
-| ----------------- | ------------- | ------------------------------------- | -------------------------------- |
-| `maxHistory`      | number        | The maximum number of history to keep | 10                               |
-| `initialPatches`  | TravelPatches | The initial patches                   | {patches: [],inversePatches: []} |
-| `initialPosition` | number        | The initial position of the state     | 0                                |
-| `autoArchive`     | boolean       | Auto archive the state                | true                             |
+| Parameter          | type          | description                           | default                          |
+| ------------------ | ------------- | ------------------------------------- | -------------------------------- |
+| `maxHistory`       | number        | The maximum number of history to keep | 10                               |
+| `initialPatches`   | TravelPatches | The initial patches                   | {patches: [],inversePatches: []} |
+| `initialPosition`  | number        | The initial position of the state     | 0                                |
+| `autoArchive`      | boolean       | Auto archive the state                | true                             |
+| `enableAutoFreeze` | boolean       | Enable auto freeze the state, [view](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)          | false                            |
+| `strict`           | boolean       | Enable strict mode, [view](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                    | false                            |
+| `mark`             | Mark<O, F>[]  | The mark function , [view](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                    | () => void                       |
 
 ### Returns
 
