@@ -129,20 +129,20 @@ const App = () => {
       <div>{state.count}</div>
       <button
         onClick={() => {
+          // use-travel is not support batch setState calls, so you should use one setState call to update the state
           setState((draft) => {
             draft.count += 1;
+          });
+          setState((draft) => {
+            draft.todo.push({ id: 1, text: 'Buy' });
           });
           // ❌ This will throw an error, because setState can only be called once within the same synchronous call stack
-          setState((draft) => {
-            draft.todo.push({ id: 1, text: 'Buy' });
-          });
-          controls.archive();
 
-          // ✅ This will work
           setState((draft) => {
             draft.count += 1;
             draft.todo.push({ id: 1, text: 'Buy' });
           });
+          // ✅ This will work
         }}
       >
         Update
