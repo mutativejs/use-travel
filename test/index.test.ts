@@ -1780,4 +1780,67 @@ describe('useTravel', () => {
     expect(controls.canForward()).toBe(false);
     expect(controls.canArchive()).toBe(false);
   });
+
+  it('[useTravel] basic test with autoArchive: false and object state', () => {
+    const { result } = renderHook(() =>
+      useTravel(
+        { count: 0 },
+        {
+          maxHistory: 10,
+          initialPatches: {
+            patches: [],
+            inversePatches: [],
+          },
+          autoArchive: false,
+        }
+      )
+    );
+
+    let [state, setState, controls] = result.current;
+
+    // initial state
+    expect(state).toEqual({ count: 0 });
+    expect(controls.position).toBe(0);
+    expect(controls.getHistory()).toEqual([{ count: 0 }]);
+    expect(controls.canBack()).toBe(false);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(false);
+
+    // simulate the first click of Increment button
+    act(() => {
+      setState({ count: state.count + 1 });
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toEqual({ count: 1 });
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([{ count: 0 }, { count: 1 }]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(true);
+
+    act(() => {
+      setState({ count: state.count + 1 });
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toEqual({ count: 2 });
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([{ count: 0 }, { count: 2 }]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(true);
+
+    act(() => {
+      controls.archive();
+    });
+    [state, setState, controls] = result.current;
+
+    expect(state).toEqual({ count: 2 });
+    expect(controls.position).toBe(1);
+    expect(controls.getHistory()).toEqual([{ count: 0 }, { count: 2 }]);
+    expect(controls.canBack()).toBe(true);
+    expect(controls.canForward()).toBe(false);
+    expect(controls.canArchive()).toBe(false);
+  });
 });
