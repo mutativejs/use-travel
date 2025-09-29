@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { vi } from 'vitest';
 import { useTravel } from '../src/index';
 
 describe('useTravel', () => {
@@ -380,7 +381,7 @@ describe('useTravel', () => {
       ],
     });
 
-    const fnWarning = jest.spyOn(console, 'warn');
+    const fnWarning = vi.spyOn(console, 'warn');
     act(() => controls.go(3));
     [nextState, setState, controls] = result.current;
     expect(fnWarning).toHaveBeenCalledWith(`Can't go forward to position 3`);
@@ -419,6 +420,7 @@ describe('useTravel', () => {
     expect(fnWarning).toHaveBeenCalledWith(
       `Auto archive is enabled, no need to archive manually`
     );
+    fnWarning.mockRestore();
   });
 
   it('[useTravel] with normal init state and disable autoArchive', () => {
