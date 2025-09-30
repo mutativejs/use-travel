@@ -119,7 +119,8 @@ const App = () => {
 | `controls.go`         | (nextPosition: number) => void | Go to the specific position of the state                               |
 | `controls.archive`    | () => void                     | Archive the current state(the `autoArchive` options should be `false`) |
 
-> `setState` can only be called once within the same synchronous call stack (for example, inside a single event handler). Subsequent calls throw an error so each undo step maps to exactly one update. Batch multiple mutations inside one updater callback (mutating the draft) or finish all updates before calling `archive()` when `autoArchive` is disabled.
+Note:
+> **Important**: ⚠️⚠️⚠️ `setState` can only be called once within the same synchronous call stack (for example, inside a single event handler). Subsequent calls throw an error so each undo step maps to exactly one update. Batch multiple mutations inside one updater callback (mutating the draft) or finish all updates before calling `archive()` when `autoArchive` is disabled.
 
 ```jsx
 const App = () => {
