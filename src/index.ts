@@ -392,7 +392,9 @@ export function useTravel<S, F extends boolean, A extends boolean>(
       if (nextPosition === position) return;
       if (shouldArchive) {
         const lastInversePatch = _allPatches.inversePatches.slice(-1)[0];
-        _allPatches.inversePatches[_allPatches.inversePatches.length - 1] = [...lastInversePatch].reverse();
+        _allPatches.inversePatches[_allPatches.inversePatches.length - 1] = [
+          ...lastInversePatch,
+        ].reverse();
       }
       setState(
         () =>
