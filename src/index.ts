@@ -162,6 +162,39 @@ export function useTravel<S, F extends boolean, A extends boolean>(
     autoArchive = true,
     ...options
   } = _options;
+
+  // Validate options in development mode
+  if (__DEV__) {
+    if (maxHistory <= 0) {
+      console.error(
+        `useTravel: maxHistory must be a positive number, but got ${maxHistory}`
+      );
+    }
+
+    if (initialPosition < 0) {
+      console.error(
+        `useTravel: initialPosition must be non-negative, but got ${initialPosition}`
+      );
+    }
+
+    if (initialPatches) {
+      if (
+        !Array.isArray(initialPatches.patches) ||
+        !Array.isArray(initialPatches.inversePatches)
+      ) {
+        console.error(
+          `useTravel: initialPatches must have 'patches' and 'inversePatches' arrays`
+        );
+      } else if (
+        initialPatches.patches.length !== initialPatches.inversePatches.length
+      ) {
+        console.error(
+          `useTravel: initialPatches.patches and initialPatches.inversePatches must have the same length`
+        );
+      }
+    }
+  }
+
   let updatedState: S | null = null;
   const [position, setPosition] = useState(initialPosition);
   const [tempPatchesRef, setTempPatches, tempPatchesVersion] =
@@ -317,7 +350,8 @@ export function useTravel<S, F extends boolean, A extends boolean>(
       }
       if (nextPosition === position) return;
       if (shouldArchive) {
-        _allPatches.inversePatches.slice(-1)[0].reverse();
+        const lastInversePatch = _allPatches.inversePatches.slice(-1)[0];
+        _allPatches.inversePatches[_allPatches.inversePatches.length - 1] = [...lastInversePatch].reverse();
       }
       setState(
         () =>
