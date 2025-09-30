@@ -96,7 +96,7 @@ const App = () => {
 | `maxHistory`       | number        | The maximum number of history to keep                                                                                    | 10                               |
 | `initialPatches`   | TravelPatches | The initial patches                                                                                                      | {patches: [],inversePatches: []} |
 | `initialPosition`  | number        | The initial position of the state                                                                                        | 0                                |
-| `autoArchive`      | boolean       | Auto archive the state                                                                                                   | true                             |
+| `autoArchive`      | boolean       | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                  | true                             |
 | `enableAutoFreeze` | boolean       | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options) | false                            |
 | `strict`           | boolean       | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | false                            |
 | `mark`             | Mark<O, F>[]  | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | () => void                       |
@@ -119,8 +119,71 @@ const App = () => {
 | `controls.go`         | (nextPosition: number) => void | Go to the specific position of the state                               |
 | `controls.archive`    | () => void                     | Archive the current state(the `autoArchive` options should be `false`) |
 
-Note:
-> **Important**: ⚠️⚠️⚠️ `setState` can only be called once within the same synchronous call stack (for example, inside a single event handler). Subsequent calls throw an error so each undo step maps to exactly one update. Batch multiple mutations inside one updater callback (mutating the draft) or finish all updates before calling `archive()` when `autoArchive` is disabled.
+### Archive Mode
+
+`use-travel` provides two archive modes to control how state changes are recorded in history:
+
+#### Auto Archive Mode (default: `autoArchive: true`)
+
+In auto archive mode, every `setState` call is automatically recorded as a separate history entry. This is the simplest mode and suitable for most use cases.
+
+```jsx
+const [state, setState, controls] = useTravel({ count: 0 });
+// or explicitly: useTravel({ count: 0 }, { autoArchive: true })
+
+// Each setState creates a new history entry
+setState({ count: 1 }); // History: [0, 1]
+// ... user clicks another button
+setState({ count: 2 }); // History: [0, 1, 2]
+// ... user clicks another button
+setState({ count: 3 }); // History: [0, 1, 2, 3]
+
+controls.back(); // Go back to count: 2
+```
+
+#### Manual Archive Mode (`autoArchive: false`)
+
+In manual archive mode, you control when state changes are recorded to history using the `archive()` function. This is useful when you want to group multiple state changes into a single undo/redo step.
+
+**Use Case 1: Batch multiple changes into one history entry**
+
+```jsx
+const [state, setState, controls] = useTravel({ count: 0 }, {
+  autoArchive: false
+});
+
+// Multiple setState calls across different renders
+setState({ count: 1 }); // Temporary change (not in history yet)
+// ... user clicks another button
+setState({ count: 2 }); // Temporary change (not in history yet)
+// ... user clicks another button
+setState({ count: 3 }); // Temporary change (not in history yet)
+
+// Commit all changes as a single history entry
+controls.archive(); // History: [0, 3]
+
+// Now undo will go back to 0, not 2 or 1
+controls.back(); // Back to 0
+```
+
+**Use Case 2: Explicit commit after a single change**
+
+```jsx
+function handleSave() {
+  setState((draft) => {
+    draft.count += 1;
+  });
+  controls.archive(); // Commit immediately
+}
+```
+
+The key difference:
+- **Auto archive**: Each `setState` = one undo step
+- **Manual archive**: `archive()` call = one undo step (can include multiple `setState` calls)
+
+### Important Notes
+
+> **⚠️ setState Restriction**: `setState` can only be called **once** within the same synchronous call stack (e.g., inside a single event handler). This ensures predictable undo/redo behavior where each history entry represents a clear, atomic change.
 
 ```jsx
 const App = () => {
@@ -130,20 +193,20 @@ const App = () => {
       <div>{state.count}</div>
       <button
         onClick={() => {
-          // use-travel is not support batch setState calls, so you should use one setState call to update the state
+          // ❌ Multiple setState calls in the same event handler
           setState((draft) => {
             draft.count += 1;
           });
           setState((draft) => {
             draft.todo.push({ id: 1, text: 'Buy' });
           });
-          // ❌ This will throw an error, because setState can only be called once within the same synchronous call stack
+          // This will throw: "setState cannot be called multiple times in the same render cycle"
 
+          // ✅ Correct: Batch all changes in a single setState
           setState((draft) => {
             draft.count += 1;
             draft.todo.push({ id: 1, text: 'Buy' });
           });
-          // ✅ This will work
         }}
       >
         Update
@@ -153,9 +216,11 @@ const App = () => {
 };
 ```
 
-> `TravelPatches` is the type of patches history, it includes `patches` and `inversePatches`.
+> **Note**: With `autoArchive: false`, you can call `setState` once per event handler across multiple renders, then call `archive()` whenever you want to commit those changes to history.
 
-> If you want to control the state travel manually, you can set the `autoArchive` option to `false`, and use the `controls.archive` function to archive the state.
+### Persistence
+
+> `TravelPatches` is the type of patches history, it includes `patches` and `inversePatches`.
 
 > If you want to persist the state, you can use `state`/`controls.patches`/`controls.position` to save the travel history. Then, read the persistent data as `initialState`, `initialPatches`, and `initialPosition` when initializing the state, like this:
 

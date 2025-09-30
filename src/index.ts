@@ -203,11 +203,21 @@ export function useTravel<S, F extends boolean, A extends boolean>(
     useRefState<TravelPatches>(() => cloneTravelPatches(initialPatches));
   const [state, setState] = useState(initialState);
 
-  // Track if setState has been called in the current render cycle
+  // Track if setState has been called in the current render cycle.
+  // This prevents multiple setState calls within the same synchronous execution,
+  // which could make undo/redo behavior unpredictable for users.
   const setStateCalledInRender = useRef(false);
+
+  // Store the pending state when setState is called.
+  // This is used by archive() to access the latest state when it's called
+  // immediately after setState in the same synchronous execution (before React re-renders).
+  // For archive() calls in later render cycles, this will be null and archive() will use
+  // the committed state instead.
   const pendingStateRef = useRef<S | null>(null);
 
-  // Reset the flag at the start of each render cycle
+  // Reset the flags at the start of each render cycle.
+  // This allows setState to be called again in the next render cycle,
+  // and ensures pendingStateRef is cleared after React commits the state update.
   useEffect(() => {
     setStateCalledInRender.current = false;
     pendingStateRef.current = null;
@@ -310,25 +320,42 @@ export function useTravel<S, F extends boolean, A extends boolean>(
     }
     const currentTempPatches = tempPatchesRef.current;
     if (!currentTempPatches.patches.length) return;
+
     setAllPatches((allPatchesDraft) => {
-      // All patches will be merged, it helps to minimize the patch structure
-      // Use pendingStateRef if setState was just called, otherwise use current state
+      // Archive commits all temporary state changes to history as a single entry.
+      // This merges all patches since the last archive, minimizing the patch structure.
+      //
+      // State selection strategy:
+      // 1. If archive() is called immediately after setState() in the same synchronous execution,
+      //    use pendingStateRef.current (the just-updated state before React re-renders)
+      // 2. If archive() is called in a later render cycle (after one or more setState calls),
+      //    use state (which contains all committed changes from previous renders)
+      //
+      // Note: setAllPatches callback executes synchronously, so pendingStateRef is still valid
+      // when archive() is called in the same event loop as setState().
+      const stateToUse = (pendingStateRef.current ?? state) as object;
+
       const [, patches, inversePatches] = create(
-        (pendingStateRef.current ?? state) as object,
+        stateToUse,
         (draft) =>
           apply(draft, currentTempPatches.inversePatches.flat().reverse()),
         {
           enablePatches: true,
         }
       );
+
       allPatchesDraft.patches.push(inversePatches);
       allPatchesDraft.inversePatches.push(patches);
+
+      // Respect maxHistory limit
       if (maxHistory < allPatchesDraft.patches.length) {
         allPatchesDraft.patches = allPatchesDraft.patches.slice(-maxHistory);
         allPatchesDraft.inversePatches =
           allPatchesDraft.inversePatches.slice(-maxHistory);
       }
     });
+
+    // Clear temporary patches after archiving
     setTempPatches((tempPatchesDraft) => {
       tempPatchesDraft.patches.length = 0;
       tempPatchesDraft.inversePatches.length = 0;
