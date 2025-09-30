@@ -1,3 +1,4 @@
+import { expect, describe, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useTravel } from '../src/index';
 

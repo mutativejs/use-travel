@@ -1,9 +1,10 @@
+import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 import { useTravel } from '../src/index';
 
 // Mock __DEV__ flag to be true for these tests
-// @ts-expect-error - Mocking global variable
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 globalThis.__DEV__ = true;
 
 describe('useTravel - Input Validation', () => {

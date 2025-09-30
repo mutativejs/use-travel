@@ -1,3 +1,4 @@
+import { expect, describe, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useTravel } from '../src/index';
 
@@ -45,7 +46,7 @@ describe('useTravel', () => {
       { count: 0 },
       { count: 1 },
       { count: 2 },
-      { count: 3 }
+      { count: 3 },
     ]);
   });
 
@@ -91,11 +92,7 @@ describe('useTravel', () => {
     [state, setState, controls] = result.current;
 
     expect(controls.position).toBe(1);
-    expect(controls.getHistory()).toEqual([
-      { count: 0 },
-      { count: 3 },
-    ]);
-
+    expect(controls.getHistory()).toEqual([{ count: 0 }, { count: 3 }]);
 
     act(() => {
       setState((draft) => {
@@ -126,7 +123,7 @@ describe('useTravel', () => {
     expect(controls.getHistory()).toEqual([
       { count: 0 },
       { count: 3 },
-      { count: 6 }
+      { count: 6 },
     ]);
     expect(controls.canArchive()).toBe(true);
     act(() => controls.archive());
@@ -137,7 +134,7 @@ describe('useTravel', () => {
     expect(controls.getHistory()).toEqual([
       { count: 0 },
       { count: 3 },
-      { count: 6 }
+      { count: 6 },
     ]);
     expect(controls.canArchive()).toBe(false);
   });
@@ -162,7 +159,7 @@ describe('useTravel', () => {
       { count: 0 },
       { count: 1 },
       { count: 2 },
-      { count: 3 }
+      { count: 3 },
     ]);
 
     // Go back to middle position
@@ -176,13 +173,13 @@ describe('useTravel', () => {
         setState({ count: 10 });
         setState({ count: 20 });
       });
-    }).toThrow('setState cannot be called multiple times in the same render cycle.');
+    }).toThrow(
+      'setState cannot be called multiple times in the same render cycle.'
+    );
   });
 
   it('[useTravel]: Multiple rapid setState calls should each increment position correctly', () => {
-    const { result } = renderHook(() =>
-      useTravel(0, { autoArchive: true })
-    );
+    const { result } = renderHook(() => useTravel(0, { autoArchive: true }));
 
     let [state, setState, controls] = result.current;
 
@@ -191,6 +188,8 @@ describe('useTravel', () => {
         setState(1);
         setState(2);
       });
-    }).toThrow('setState cannot be called multiple times in the same render cycle.');
+    }).toThrow(
+      'setState cannot be called multiple times in the same render cycle.'
+    );
   });
 });
