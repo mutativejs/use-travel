@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useReducer,
   useRef,
@@ -195,18 +196,31 @@ export function useTravel<S, F extends boolean, A extends boolean>(
     }
   }
 
-  let updatedState: S | null = null;
   const [position, setPosition] = useState(initialPosition);
   const [tempPatchesRef, setTempPatches, tempPatchesVersion] =
     useRefState<TravelPatches>(() => cloneTravelPatches());
   const [allPatchesRef, setAllPatches, allPatchesVersion] =
     useRefState<TravelPatches>(() => cloneTravelPatches(initialPatches));
   const [state, setState] = useState(initialState);
+
+  // Track if setState has been called in the current render cycle
+  const setStateCalledInRender = useRef(false);
+  const pendingStateRef = useRef<S | null>(null);
+
+  // Reset the flag at the start of each render cycle
+  useEffect(() => {
+    setStateCalledInRender.current = false;
+    pendingStateRef.current = null;
+  });
+
   const cachedSetState = useCallback(
     (updater: any) => {
-      if (updatedState !== null) {
-        throw new Error('setState cannot be called multiple times.');
+      if (setStateCalledInRender.current) {
+        throw new Error(
+          'setState cannot be called multiple times in the same render cycle.'
+        );
       }
+      setStateCalledInRender.current = true;
       const [nextState, patches, inversePatches] = (
         typeof updater === 'function'
           ? create(state, updater, { ...options, enablePatches: true })
@@ -275,7 +289,7 @@ export function useTravel<S, F extends boolean, A extends boolean>(
           tempPatchesDraft.inversePatches.push(inversePatches);
         });
       }
-      updatedState = nextState;
+      pendingStateRef.current = nextState;
     },
     [
       autoArchive,
@@ -298,9 +312,9 @@ export function useTravel<S, F extends boolean, A extends boolean>(
     if (!currentTempPatches.patches.length) return;
     setAllPatches((allPatchesDraft) => {
       // All patches will be merged, it helps to minimize the patch structure
+      // Use pendingStateRef if setState was just called, otherwise use current state
       const [, patches, inversePatches] = create(
-        // where the state is updated via the setState callback and immediately executes archive().
-        (updatedState ?? state) as object,
+        (pendingStateRef.current ?? state) as object,
         (draft) =>
           apply(draft, currentTempPatches.inversePatches.flat().reverse()),
         {

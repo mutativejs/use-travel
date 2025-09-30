@@ -176,7 +176,7 @@ describe('useTravel', () => {
         setState({ count: 10 });
         setState({ count: 20 });
       });
-    }).toThrow('setState cannot be called multiple times.');
+    }).toThrow('setState cannot be called multiple times in the same render cycle.');
   });
 
   it('[useTravel]: Multiple rapid setState calls should each increment position correctly', () => {
@@ -191,6 +191,6 @@ describe('useTravel', () => {
         setState(1);
         setState(2);
       });
-    }).toThrow('setState cannot be called multiple times.');
+    }).toThrow('setState cannot be called multiple times in the same render cycle.');
   });
 });
