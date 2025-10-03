@@ -1,171 +1,47 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-  type MutableRefObject,
-} from 'react';
-import {
-  type Options as MutativeOptions,
-  type Patches,
-  type Draft,
-  type Immutable,
-  apply,
-  create,
-} from 'mutative';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import type {
+  TravelPatches,
+  TravelsOptions,
+  ManualTravelsControls,
+  TravelsControls,
+  Value,
+  Updater,
+  InitialValue,
+} from 'travels';
+import { Travels } from 'travels';
 
-export type TravelPatches = {
-  patches: Patches[];
-  inversePatches: Patches[];
-};
-
-export type Options<F extends boolean, A extends boolean> = {
-  /**
-   * The maximum number of history to keep, by default `10`
-   */
-  maxHistory?: number;
-  /**
-   * The initial position in the history, by default `0`
-   */
-  initialPosition?: number;
-  /**
-   * The initial patches of the history
-   */
-  initialPatches?: TravelPatches;
-  /**
-   * Whether to automatically archive the current state, by default `true`
-   */
-  autoArchive?: A;
-} & Omit<MutativeOptions<true, F>, 'enablePatches'>;
-
-type InitialValue<I extends any> = I extends (...args: any) => infer R ? R : I;
-type DraftFunction<S> = (draft: Draft<S>) => void;
-type Updater<S> = (value: S | (() => S) | DraftFunction<S>) => void;
-type Value<S, F extends boolean> = F extends true
-  ? Immutable<InitialValue<S>>
-  : InitialValue<S>;
-
-export interface Controls<S, F extends boolean> {
-  /**
-   * The current position in the history
-   */
-  position: number;
-  /**
-   * Get the history of the state
-   */
-  getHistory: () => Value<S, F>[];
-  /**
-   * The patches of the history
-   */
-  patches: TravelPatches;
-  /**
-   * Go back in the history
-   */
-  back: (amount?: number) => void;
-  /**
-   * Go forward in the history
-   */
-  forward: (amount?: number) => void;
-  /**
-   * Reset the history
-   */
-  reset: () => void;
-  /**
-   * Go to a specific position in the history
-   */
-  go: (position: number) => void;
-  /**
-   * Check if it's possible to go back
-   */
-  canBack: () => boolean;
-  /**
-   * Check if it's possible to go forward
-   */
-  canForward: () => boolean;
-}
-
-type ManualControls<S, F extends boolean> = Controls<S, F> & {
-  /**
-   * Archive the current state
-   */
-  archive: () => void;
-  /**
-   * Check if it's possible to archive the current state
-   */
-  canArchive: () => boolean;
-};
+export type { TravelPatches };
 
 type Result<S, F extends boolean, A extends boolean> = [
   Value<S, F>,
   Updater<InitialValue<S>>,
-  A extends false ? ManualControls<S, F> : Controls<S, F>,
+  A extends false ? ManualTravelsControls<S, F> : TravelsControls<S, F>,
 ];
-
-type RefStateAction<T> = T | ((current: T) => T | void);
-
-const cloneTravelPatches = (base?: TravelPatches): TravelPatches => ({
-  patches: base ? base.patches.map((patch) => patch) : [],
-  inversePatches: base ? base.inversePatches.map((patch) => patch) : [],
-});
-
-const useRefState = <T>(
-  initializer: () => T
-): [MutableRefObject<T>, (updater: RefStateAction<T>) => void, number] => {
-  const ref = useRef<T>(null as unknown as T);
-  const initialized = useRef(false);
-  if (!initialized.current) {
-    ref.current = initializer();
-    initialized.current = true;
-  }
-  const [version, bumpVersion] = useReducer((v: number) => v + 1, 0);
-  const setRef = useCallback(
-    (updater: RefStateAction<T>) => {
-      const currentValue = ref.current;
-      if (typeof updater === 'function') {
-        const result = (updater as (value: T) => T | void)(currentValue);
-        if (result !== undefined) {
-          ref.current = result as T;
-        }
-      } else {
-        ref.current = updater;
-      }
-      bumpVersion();
-    },
-    [bumpVersion]
-  );
-  return [ref, setRef, version];
-};
 
 /**
  * A hook to travel in the history of a state
  */
 export function useTravel<S, F extends boolean>(
   initialState: S
-): [Value<S, F>, Updater<InitialValue<S>>, Controls<S, F>];
+): [Value<S, F>, Updater<InitialValue<S>>, TravelsControls<S, F>];
 export function useTravel<S, F extends boolean>(
   initialState: S,
-  options: Omit<Options<F, true>, 'autoArchive'> & { autoArchive?: true }
-): [Value<S, F>, Updater<InitialValue<S>>, Controls<S, F>];
+  options: Omit<TravelsOptions<F, true>, 'autoArchive'> & { autoArchive?: true }
+): [Value<S, F>, Updater<InitialValue<S>>, TravelsControls<S, F>];
 export function useTravel<S, F extends boolean>(
   initialState: S,
-  options: Omit<Options<F, false>, 'autoArchive'> & { autoArchive: false }
-): [Value<S, F>, Updater<InitialValue<S>>, ManualControls<S, F>];
+  options: Omit<TravelsOptions<F, false>, 'autoArchive'> & {
+    autoArchive: false;
+  }
+): [Value<S, F>, Updater<InitialValue<S>>, ManualTravelsControls<S, F>];
 export function useTravel<S, F extends boolean, A extends boolean>(
   initialState: S,
-  _options: Options<F, A> = {}
+  _options: TravelsOptions<F, A> = {}
 ): Result<S, F, A> {
-  const {
-    maxHistory = 10,
-    initialPatches,
-    initialPosition = 0,
-    autoArchive = true,
-    ...options
-  } = _options;
-
-  // Validate options in development mode
+  // Validate options in development mode (using __DEV__ for consistency with existing codebase)
   if (__DEV__) {
+    const { maxHistory = 10, initialPosition = 0, initialPatches } = _options;
+
     if (maxHistory <= 0) {
       console.error(
         `useTravel: maxHistory must be a positive number, but got ${maxHistory}`
@@ -196,33 +72,35 @@ export function useTravel<S, F extends boolean, A extends boolean>(
     }
   }
 
-  const [position, setPosition] = useState(initialPosition);
-  const [tempPatchesRef, setTempPatches, tempPatchesVersion] =
-    useRefState<TravelPatches>(() => cloneTravelPatches());
-  const [allPatchesRef, setAllPatches, allPatchesVersion] =
-    useRefState<TravelPatches>(() => cloneTravelPatches(initialPatches));
-  const [state, setState] = useState(initialState);
+  // Create Travels instance (only once)
+  const travelsRef = useRef<Travels<S, F, A>>();
+  if (!travelsRef.current) {
+    travelsRef.current = new Travels<S, F, A>(initialState, _options);
+  }
 
-  // Track if setState has been called in the current render cycle.
-  // This prevents multiple setState calls within the same synchronous execution,
-  // which could make undo/redo behavior unpredictable for users.
+  // Force re-render when state changes
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+
+  // Track if setState has been called in the current render cycle
   const setStateCalledInRender = useRef(false);
 
-  // Store the pending state when setState is called.
-  // This is used by archive() to access the latest state when it's called
-  // immediately after setState in the same synchronous execution (before React re-renders).
-  // For archive() calls in later render cycles, this will be null and archive() will use
-  // the committed state instead.
-  const pendingStateRef = useRef<S | null>(null);
-
-  // Reset the flags at the start of each render cycle.
-  // This allows setState to be called again in the next render cycle,
-  // and ensures pendingStateRef is cleared after React commits the state update.
+  // Reset the flag at the start of each render cycle
   useEffect(() => {
     setStateCalledInRender.current = false;
-    pendingStateRef.current = null;
   });
 
+  // Subscribe to state changes
+  useEffect(() => {
+    const travels = travelsRef.current!;
+    const unsubscribe = travels.subscribe(() => {
+      forceUpdate();
+    });
+    return unsubscribe;
+  }, []);
+
+  const travels = travelsRef.current;
+
+  // Wrap setState to prevent multiple calls in the same render cycle
   const cachedSetState = useCallback(
     (updater: any) => {
       if (setStateCalledInRender.current) {
@@ -231,255 +109,52 @@ export function useTravel<S, F extends boolean, A extends boolean>(
         );
       }
       setStateCalledInRender.current = true;
-      const [nextState, patches, inversePatches] = (
-        typeof updater === 'function'
-          ? create(state, updater, { ...options, enablePatches: true })
-          : create(state, () => updater, { ...options, enablePatches: true })
-      ) as [S, Patches<true>, Patches<true>];
-      setState(nextState);
-      const currentAllPatches = allPatchesRef.current;
-      const currentTempPatches = tempPatchesRef.current;
-      if (autoArchive) {
-        setPosition(
-          maxHistory < currentAllPatches.patches.length + 1
-            ? maxHistory
-            : position + 1
-        );
-        setAllPatches((allPatchesDraft) => {
-          const notLast = position < allPatchesDraft.patches.length;
-          // Remove all patches after the current position
-          if (notLast) {
-            allPatchesDraft.patches.splice(
-              position,
-              allPatchesDraft.patches.length - position
-            );
-            allPatchesDraft.inversePatches.splice(
-              position,
-              allPatchesDraft.inversePatches.length - position
-            );
-          }
-          allPatchesDraft.patches.push(patches);
-          allPatchesDraft.inversePatches.push(inversePatches);
-          if (maxHistory < allPatchesDraft.patches.length) {
-            allPatchesDraft.patches =
-              allPatchesDraft.patches.slice(-maxHistory);
-            allPatchesDraft.inversePatches =
-              allPatchesDraft.inversePatches.slice(-maxHistory);
-          }
-        });
-      } else {
-        const notLast =
-          position <
-          currentAllPatches.patches.length +
-            Number(!!currentTempPatches.patches.length);
-        // Remove all patches after the current position
-        if (notLast) {
-          currentAllPatches.patches.splice(
-            position,
-            currentAllPatches.patches.length - position
-          );
-          currentAllPatches.inversePatches.splice(
-            position,
-            currentAllPatches.inversePatches.length - position
-          );
-        }
-        if (!currentTempPatches.patches.length || notLast) {
-          setPosition(
-            maxHistory < currentAllPatches.patches.length + 1
-              ? maxHistory
-              : position + 1
-          );
-        }
-        setTempPatches((tempPatchesDraft) => {
-          if (notLast) {
-            tempPatchesDraft.patches.length = 0;
-            tempPatchesDraft.inversePatches.length = 0;
-          }
-          tempPatchesDraft.patches.push(patches);
-          tempPatchesDraft.inversePatches.push(inversePatches);
-        });
-      }
-      pendingStateRef.current = nextState;
+      travels.setState(updater);
     },
-    [
-      autoArchive,
-      maxHistory,
-      options,
-      position,
-      setAllPatches,
-      setPosition,
-      setTempPatches,
-      setState,
-      state,
-    ]
+    [travels]
   );
-  const archive = useCallback(() => {
-    if (autoArchive) {
-      console.warn('Auto archive is enabled, no need to archive manually');
-      return;
-    }
-    const currentTempPatches = tempPatchesRef.current;
-    if (!currentTempPatches.patches.length) return;
 
-    setAllPatches((allPatchesDraft) => {
-      // Archive commits all temporary state changes to history as a single entry.
-      // This merges all patches since the last archive, minimizing the patch structure.
-      //
-      // State selection strategy:
-      // 1. If archive() is called immediately after setState() in the same synchronous execution,
-      //    use pendingStateRef.current (the just-updated state before React re-renders)
-      // 2. If archive() is called in a later render cycle (after one or more setState calls),
-      //    use state (which contains all committed changes from previous renders)
-      //
-      // Note: setAllPatches callback executes synchronously, so pendingStateRef is still valid
-      // when archive() is called in the same event loop as setState().
-      const stateToUse = (pendingStateRef.current ?? state) as object;
+  // Get the current state
+  const state = travels.getState();
 
-      const [, patches, inversePatches] = create(
-        stateToUse,
-        (draft) =>
-          apply(draft, currentTempPatches.inversePatches.flat().reverse()),
-        {
-          enablePatches: true,
+  // Create controls object with memoization
+  const cachedControls = useMemo(() => {
+    const baseControls = travels.getControls();
+
+    // Create a proxy-like object that always gets fresh values
+    const controls: any = {
+      get position() {
+        return travels.getPosition();
+      },
+      getHistory: () => baseControls.getHistory(),
+      get patches() {
+        return travels.getPatches();
+      },
+      back: (amount?: number) => baseControls.back(amount),
+      forward: (amount?: number) => baseControls.forward(amount),
+      reset: () => baseControls.reset(),
+      go: (position: number) => baseControls.go(position),
+      canBack: () => baseControls.canBack(),
+      canForward: () => baseControls.canForward(),
+      // Always include archive and canArchive methods for compatibility
+      // Even in autoArchive mode, archive() can be called (but will warn)
+      archive: () => {
+        if ('archive' in baseControls) {
+          baseControls.archive();
+        } else {
+          travels.archive();
         }
-      );
-
-      allPatchesDraft.patches.push(inversePatches);
-      allPatchesDraft.inversePatches.push(patches);
-
-      // Respect maxHistory limit
-      if (maxHistory < allPatchesDraft.patches.length) {
-        allPatchesDraft.patches = allPatchesDraft.patches.slice(-maxHistory);
-        allPatchesDraft.inversePatches =
-          allPatchesDraft.inversePatches.slice(-maxHistory);
-      }
-    });
-
-    // Clear temporary patches after archiving
-    setTempPatches((tempPatchesDraft) => {
-      tempPatchesDraft.patches.length = 0;
-      tempPatchesDraft.inversePatches.length = 0;
-    });
-  }, [autoArchive, maxHistory, setAllPatches, setTempPatches, state]);
-  const shouldArchive = !autoArchive && !!tempPatchesRef.current.patches.length;
-  const _allPatches = useMemo(() => {
-    const base = allPatchesRef.current;
-    if (!shouldArchive) {
-      return base;
-    }
-    return {
-      patches: base.patches.concat([tempPatchesRef.current.patches.flat()]),
-      inversePatches: base.inversePatches.concat([
-        tempPatchesRef.current.inversePatches.flat().reverse(),
-      ]),
-    };
-  }, [allPatchesVersion, shouldArchive, tempPatchesVersion]);
-
-  const cachedTravels = useMemo(() => {
-    const go = (nextPosition: number) => {
-      const back = nextPosition < position;
-      if (shouldArchive) {
-        archive();
-      }
-      if (nextPosition > _allPatches.patches.length) {
-        console.warn(`Can't go forward to position ${nextPosition}`);
-        nextPosition = _allPatches.patches.length;
-      }
-      if (nextPosition < 0) {
-        console.warn(`Can't go back to position ${nextPosition}`);
-        nextPosition = 0;
-      }
-      if (nextPosition === position) return;
-      if (shouldArchive) {
-        const lastInversePatch = _allPatches.inversePatches.slice(-1)[0];
-        _allPatches.inversePatches[_allPatches.inversePatches.length - 1] = [
-          ...lastInversePatch,
-        ].reverse();
-      }
-      setState(
-        () =>
-          apply(
-            state as object,
-            back
-              ? _allPatches.inversePatches
-                  .slice(-maxHistory)
-                  .slice(nextPosition)
-                  .flat()
-                  .reverse()
-              : _allPatches.patches
-                  .slice(-maxHistory)
-                  .slice(position, nextPosition)
-                  .flat()
-          ) as S
-      );
-      setPosition(nextPosition);
-    };
-    let cachedHistory: S[];
-    return {
-      position,
-      getHistory: () => {
-        if (cachedHistory) return cachedHistory;
-        cachedHistory = [state];
-        let currentState = state;
-        const patches =
-          !autoArchive && _allPatches.patches.length > maxHistory
-            ? _allPatches.patches.slice(_allPatches.patches.length - maxHistory)
-            : _allPatches.patches;
-        const inversePatches =
-          !autoArchive && _allPatches.inversePatches.length > maxHistory
-            ? _allPatches.inversePatches.slice(
-                _allPatches.inversePatches.length - maxHistory
-              )
-            : _allPatches.inversePatches;
-        for (let i = position; i < patches.length; i++) {
-          currentState = apply(currentState as object, patches[i]) as S;
-          cachedHistory.push(currentState);
+      },
+      canArchive: () => {
+        if ('canArchive' in baseControls) {
+          return baseControls.canArchive();
         }
-        currentState = state;
-        for (let i = position - 1; i > -1; i--) {
-          currentState = apply(currentState as object, inversePatches[i]) as S;
-          cachedHistory.unshift(currentState);
-        }
-        return cachedHistory;
+        return travels.canArchive();
       },
-      patches: shouldArchive ? _allPatches : allPatchesRef.current,
-      back: (amount = 1) => {
-        go(position - amount);
-      },
-      forward: (amount = 1) => {
-        go(position + amount);
-      },
-      reset: () => {
-        setPosition(initialPosition);
-        setAllPatches(() => cloneTravelPatches(initialPatches));
-        setState(() => initialState);
-        setTempPatches(() => cloneTravelPatches());
-      },
-      go,
-      canBack: () => position > 0,
-      canForward: () =>
-        shouldArchive
-          ? position < _allPatches.patches.length - 1
-          : position < allPatchesRef.current.patches.length,
-      canArchive: () => shouldArchive,
-      archive,
     };
-  }, [
-    archive,
-    allPatchesVersion,
-    autoArchive,
-    initialPatches,
-    initialPosition,
-    initialState,
-    maxHistory,
-    position,
-    setAllPatches,
-    setPosition,
-    setState,
-    setTempPatches,
-    shouldArchive,
-    state,
-    _allPatches,
-  ]);
-  return [state, cachedSetState, cachedTravels] as Result<S, F, A>;
+
+    return controls;
+  }, [travels]);
+
+  return [state, cachedSetState, cachedControls] as Result<S, F, A>;
 }
