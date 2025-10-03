@@ -5,20 +5,22 @@
 [![npm](https://img.shields.io/npm/v/use-travel.svg)](https://www.npmjs.com/package/use-travel)
 ![license](https://img.shields.io/npm/l/use-travel)
 
-A React hook for state time travel with undo, redo, reset and archive functionalities.
+A React hook for state time travel with undo, redo, reset and archive functionalities with [Travels](https://github.com/mutativejs/travels).
 
 ### Motivation
 
-`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/unadlib/mutative) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
+`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/unadlib/mutative) and [Travels](https://github.com/mutativejs/travels) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
 
 It's suitable for building any time travel feature in your application.
 
 ### Installation
 
 ```bash
-npm install use-travel mutative
+npm install use-travel mutative travels
 # or
-yarn add use-travel mutative
+yarn add use-travel mutative travels
+# or
+pnpm add use-travel mutative travels
 ```
 
 ### Features
