@@ -14,7 +14,7 @@ export type { TravelPatches };
 
 type Result<S, F extends boolean, A extends boolean> = [
   Value<S, F>,
-  Updater<InitialValue<S>>,
+  (updater: Updater<S>) => void,
   A extends false ? ManualTravelsControls<S, F> : TravelsControls<S, F>,
 ];
 
@@ -23,17 +23,17 @@ type Result<S, F extends boolean, A extends boolean> = [
  */
 export function useTravel<S, F extends boolean>(
   initialState: S
-): [Value<S, F>, Updater<InitialValue<S>>, TravelsControls<S, F>];
+): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F>];
 export function useTravel<S, F extends boolean>(
   initialState: S,
   options: Omit<TravelsOptions<F, true>, 'autoArchive'> & { autoArchive?: true }
-): [Value<S, F>, Updater<InitialValue<S>>, TravelsControls<S, F>];
+): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F>];
 export function useTravel<S, F extends boolean>(
   initialState: S,
   options: Omit<TravelsOptions<F, false>, 'autoArchive'> & {
     autoArchive: false;
   }
-): [Value<S, F>, Updater<InitialValue<S>>, ManualTravelsControls<S, F>];
+): [Value<S, F>, (updater: Updater<S>) => void, ManualTravelsControls<S, F>];
 export function useTravel<S, F extends boolean, A extends boolean>(
   initialState: S,
   _options: TravelsOptions<F, A> = {}
@@ -102,7 +102,7 @@ export function useTravel<S, F extends boolean, A extends boolean>(
 
   // Wrap setState to prevent multiple calls in the same render cycle
   const cachedSetState = useCallback(
-    (updater: any) => {
+    (updater: Updater<S>) => {
       if (setStateCalledInRender.current) {
         throw new Error(
           'setState cannot be called multiple times in the same render cycle.'
