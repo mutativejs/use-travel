@@ -6,16 +6,21 @@ import type {
   TravelsControls,
   Value,
   Updater,
-  InitialValue,
+  PatchesOption,
 } from 'travels';
 import { Travels } from 'travels';
 
 export type { TravelPatches };
 
-type Result<S, F extends boolean, A extends boolean> = [
+type Result<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+> = [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  A extends false ? ManualTravelsControls<S, F> : TravelsControls<S, F>,
+  A extends false ? ManualTravelsControls<S, F, P> : TravelsControls<S, F, P>,
 ];
 
 /**
@@ -24,21 +29,34 @@ type Result<S, F extends boolean, A extends boolean> = [
 export function useTravel<S, F extends boolean>(
   initialState: S
 ): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F>];
-export function useTravel<S, F extends boolean>(
+export function useTravel<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+>(
   initialState: S,
-  options: Omit<TravelsOptions<F, true>, 'autoArchive'> & { autoArchive?: true }
-): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F>];
-export function useTravel<S, F extends boolean>(
+  options: Omit<TravelsOptions<F, true, P>, 'autoArchive'> & {
+    autoArchive?: true;
+  }
+): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F, P>];
+export function useTravel<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+>(
   initialState: S,
-  options: Omit<TravelsOptions<F, false>, 'autoArchive'> & {
+  options: Omit<TravelsOptions<F, false, P>, 'autoArchive'> & {
     autoArchive: false;
   }
-): [Value<S, F>, (updater: Updater<S>) => void, ManualTravelsControls<S, F>];
-export function useTravel<S, F extends boolean, A extends boolean>(
-  initialState: S,
-  _options: TravelsOptions<F, A> = {}
-): Result<S, F, A> {
-  // Validate options in development mode (using __DEV__ for consistency with existing codebase)
+): [Value<S, F>, (updater: Updater<S>) => void, ManualTravelsControls<S, F, P>];
+export function useTravel<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+>(initialState: S, _options: TravelsOptions<F, A, P> = {}): Result<S, F, A, P> {
   if (__DEV__) {
     const { maxHistory = 10, initialPosition = 0, initialPatches } = _options;
 
