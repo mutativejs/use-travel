@@ -813,6 +813,11 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-3.0.3.tgz#acaab0f919ce69cce629c2d4ed2eb4adc1b6c20c"
   integrity sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==
 
+"@types/use-sync-external-store@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-1.5.0.tgz#222c28a98eb8f4f8a72c1a7e9fe6d8946eca6383"
+  integrity sha512-5dyB8nLC/qogMrlCizZnYWQTA4lnb/v+It+sqNl5YnSRAPMlIqY/X0Xn+gZw8vOL+TgTTr28VEbn3uf8fUtAkw==
+
 "@typescript-eslint/eslint-plugin@^8.44.1":
   version "8.44.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.44.1.tgz#011a2b5913d297b3d9d77f64fb78575bab01a1b3"
@@ -4387,10 +4392,10 @@ tr46@^6.0.0:
   dependencies:
     punycode "^2.3.1"
 
-travels@^0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/travels/-/travels-0.5.2.tgz#25d167d9feb2bce987bdb463c69bf98852456090"
-  integrity sha512-2cr4HJ02keoD1DrGCjhguKY2j55ySKkrFGZpZT9u264orhQd+Df6njXOUcFEHGxfoKBOwXlHK+RJ2IKlLYjTeQ==
+travels@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/travels/-/travels-0.7.0.tgz#8c6ddf2802f6cb4c59c5857cf1c92912e0f7a1ef"
+  integrity sha512-4MVdWct7TWVIU5jPYz6rWQmML3iVlUzXv1YBqyBO4ONpERlg3Z/PfOoUCFCXY8lzc57BsJlRvHuPKqN1WML2+Q==
 
 trim-lines@^3.0.0:
   version "3.0.1"
@@ -4599,6 +4604,11 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
+
+use-sync-external-store@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.6.0.tgz#b174bfa65cb2b526732d9f2ac0a408027876f32d"
+  integrity sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==
 
 util-deprecate@^1.0.1:
   version "1.0.2"
