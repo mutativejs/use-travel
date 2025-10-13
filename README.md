@@ -117,6 +117,47 @@ const App = () => {
 | `controls.go`         | (nextPosition: number) => void | Go to the specific position of the state                               |
 | `controls.archive`    | () => void                     | Archive the current state(the `autoArchive` options should be `false`) |
 
+### useTravelStore
+
+When you need to manage a single `Travels` instance outside of React—e.g. to share the same undo/redo history across multiple components—create the store manually and bind it with `useTravelStore`. The hook keeps React in sync with the external store, exposes the same controls object, and rejects mutable stores to ensure React can observe updates.
+
+```tsx
+// store.ts
+import { Travels } from 'travels';
+
+export const travels = new Travels({ count: 0 }); // mutable: true is not supported
+```
+
+```tsx
+// Counter.tsx
+import { useTravelStore } from 'use-travel';
+import { travels } from './store';
+
+export function Counter() {
+  const [state, setState, controls] = useTravelStore(travels);
+
+  return (
+    <div>
+      <span>{state.count}</span>
+      <button
+        onClick={() =>
+          setState((draft) => {
+            draft.count += 1;
+          })
+        }
+      >
+        Increment
+      </button>
+      <button onClick={() => controls.back()} disabled={!controls.canBack()}>
+        Undo
+      </button>
+    </div>
+  );
+}
+```
+
+`useTravelStore` stays reactive even when the `Travels` instance is updated elsewhere (for example, in services or other components) and forwards manual archive helpers when the store is created with `autoArchive: false`.
+
 ### Archive Mode
 
 `use-travel` provides two archive modes to control how state changes are recorded in history:
