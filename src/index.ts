@@ -227,9 +227,9 @@ export function useTravelStore<
     );
   }
   const state = useSyncExternalStore(
-    travels.subscribe.bind(travels),
-    travels.getState.bind(travels),
-    travels.getState.bind(travels)
+    travels.subscribe,
+    travels.getState,
+    travels.getState
   );
   const setState = useCallback(
     (updater: Updater<S>) => travels.setState(updater),
