@@ -4392,10 +4392,10 @@ tr46@^6.0.0:
   dependencies:
     punycode "^2.3.1"
 
-travels@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/travels/-/travels-0.7.1.tgz#a96b5fb902431c2716cd2f3d09df1e4e12e2ac6b"
-  integrity sha512-drQ0vsWBIw4L2ufRrRADv/AObT1M70/aXeHCoM8wVRo6Fl30uDVfSKfTLN+/3nRIKl3jQM1PD9yctTHiEVka+A==
+travels@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/travels/-/travels-0.8.0.tgz#03e0e3a3963ff7073cfef2b60fdb6ead331a39db"
+  integrity sha512-MkIH+ICgNER0XF9SE3bMsz3H2m0at/DCoUcvOhdFezkcSUuBIQzURkf5V0q4xpw4MPmTi15CguZZmbJqyMXk5A==
 
 trim-lines@^3.0.0:
   version "3.0.1"
