@@ -32,11 +32,13 @@ describe('useTravel - Input Validation', () => {
     });
 
     it('should log error when maxHistory is negative', () => {
-      renderHook(() =>
-        useTravel(0, {
-          maxHistory: -5,
-        })
-      );
+      expect(() =>
+        renderHook(() =>
+          useTravel(0, {
+            maxHistory: -5,
+          })
+        )
+      ).toThrowError('Travels: maxHistory must be non-negative, but got -5');
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'useTravel: maxHistory must be a positive number, but got -5'
