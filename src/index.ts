@@ -51,7 +51,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<TravelsOptions<F, true, P>, 'autoArchive'> & {
+  options: Omit<TravelsOptions<F, true, P>, 'autoArchive' | 'mutable'> & {
     autoArchive?: true;
   }
 ): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F, P>];
@@ -62,7 +62,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<TravelsOptions<F, false, P>, 'autoArchive'> & {
+  options: Omit<TravelsOptions<F, false, P>, 'autoArchive' | 'mutable'> & {
     autoArchive: false;
   }
 ): [Value<S, F>, (updater: Updater<S>) => void, ManualTravelsControls<S, F, P>];
@@ -108,7 +108,10 @@ export function useTravel<
   // Create Travels instance (only once)
   const travelsRef = useRef<Travels<S, F, A>>();
   if (!travelsRef.current) {
-    travelsRef.current = new Travels<S, F, A>(initialState, _options);
+    travelsRef.current = new Travels<S, F, A>(initialState, {
+      ..._options,
+      mutable: false,
+    });
   }
 
   // Force re-render when state changes

@@ -89,15 +89,16 @@ const App = () => {
 
 ### Parameters
 
-| Parameter          | type          | description                                                                                                              | default                          |
-| ------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| `maxHistory`       | number        | The maximum number of history to keep                                                                                    | 10                               |
-| `initialPatches`   | TravelPatches | The initial patches                                                                                                      | {patches: [],inversePatches: []} |
-| `initialPosition`  | number        | The initial position of the state                                                                                        | 0                                |
-| `autoArchive`      | boolean       | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                  | true                             |
-| `enableAutoFreeze` | boolean       | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options) | false                            |
-| `strict`           | boolean       | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | false                            |
-| `mark`             | Mark<O, F>[]  | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | () => void                       |
+| Parameter          | type                        | description                                                                                                                                                                     | default                          |
+| ------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `maxHistory`       | `number`                    | The maximum number of history to keep                                                                                                                                           | 10                               |
+| `initialPatches`   | `TravelPatches`             | The initial patches                                                                                                                                                             | {patches: [],inversePatches: []} |
+| `initialPosition`  | `number`                    | The initial position of the state                                                                                                                                               | 0                                |
+| `autoArchive`      | `boolean`                   | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                                                                          | true                             |
+| `enableAutoFreeze` | `boolean`                   | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                                                        | false                            |
+| `strict`           | `boolean`                   | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                                                                  | false                            |
+| `mark`             | `Mark<O, F>[]`              | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                                                                  | () => void                       |
+| `patchesOptions`   | `boolean ｜ PatchesOptions` | Customize JSON Patch format. Supports `{ pathAsArray: boolean }` to control path format. See [Mutative patches docs](https://mutative.js.org/docs/api-reference/create#patches) | `true` (enable patches)          |
 
 ### Returns
 
@@ -187,9 +188,12 @@ In manual archive mode, you control when state changes are recorded to history u
 **Use Case 1: Batch multiple changes into one history entry**
 
 ```jsx
-const [state, setState, controls] = useTravel({ count: 0 }, {
-  autoArchive: false
-});
+const [state, setState, controls] = useTravel(
+  { count: 0 },
+  {
+    autoArchive: false,
+  }
+);
 
 // Multiple setState calls across different renders
 setState({ count: 1 }); // Temporary change (not in history yet)
@@ -217,6 +221,7 @@ function handleSave() {
 ```
 
 The key difference:
+
 - **Auto archive**: Each `setState` = one undo step
 - **Manual archive**: `archive()` call = one undo step (can include multiple `setState` calls)
 
