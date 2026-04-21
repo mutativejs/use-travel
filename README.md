@@ -38,6 +38,14 @@ pnpm add use-travel mutative travels
 - [Basic](https://stackblitz.com/edit/react-xfw3uk?file=src%2FApp.js)
 - [Manual Time Travel](https://stackblitz.com/edit/react-3mnzq9?file=src%2FApp.js)
 
+### Choosing Between `use-travel` and `travels`
+
+Use `use-travel` when React components directly consume and render the time-travel state. The hook keeps React subscribed to the store and returns the current render snapshot together with the history controls.
+
+Use plain [`travels`](https://github.com/mutativejs/travels) when another layer such as a form manager or external store remains the single source of truth and Travels is only responsible for recording and replaying history. In that setup, the imperative API is usually a better fit because you can call `back()` / `forward()` and immediately read `travels.getState()` in the same callback.
+
+If you already have a shared `Travels` instance and still want to render it in React, `useTravelStore` is the right bridge. It keeps React in sync with the external store, but the returned `state` still follows React's render cycle. For imperative integrations, read from the `Travels` instance directly.
+
 ### API
 
 You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back()`, `forward()`, `reset()`, `canBack()`, `canForward()`, `canArchive()`, `getHistory()`, `patches`, `position`, `archive()`, and `go()`.
@@ -157,7 +165,7 @@ export function Counter() {
 }
 ```
 
-`useTravelStore` stays reactive even when the `Travels` instance is updated elsewhere (for example, in services or other components) and forwards manual archive helpers when the store is created with `autoArchive: false`.
+`useTravelStore` stays reactive even when the `Travels` instance is updated elsewhere (for example, in services or other components) and forwards manual archive helpers when the store is created with `autoArchive: false`. It is still a React bridge, so the returned `state` is a render snapshot rather than an imperative "read after back()" value.
 
 ### Archive Mode
 
