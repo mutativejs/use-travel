@@ -31,9 +31,9 @@ type StoreControls<
   F extends boolean,
   A extends boolean,
   P extends PatchesOption = {},
-> = A extends false
-  ? RebasableManualTravelsControls<S, F, P>
-  : RebasableTravelsControls<S, F, P>;
+> = A extends true
+  ? RebasableTravelsControls<S, F, P>
+  : RebasableManualTravelsControls<S, F, P>;
 
 /**
  * Creates a component-scoped {@link Travels} instance with undo/redo support and returns its reactive API.
@@ -255,7 +255,7 @@ export function useTravelStore<
     [travels]
   );
   const controls = useMemo<StoreControls<S, F, A, P>>(
-    () => travels.getControls() as unknown as StoreControls<S, F, A, P>,
+    () => travels.getControls(),
     [travels]
   );
   return [state as Value<S, F>, setState, controls];

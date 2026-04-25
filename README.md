@@ -51,6 +51,13 @@ yarn add use-travel travels mutative
 pnpm add use-travel travels mutative
 ```
 
+### Version compatibility
+
+| use-travel | travels                                    |
+| ---------- | ------------------------------------------ |
+| `>= 1.8.0` | `>= 1.2.0` (required for `rebase` support) |
+| `< 1.8.0`  | `< 1.2.0`                                  |
+
 ## Quick Start
 
 ```tsx
@@ -132,20 +139,20 @@ const [state, setState, controls] = useTravel(initialState, options);
 
 Common tuple members:
 
-| Member                      | Type                         | Description                                             |
-| --------------------------- | ---------------------------- | ------------------------------------------------------- |
-| `state`                     | `Value<S, F>`                | Current render snapshot                                 |
-| `setState`                  | `Updater<S>`                 | Updates state with a value, function, or draft mutation |
-| `controls.position`         | `number`                     | Current position in the history timeline                |
-| `controls.getHistory()`     | `() => Value<S, F>[]`        | Returns the history as state snapshots                  |
-| `controls.patches`          | `TravelPatches`              | Returns the stored patch history                        |
-| `controls.back(amount?)`    | `(amount?: number) => void`  | Undo one or more steps                                  |
-| `controls.forward(amount?)` | `(amount?: number) => void`  | Redo one or more steps                                  |
-| `controls.go(position)`     | `(position: number) => void` | Jump to a specific history position                     |
-| `controls.reset()`          | `() => void`                 | Reset to the initial state and clear history            |
+| Member                      | Type                         | Description                                                                 |
+| --------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
+| `state`                     | `Value<S, F>`                | Current render snapshot                                                     |
+| `setState`                  | `Updater<S>`                 | Updates state with a value, function, or draft mutation                     |
+| `controls.position`         | `number`                     | Current position in the history timeline                                    |
+| `controls.getHistory()`     | `() => Value<S, F>[]`        | Returns the history as state snapshots                                      |
+| `controls.patches`          | `TravelPatches`              | Returns the stored patch history                                            |
+| `controls.back(amount?)`    | `(amount?: number) => void`  | Undo one or more steps                                                      |
+| `controls.forward(amount?)` | `(amount?: number) => void`  | Redo one or more steps                                                      |
+| `controls.go(position)`     | `(position: number) => void` | Jump to a specific history position                                         |
+| `controls.reset()`          | `() => void`                 | Reset to the initial state and clear history                                |
 | `controls.rebase()`         | `() => void`                 | Make the current state the new baseline and discard past and future history |
-| `controls.canBack()`        | `() => boolean`              | Whether undo is possible                                |
-| `controls.canForward()`     | `() => boolean`              | Whether redo is possible                                |
+| `controls.canBack()`        | `() => boolean`              | Whether undo is possible                                                    |
+| `controls.canForward()`     | `() => boolean`              | Whether redo is possible                                                    |
 
 When `autoArchive: false`, the controls also include:
 

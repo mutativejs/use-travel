@@ -49,16 +49,15 @@ describe('useTravelStore', () => {
   it('exposes manual archive controls when autoArchive is disabled', () => {
     const travels = new Travels(
       { todos: [] as string[] },
-      { autoArchive: false }
+      { autoArchive: false as const }
     );
 
     const { result } = renderHook(() => useTravelStore(travels));
 
     let [state, setState, controls] = result.current;
-    const manualControls = controls as ReturnType<typeof travels.getControls>;
-    expect(typeof (manualControls as any).archive).toBe('function');
-    expect(typeof (manualControls as any).canArchive).toBe('function');
-    expect((manualControls as any).canArchive()).toBe(false);
+    expect(typeof controls.archive).toBe('function');
+    expect(typeof controls.canArchive).toBe('function');
+    expect(controls.canArchive()).toBe(false);
 
     act(() =>
       setState((draft) => {
@@ -67,21 +66,13 @@ describe('useTravelStore', () => {
     );
     [state, setState, controls] = result.current;
 
-    const manualControlsAfterUpdate =
-      controls as ReturnType<typeof travels.getControls>;
-
     expect(state.todos).toEqual(['todo 1']);
-    expect((manualControlsAfterUpdate as any).canArchive()).toBe(true);
+    expect(controls.canArchive()).toBe(true);
 
-    act(() => (manualControlsAfterUpdate as any).archive());
+    act(() => controls.archive());
     [state, setState, controls] = result.current;
 
-    const manualControlsAfterArchive =
-      controls as ReturnType<typeof travels.getControls>;
-
-    expect((manualControlsAfterArchive as any).canArchive()).toBe(false);
-    expect(manualControlsAfterArchive.getHistory()).toEqual(
-      travels.getHistory()
-    );
+    expect(controls.canArchive()).toBe(false);
+    expect(controls.getHistory()).toEqual(travels.getHistory());
   });
 });

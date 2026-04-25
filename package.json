@@ -1,7 +1,7 @@
 {
   "name": "use-travel",
-  "version": "1.7.0",
-  "description": "A React hook for state time travel with undo, redo, reset and archive functionalities.",
+  "version": "1.8.0",
+  "description": "A React hook for state time travel with undo, redo, reset, rebase and archive functionalities.",
   "main": "dist/index.cjs.js",
   "unpkg": "dist/index.umd.js",
   "types": "dist/index.d.ts",
@@ -19,10 +19,11 @@
     "access": "public"
   },
   "scripts": {
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage && coveralls < coverage/lcov.info",
+    "test": "yarn test:types && vitest run",
+    "test:types": "tsc -p tsconfig.typecheck.json",
+    "test:coverage": "yarn test:types && vitest run --coverage && coveralls < coverage/lcov.info",
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc --skipLibCheck && yarn build:prod",
+    "build": "yarn clean && yarn test:types && tsc --skipLibCheck && yarn build:prod",
     "build:prod": "NODE_ENV=production rollup --config --bundleConfigAsCjs",
     "build:doc": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "commit": "yarn git-cz"
