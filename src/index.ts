@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import type {
   TravelPatches,
   TravelsOptions,
-  ManualTravelsControls,
-  TravelsControls,
+  RebasableManualTravelsControls,
+  RebasableTravelsControls,
   Value,
   Updater,
   PatchesOption,
@@ -21,8 +21,19 @@ type Result<
 > = [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  A extends false ? ManualTravelsControls<S, F, P> : TravelsControls<S, F, P>,
+  A extends false
+    ? RebasableManualTravelsControls<S, F, P>
+    : RebasableTravelsControls<S, F, P>,
 ];
+
+type StoreControls<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+> = A extends false
+  ? RebasableManualTravelsControls<S, F, P>
+  : RebasableTravelsControls<S, F, P>;
 
 /**
  * Creates a component-scoped {@link Travels} instance with undo/redo support and returns its reactive API.
@@ -43,7 +54,7 @@ type Result<
  */
 export function useTravel<S, F extends boolean>(
   initialState: S
-): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F>];
+): [Value<S, F>, (updater: Updater<S>) => void, RebasableTravelsControls<S, F>];
 export function useTravel<
   S,
   F extends boolean,
@@ -54,7 +65,11 @@ export function useTravel<
   options: Omit<TravelsOptions<F, true, P>, 'autoArchive' | 'mutable'> & {
     autoArchive?: true;
   }
-): [Value<S, F>, (updater: Updater<S>) => void, TravelsControls<S, F, P>];
+): [
+  Value<S, F>,
+  (updater: Updater<S>) => void,
+  RebasableTravelsControls<S, F, P>,
+];
 export function useTravel<
   S,
   F extends boolean,
@@ -65,7 +80,11 @@ export function useTravel<
   options: Omit<TravelsOptions<F, false, P>, 'autoArchive' | 'mutable'> & {
     autoArchive: false;
   }
-): [Value<S, F>, (updater: Updater<S>) => void, ManualTravelsControls<S, F, P>];
+): [
+  Value<S, F>,
+  (updater: Updater<S>) => void,
+  RebasableManualTravelsControls<S, F, P>,
+];
 export function useTravel<
   S,
   F extends boolean,
@@ -172,6 +191,7 @@ export function useTravel<
       go: (position: number) => baseControls.go(position),
       canBack: () => baseControls.canBack(),
       canForward: () => baseControls.canForward(),
+      rebase: () => baseControls.rebase(),
       // Always include archive and canArchive methods for compatibility
       // Even in autoArchive mode, archive() can be called (but will warn)
       archive: () => {
@@ -217,11 +237,7 @@ export function useTravelStore<
   P extends PatchesOption = {},
 >(
   travels: Travels<S, F, A, P>
-): [
-  Value<S, F>,
-  (updater: Updater<S>) => void,
-  A extends false ? ManualTravelsControls<S, F, P> : TravelsControls<S, F, P>,
-] {
+): [Value<S, F>, (updater: Updater<S>) => void, StoreControls<S, F, A, P>] {
   const isMutable = Boolean((travels as any)?.mutable);
 
   if (isMutable) {
@@ -238,10 +254,9 @@ export function useTravelStore<
     (updater: Updater<S>) => travels.setState(updater),
     [travels]
   );
-  const controls = useMemo(() => travels.getControls(), [travels]);
-  return [state as Value<S, F>, setState, controls] as [
-    Value<S, F>,
-    (updater: Updater<S>) => void,
-    A extends false ? ManualTravelsControls<S, F, P> : TravelsControls<S, F, P>,
-  ];
+  const controls = useMemo<StoreControls<S, F, A, P>>(
+    () => travels.getControls() as unknown as StoreControls<S, F, A, P>,
+    [travels]
+  );
+  return [state as Value<S, F>, setState, controls];
 }

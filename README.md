@@ -5,136 +5,164 @@
 [![npm](https://img.shields.io/npm/v/use-travel.svg)](https://www.npmjs.com/package/use-travel)
 ![license](https://img.shields.io/npm/l/use-travel)
 
-A React hook for state time travel with undo, redo, reset and archive functionalities with [Travels](https://github.com/mutativejs/travels).
+**React hooks for [Travels](https://github.com/mutativejs/travels): patch-based undo/redo state with immutable updates, manual archiving, rebasing, and shared-store support.**
 
-### Motivation
+`use-travel` is the React layer for [`travels`](https://github.com/mutativejs/travels). It keeps the same core model as Travels, which stores JSON Patch history instead of full state snapshots, but exposes that model through React-friendly hooks:
 
-`use-travel` is a small and high-performance library for state time travel. It's built on [Mutative](https://github.com/unadlib/mutative) and [Travels](https://github.com/mutativejs/travels) to support mutation updating immutable data. It's designed to be simple and easy to use, and it's also customizable for different use cases.
+- `useTravel` for component-scoped state with undo/redo
+- `useTravelStore` for subscribing React components to an existing immutable `Travels` instance
 
-It's suitable for building any time travel feature in your application.
+Use plain [`travels`](https://github.com/mutativejs/travels) directly when your state lives outside React, you need imperative reads right after navigation, or you need `mutable: true`.
 
-### Installation
+## Table of Contents
+
+- [Why use-travel?](#why-use-travel)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Choosing Between `useTravel`, `useTravelStore`, and `travels`](#choosing-between-usetravel-usetravelstore-and-travels)
+- [API Reference](#api-reference)
+  - [`useTravel(initialState, options?)`](#usetravelinitialstate-options)
+  - [`useTravelStore(travels)`](#usetravelstoretravels)
+- [Archive Modes](#archive-modes)
+- [Important Behavior](#important-behavior)
+- [Rebase](#rebase)
+- [Persistence](#persistence)
+- [State Requirements](#state-requirements)
+- [Examples](#examples)
+- [Related Projects](#related-projects)
+- [License](#license)
+
+## Why use-travel?
+
+- **React-first API**: Use a hook tuple instead of wiring subscriptions manually.
+- **Patch-based history**: Undo/redo stores only changes, not full state snapshots.
+- **Mutative update syntax**: Write `draft.count += 1` while keeping immutable React state.
+- **Manual archive mode**: Group several edits into one undo step when needed.
+- **Rebase support**: Promote the current state to the new reset baseline.
+- **Shared history support**: Subscribe multiple React components to the same immutable `Travels` store with `useTravelStore`.
+
+## Installation
 
 ```bash
-npm install use-travel mutative travels
+npm install use-travel travels mutative
 # or
-yarn add use-travel mutative travels
+yarn add use-travel travels mutative
 # or
-pnpm add use-travel mutative travels
+pnpm add use-travel travels mutative
 ```
 
-### Features
+## Quick Start
 
-- Undo/Redo/Reset/Go/Archive functionalities
-- Mutations update immutable data
-- Small size for time travel with JSON Patch history
-- Customizable history size
-- Customizable initial patches
-- High performance
-- Mark function for custom immutability
-
-### Example
-
-- [Basic](https://stackblitz.com/edit/react-xfw3uk?file=src%2FApp.js)
-- [Manual Time Travel](https://stackblitz.com/edit/react-3mnzq9?file=src%2FApp.js)
-
-### Choosing Between `use-travel` and `travels`
-
-Use `use-travel` when React components directly consume and render the time-travel state. The hook keeps React subscribed to the store and returns the current render snapshot together with the history controls.
-
-Use plain [`travels`](https://github.com/mutativejs/travels) when another layer such as a form manager or external store remains the single source of truth and Travels is only responsible for recording and replaying history. In that setup, the imperative API is usually a better fit because you can call `back()` / `forward()` and immediately read `travels.getState()` in the same callback.
-
-If you already have a shared `Travels` instance and still want to render it in React, `useTravelStore` is the right bridge. It keeps React in sync with the external store, but the returned `state` still follows React's render cycle. For imperative integrations, read from the `Travels` instance directly.
-
-### API
-
-You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back()`, `forward()`, `reset()`, `canBack()`, `canForward()`, `canArchive()`, `getHistory()`, `patches`, `position`, `archive()`, and `go()`.
-
-```jsx
+```tsx
 import { useTravel } from 'use-travel';
 
-const App = () => {
-  const [state, setState, controls] = useTravel(0, {
-    maxHistory: 10,
-    initialPatches: {
-      patches: [],
-      inversePatches: [],
-    },
-  });
+export function Counter() {
+  const [state, setState, controls] = useTravel({ count: 0 });
+
   return (
     <div>
-      <div>{state}</div>
-      <button onClick={() => setState(state + 1)}>Increment</button>
-      <button onClick={() => setState(state - 1)}>Decrement</button>
+      <strong>{state.count}</strong>
+
+      <button
+        onClick={() =>
+          setState((draft) => {
+            draft.count += 1;
+          })
+        }
+      >
+        Increment
+      </button>
+
       <button onClick={() => controls.back()} disabled={!controls.canBack()}>
         Undo
       </button>
+
       <button
         onClick={() => controls.forward()}
         disabled={!controls.canForward()}
       >
         Redo
       </button>
+
       <button onClick={controls.reset}>Reset</button>
-      {controls.getHistory().map((state, index) => (
-        <div key={index}>{state}</div>
-      ))}
-      {controls.patches.patches.map((patch, index) => (
-        <div key={index}>{JSON.stringify(patch)}</div>
-      ))}
-      <div>{controls.position}</div>
-      <button
-        onClick={() => {
-          controls.go(1);
-        }}
-      >
-        Go
-      </button>
     </div>
   );
-};
+}
 ```
 
-### Parameters
+`setState` supports three update styles:
 
-| Parameter          | type                        | description                                                                                                                                                                     | default                          |
-| ------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `maxHistory`       | `number`                    | The maximum number of history to keep                                                                                                                                           | 10                               |
-| `initialPatches`   | `TravelPatches`             | The initial patches                                                                                                                                                             | {patches: [],inversePatches: []} |
-| `initialPosition`  | `number`                    | The initial position of the state                                                                                                                                               | 0                                |
-| `autoArchive`      | `boolean`                   | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                                                                          | true                             |
-| `enableAutoFreeze` | `boolean`                   | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                                                        | false                            |
-| `strict`           | `boolean`                   | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                                                                  | false                            |
-| `mark`             | `Mark<O, F>[]`              | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)                                                                  | () => void                       |
-| `patchesOptions`   | `boolean ｜ PatchesOptions` | Customize JSON Patch format. Supports `{ pathAsArray: boolean }` to control path format. See [Mutative patches docs](https://mutative.js.org/docs/api-reference/create#patches) | `true` (enable patches)          |
+- Direct value: `setState({ count: 1 })`
+- Function returning a value: `setState(() => ({ count: 1 }))`
+- Draft mutation: `setState((draft) => { draft.count += 1 })`
 
-### Returns
+## Choosing Between `useTravel`, `useTravelStore`, and `travels`
 
-| Return                | type                           | description                                                            |
-| --------------------- | ------------------------------ | ---------------------------------------------------------------------- |
-| `state`               | Value<S, F>                    | The current state                                                      |
-| `setState`            | Updater<InitialValue<S>>       | The state setter, support mutation update or return immutable data     |
-| `controls.back`       | (amount?: number) => void      | Go back to the previous state                                          |
-| `controls.forward`    | (amount?: number) => void      | Go forward to the next state                                           |
-| `controls.reset`      | () => void                     | Reset the state to the initial state                                   |
-| `controls.canBack`    | () => boolean                  | Check if can go back to the previous state                             |
-| `controls.canForward` | () => boolean                  | Check if can go forward to the next state                              |
-| `controls.canArchive` | () => boolean                  | Check if can archive the current state                                 |
-| `controls.getHistory` | () => T[]                      | Get the history of the state                                           |
-| `controls.patches`    | TravelPatches[]                | Get the patches history of the state                                   |
-| `controls.position`   | number                         | Get the current position of the state                                  |
-| `controls.go`         | (nextPosition: number) => void | Go to the specific position of the state                               |
-| `controls.archive`    | () => void                     | Archive the current state(the `autoArchive` options should be `false`) |
+- Use `useTravel` when the state belongs to a React component and React should own the lifecycle.
+- Use `useTravelStore` when you already have a shared immutable `Travels` instance and want React to stay subscribed to it.
+- Use plain [`travels`](https://github.com/mutativejs/travels) when another layer is the source of truth, you need imperative `getState()` reads after `back()` or `forward()`, or you need `mutable: true`.
 
-### useTravelStore
+## API Reference
 
-When you need to manage a single `Travels` instance outside of React—e.g. to share the same undo/redo history across multiple components—create the store manually and bind it with `useTravelStore`. The hook keeps React in sync with the external store, exposes the same controls object, and rejects mutable stores to ensure React can observe updates.
+### `useTravel(initialState, options?)`
+
+Creates a component-scoped immutable `Travels` instance and returns a tuple:
+
+```ts
+const [state, setState, controls] = useTravel(initialState, options);
+```
+
+`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. `mutable` is intentionally not supported here.
+
+#### Options
+
+| Option                 | Type             | Description                                                                       | Default                               |
+| ---------------------- | ---------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
+| `maxHistory`           | `number`         | Maximum number of history entries to keep                                         | `10`                                  |
+| `initialPatches`       | `TravelPatches`  | Patch history to restore from persistence                                         | `{ patches: [], inversePatches: [] }` |
+| `strictInitialPatches` | `boolean`        | Throw when persisted patches are invalid instead of falling back to empty history | `false`                               |
+| `initialPosition`      | `number`         | History position to restore from persistence                                      | `0`                                   |
+| `autoArchive`          | `boolean`        | Save each change automatically or require manual `archive()`                      | `true`                                |
+| `enableAutoFreeze`     | `boolean`        | Forwarded to Mutative immutability options                                        | `false`                               |
+| `strict`               | `boolean`        | Forwarded to Mutative strict immutability checks                                  | `false`                               |
+| `mark`                 | `Mark<O, F>[]`   | Forwarded to Mutative mark options                                                | `() => void`                          |
+| `patchesOptions`       | `PatchesOptions` | Customize patch output such as `{ pathAsArray: true }`                            | enabled                               |
+
+#### Returns
+
+Common tuple members:
+
+| Member                      | Type                         | Description                                             |
+| --------------------------- | ---------------------------- | ------------------------------------------------------- |
+| `state`                     | `Value<S, F>`                | Current render snapshot                                 |
+| `setState`                  | `Updater<S>`                 | Updates state with a value, function, or draft mutation |
+| `controls.position`         | `number`                     | Current position in the history timeline                |
+| `controls.getHistory()`     | `() => Value<S, F>[]`        | Returns the history as state snapshots                  |
+| `controls.patches`          | `TravelPatches`              | Returns the stored patch history                        |
+| `controls.back(amount?)`    | `(amount?: number) => void`  | Undo one or more steps                                  |
+| `controls.forward(amount?)` | `(amount?: number) => void`  | Redo one or more steps                                  |
+| `controls.go(position)`     | `(position: number) => void` | Jump to a specific history position                     |
+| `controls.reset()`          | `() => void`                 | Reset to the initial state and clear history            |
+| `controls.rebase()`         | `() => void`                 | Make the current state the new baseline and discard past and future history |
+| `controls.canBack()`        | `() => boolean`              | Whether undo is possible                                |
+| `controls.canForward()`     | `() => boolean`              | Whether redo is possible                                |
+
+When `autoArchive: false`, the controls also include:
+
+| Member                  | Type            | Description                                            |
+| ----------------------- | --------------- | ------------------------------------------------------ |
+| `controls.archive()`    | `() => void`    | Commit the current working state as the next undo step |
+| `controls.canArchive()` | `() => boolean` | Whether there are unarchived changes                   |
+
+### `useTravelStore(travels)`
+
+Subscribes React to an existing immutable `Travels` instance without creating a new store.
 
 ```tsx
 // store.ts
 import { Travels } from 'travels';
 
-export const travels = new Travels({ count: 0 }); // mutable: true is not supported
+export const travels = new Travels({ count: 0 });
 ```
 
 ```tsx
@@ -165,123 +193,169 @@ export function Counter() {
 }
 ```
 
-`useTravelStore` stays reactive even when the `Travels` instance is updated elsewhere (for example, in services or other components) and forwards manual archive helpers when the store is created with `autoArchive: false`. It is still a React bridge, so the returned `state` is a render snapshot rather than an imperative "read after back()" value.
+Important notes for `useTravelStore`:
 
-### Archive Mode
+- It only supports immutable `Travels` instances. Passing a store created with `mutable: true` throws.
+- It exposes the same navigation controls as `useTravel`, including `rebase()`.
+- It is a React bridge, so the returned `state` is still a render snapshot.
+- If you need imperative "navigate and read immediately" behavior, call `travels.back()` or `travels.forward()` and read `travels.getState()` directly from the store.
 
-`use-travel` provides two archive modes to control how state changes are recorded in history:
+## Archive Modes
 
-#### Auto Archive Mode (default: `autoArchive: true`)
+`use-travel` supports two recording modes.
 
-In auto archive mode, every `setState` call is automatically recorded as a separate history entry. This is the simplest mode and suitable for most use cases.
+### Auto Archive Mode
 
-```jsx
+With the default `autoArchive: true`, every `setState` call becomes its own undo step.
+
+```tsx
 const [state, setState, controls] = useTravel({ count: 0 });
-// or explicitly: useTravel({ count: 0 }, { autoArchive: true })
 
-// Each setState creates a new history entry
-setState({ count: 1 }); // History: [0, 1]
-// ... user clicks another button
-setState({ count: 2 }); // History: [0, 1, 2]
-// ... user clicks another button
-setState({ count: 3 }); // History: [0, 1, 2, 3]
-
-controls.back(); // Go back to count: 2
-```
-
-#### Manual Archive Mode (`autoArchive: false`)
-
-In manual archive mode, you control when state changes are recorded to history using the `archive()` function. This is useful when you want to group multiple state changes into a single undo/redo step.
-
-**Use Case 1: Batch multiple changes into one history entry**
-
-```jsx
-const [state, setState, controls] = useTravel(
-  { count: 0 },
-  {
-    autoArchive: false,
-  }
-);
-
-// Multiple setState calls across different renders
-setState({ count: 1 }); // Temporary change (not in history yet)
-// ... user clicks another button
-setState({ count: 2 }); // Temporary change (not in history yet)
-// ... user clicks another button
-setState({ count: 3 }); // Temporary change (not in history yet)
-
-// Commit all changes as a single history entry
-controls.archive(); // History: [0, 3]
-
-// Now undo will go back to 0, not 2 or 1
-controls.back(); // Back to 0
-```
-
-**Use Case 2: Explicit commit after a single change**
-
-```jsx
-function handleSave() {
+function increment() {
   setState((draft) => {
     draft.count += 1;
   });
-  controls.archive(); // Commit immediately
+}
+
+// Three separate user interactions:
+// click #1 -> count = 1
+// click #2 -> count = 2
+// click #3 -> count = 3
+
+controls.back(); // { count: 2 }
+```
+
+### Manual Archive Mode
+
+With `autoArchive: false`, you decide when the current working state should become a committed history entry.
+
+This is useful for flows like forms, drag interactions, or multi-step editors where several changes should undo together.
+
+```tsx
+const [doc, setDoc, controls] = useTravel(
+  { title: '', body: '' },
+  { autoArchive: false }
+);
+
+function onTitleChange(title: string) {
+  setDoc((draft) => {
+    draft.title = title;
+  });
+}
+
+function onBodyChange(body: string) {
+  setDoc((draft) => {
+    draft.body = body;
+  });
+}
+
+function save() {
+  if (controls.canArchive()) {
+    controls.archive();
+  }
 }
 ```
 
-The key difference:
+## Important Behavior
 
-- **Auto archive**: Each `setState` = one undo step
-- **Manual archive**: `archive()` call = one undo step (can include multiple `setState` calls)
+### One `setState` call per synchronous call stack
 
-### Important Notes
+`useTravel` throws if `setState` is called more than once within the same synchronous call stack. If multiple fields need to change together, update them in a single draft mutation.
 
-> **⚠️ setState Restriction**: `setState` can only be called **once** within the same synchronous call stack (e.g., inside a single event handler). This ensures predictable undo/redo behavior where each history entry represents a clear, atomic change.
+```tsx
+setState((draft) => {
+  draft.count += 1;
+  draft.todos.push({ id: 1, text: 'Buy milk' });
+});
+```
 
-```jsx
-const App = () => {
-  const [state, setState, controls] = useTravel({ count: 0, todo: [] });
-  return (
-    <div>
-      <div>{state.count}</div>
-      <button
-        onClick={() => {
-          // ❌ Multiple setState calls in the same event handler
-          setState((draft) => {
-            draft.count += 1;
-          });
-          setState((draft) => {
-            draft.todo.push({ id: 1, text: 'Buy' });
-          });
-          // This will throw: "setState cannot be called multiple times in the same render cycle"
+In manual archive mode, you can still make one `setState` call per event or render and archive later when the grouped change is ready.
 
-          // ✅ Correct: Batch all changes in a single setState
-          setState((draft) => {
-            draft.count += 1;
-            draft.todo.push({ id: 1, text: 'Buy' });
-          });
-        }}
-      >
-        Update
-      </button>
-    </div>
-  );
+### `initialState` and `options` are read once
+
+`useTravel` creates the underlying `Travels` instance only on the first render. Later changes to `initialState` or `options` do not recreate the history store automatically. If you need a fresh store, remount the component or change its `key`.
+
+### No-op updates are ignored
+
+Updates that do not produce actual changes do not create history entries.
+
+## Rebase
+
+`controls.rebase()` discards all past and future history and makes the current state the new baseline.
+
+This is a destructive operation. After rebasing:
+
+- `controls.position` becomes `0`
+- `controls.getHistory()` contains only the current state
+- `controls.reset()` returns to the rebased state, not the original initial state
+- In manual archive mode, any unarchived working changes become part of the new baseline
+
+```tsx
+const [state, setState, controls] = useTravel({ count: 0 });
+
+setState((draft) => {
+  draft.count = 5;
+});
+
+controls.rebase();
+
+setState((draft) => {
+  draft.count = 9;
+});
+
+controls.reset(); // { count: 5 }
+```
+
+## Persistence
+
+`use-travel` re-exports `TravelPatches`, so you can persist both the current state and its history:
+
+```tsx
+import type { TravelPatches } from 'use-travel';
+
+type SavedTravel = {
+  state: { count: number };
+  patches: TravelPatches;
+  position: number;
+};
+
+const saved: SavedTravel = {
+  state,
+  patches: controls.patches,
+  position: controls.position,
 };
 ```
 
-> **Note**: With `autoArchive: false`, you can call `setState` once per event handler across multiple renders, then call `archive()` whenever you want to commit those changes to history.
+Restore that data by passing the saved state as `initialState` and the saved history as `initialPatches` plus `initialPosition`:
 
-### Persistence
-
-> `TravelPatches` is the type of patches history, it includes `patches` and `inversePatches`.
-
-> If you want to persist the state, you can use `state`/`controls.patches`/`controls.position` to save the travel history. Then, read the persistent data as `initialState`, `initialPatches`, and `initialPosition` when initializing the state, like this:
-
-```jsx
-const [state, setState, controls] = useTravel(initialState, {
-  initialPatches,
-  initialPosition,
+```tsx
+const [state, setState, controls] = useTravel(saved.state, {
+  initialPatches: saved.patches,
+  initialPosition: saved.position,
 });
 ```
+
+If persisted patch data may be corrupt, set `strictInitialPatches: true` to fail fast instead of silently starting with empty history.
+
+## State Requirements
+
+`use-travel` follows the same state rules as [`travels`](https://github.com/mutativejs/travels):
+
+- Prefer plain JSON-serializable data.
+- `Map` and `Set` are supported in immutable mode.
+- Avoid complex mutable objects such as class instances, functions, DOM nodes, or framework-specific reactive proxies.
+
+If you need mutable observable state, use `travels` directly instead of `useTravelStore`.
+
+## Examples
+
+- [Basic](https://stackblitz.com/edit/react-xfw3uk?file=src%2FApp.js)
+- [Manual Time Travel](https://stackblitz.com/edit/react-3mnzq9?file=src%2FApp.js)
+
+## Related Projects
+
+- [travels](https://github.com/mutativejs/travels) - The framework-agnostic undo/redo core
+- [zustand-travel](https://github.com/mutativejs/zustand-travel) - Zustand middleware built on Travels
 
 ## License
 

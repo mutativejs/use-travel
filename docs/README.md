@@ -1,6 +1,6 @@
 **use-travel** • [**Docs**](globals.md)
 
-***
+---
 
 # use-travel
 
@@ -9,7 +9,7 @@
 [![npm](https://img.shields.io/npm/v/use-travel.svg)](https://www.npmjs.com/package/use-travel)
 ![license](https://img.shields.io/npm/l/use-travel)
 
-A React hook for state time travel with undo, redo, reset and archive functionalities.
+A React hook for state time travel with undo, redo, reset, rebase and archive functionalities.
 
 ### Motivation
 
@@ -20,14 +20,16 @@ It's suitable for building any time travel feature in your application.
 ### Installation
 
 ```bash
-npm install use-travel mutative
+npm install use-travel travels mutative
 # or
-yarn add use-travel mutative
+yarn add use-travel travels mutative
+# or
+pnpm add use-travel travels mutative
 ```
 
 ### Features
 
-- Undo/Redo/Reset/Go/Archive functionalities
+- Undo/Redo/Reset/Rebase/Go/Archive functionalities
 - Mutations update immutable data
 - Small size for time travel with JSON Patch history
 - Customizable history size
@@ -42,7 +44,7 @@ yarn add use-travel mutative
 
 ### API
 
-You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back()`, `forward()`, `reset()`, `canBack()`, `canForward()`, `canArchive()`, `getHistory()`, `patches`, `position`, `archive()`, and `go()`.
+You can use `useTravel` to create a time travel state. And it returns a tuple with the current state, the state setter, and the controls. The controls include `back()`, `forward()`, `reset()`, `rebase()`, `canBack()`, `canForward()`, `canArchive()`, `getHistory()`, `patches`, `position`, `archive()`, and `go()`.
 
 ```jsx
 import { useTravel } from 'use-travel';
@@ -96,7 +98,7 @@ const App = () => {
 | `maxHistory`       | number        | The maximum number of history to keep                                                                                    | 10                               |
 | `initialPatches`   | TravelPatches | The initial patches                                                                                                      | {patches: [],inversePatches: []} |
 | `initialPosition`  | number        | The initial position of the state                                                                                        | 0                                |
-| `autoArchive`      | boolean       | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                  | true                             |
+| `autoArchive`      | boolean       | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                   | true                             |
 | `enableAutoFreeze` | boolean       | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options) | false                            |
 | `strict`           | boolean       | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | false                            |
 | `mark`             | Mark<O, F>[]  | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | () => void                       |
@@ -117,6 +119,7 @@ const App = () => {
 | `controls.patches`    | TravelPatches[]                | Get the patches history of the state                                   |
 | `controls.position`   | number                         | Get the current position of the state                                  |
 | `controls.go`         | (nextPosition: number) => void | Go to the specific position of the state                               |
+| `controls.rebase`     | () => void                     | Make the current state the new baseline and discard all history        |
 | `controls.archive`    | () => void                     | Archive the current state(the `autoArchive` options should be `false`) |
 
 ### Archive Mode
@@ -148,9 +151,12 @@ In manual archive mode, you control when state changes are recorded to history u
 **Use Case 1: Batch multiple changes into one history entry**
 
 ```jsx
-const [state, setState, controls] = useTravel({ count: 0 }, {
-  autoArchive: false
-});
+const [state, setState, controls] = useTravel(
+  { count: 0 },
+  {
+    autoArchive: false,
+  }
+);
 
 // Multiple setState calls across different renders
 setState({ count: 1 }); // Temporary change (not in history yet)
@@ -178,6 +184,7 @@ function handleSave() {
 ```
 
 The key difference:
+
 - **Auto archive**: Each `setState` = one undo step
 - **Manual archive**: `archive()` call = one undo step (can include multiple `setState` calls)
 
@@ -217,6 +224,12 @@ const App = () => {
 ```
 
 > **Note**: With `autoArchive: false`, you can call `setState` once per event handler across multiple renders, then call `archive()` whenever you want to commit those changes to history.
+
+### Rebase
+
+`rebase()` discards all past and future history and promotes the current state to the new reset baseline.
+
+After calling `rebase()`, `position` becomes `0`, `getHistory()` contains only the current state, and later `reset()` calls return to that rebased state rather than the original initial state.
 
 ### Persistence
 

@@ -9,13 +9,16 @@ globalThis.__DEV__ = true;
 
 describe('useTravel - Input Validation', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
     consoleErrorSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
   });
 
   describe('maxHistory validation', () => {
@@ -103,65 +106,68 @@ describe('useTravel - Input Validation', () => {
   });
 
   describe('initialPatches validation', () => {
-    it('should log error when patches is not an array', () => {
-      // This will throw an error when trying to use invalid patches
-      // but should log the validation error first
-      expect(() => {
-        renderHook(() =>
-          useTravel(0, {
-            initialPatches: {
-              // @ts-expect-error - Testing invalid input
-              patches: 'not-an-array',
-              inversePatches: [],
-            },
-          })
-        );
-      }).toThrow();
+    it('should log error and fall back when patches is not an array', () => {
+      const { result } = renderHook(() =>
+        useTravel(0, {
+          initialPatches: {
+            // @ts-expect-error - Testing invalid input
+            patches: 'not-an-array',
+            inversePatches: [],
+          },
+        })
+      );
+
+      const [state, _setState, controls] = result.current;
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         `useTravel: initialPatches must have 'patches' and 'inversePatches' arrays`
       );
+      expect(state).toBe(0);
+      expect(controls.position).toBe(0);
+      expect(controls.patches).toEqual({ patches: [], inversePatches: [] });
     });
 
-    it('should log error when inversePatches is not an array', () => {
-      // This will throw an error when trying to use invalid patches
-      // but should log the validation error first
-      expect(() => {
-        renderHook(() =>
-          useTravel(0, {
-            initialPatches: {
-              patches: [],
-              // @ts-expect-error - Testing invalid input
-              inversePatches: null,
-            },
-          })
-        );
-      }).toThrow();
+    it('should log error and fall back when inversePatches is not an array', () => {
+      const { result } = renderHook(() =>
+        useTravel(0, {
+          initialPatches: {
+            patches: [],
+            // @ts-expect-error - Testing invalid input
+            inversePatches: null,
+          },
+        })
+      );
+
+      const [state, _setState, controls] = result.current;
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         `useTravel: initialPatches must have 'patches' and 'inversePatches' arrays`
       );
+      expect(state).toBe(0);
+      expect(controls.position).toBe(0);
+      expect(controls.patches).toEqual({ patches: [], inversePatches: [] });
     });
 
-    it('should log error when both patches and inversePatches are not arrays', () => {
-      // This will throw an error when trying to use invalid patches
-      // but should log the validation error first
-      expect(() => {
-        renderHook(() =>
-          useTravel(0, {
-            initialPatches: {
-              // @ts-expect-error - Testing invalid input
-              patches: {},
-              // @ts-expect-error - Testing invalid input
-              inversePatches: {},
-            },
-          })
-        );
-      }).toThrow();
+    it('should log error and fall back when both patches and inversePatches are not arrays', () => {
+      const { result } = renderHook(() =>
+        useTravel(0, {
+          initialPatches: {
+            // @ts-expect-error - Testing invalid input
+            patches: {},
+            // @ts-expect-error - Testing invalid input
+            inversePatches: {},
+          },
+        })
+      );
+
+      const [state, _setState, controls] = result.current;
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         `useTravel: initialPatches must have 'patches' and 'inversePatches' arrays`
       );
+      expect(state).toBe(0);
+      expect(controls.position).toBe(0);
+      expect(controls.patches).toEqual({ patches: [], inversePatches: [] });
     });
 
     it('should log error when patches and inversePatches have different lengths', () => {
@@ -216,6 +222,49 @@ describe('useTravel - Input Validation', () => {
       );
 
       expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('strictInitialPatches validation', () => {
+    it('should throw when strictInitialPatches is true and patches is invalid', () => {
+      expect(() =>
+        renderHook(() =>
+          useTravel(0, {
+            strictInitialPatches: true,
+            initialPatches: {
+              // @ts-expect-error - Testing invalid input
+              patches: 'not-an-array',
+              inversePatches: [],
+            },
+          })
+        )
+      ).toThrow(
+        `Travels: initialPatches must have 'patches' and 'inversePatches' arrays`
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        `useTravel: initialPatches must have 'patches' and 'inversePatches' arrays`
+      );
+    });
+
+    it('should throw when strictInitialPatches is true and patch lengths mismatch', () => {
+      expect(() =>
+        renderHook(() =>
+          useTravel(0, {
+            strictInitialPatches: true,
+            initialPatches: {
+              patches: [[{ op: 'replace', path: [], value: 1 }]],
+              inversePatches: [],
+            },
+          })
+        )
+      ).toThrow(
+        'Travels: initialPatches.patches and initialPatches.inversePatches must have the same length'
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        `useTravel: initialPatches.patches and initialPatches.inversePatches must have the same length`
+      );
     });
   });
 
