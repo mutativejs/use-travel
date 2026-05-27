@@ -55,7 +55,8 @@ pnpm add use-travel travels mutative
 
 | use-travel | travels                                    |
 | ---------- | ------------------------------------------ |
-| `>= 1.8.0` | `>= 1.2.0` (required for `rebase` support) |
+| `>= 1.8.1` | `>= 1.3.0` (persistence and metadata APIs) |
+| `1.8.0`    | `>= 1.2.0` (required for `rebase` support) |
 | `< 1.8.0`  | `< 1.2.0`                                  |
 
 ## Quick Start
@@ -123,17 +124,22 @@ const [state, setState, controls] = useTravel(initialState, options);
 
 #### Options
 
-| Option                 | Type             | Description                                                                       | Default                               |
-| ---------------------- | ---------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
-| `maxHistory`           | `number`         | Maximum number of history entries to keep                                         | `10`                                  |
-| `initialPatches`       | `TravelPatches`  | Patch history to restore from persistence                                         | `{ patches: [], inversePatches: [] }` |
-| `strictInitialPatches` | `boolean`        | Throw when persisted patches are invalid instead of falling back to empty history | `false`                               |
-| `initialPosition`      | `number`         | History position to restore from persistence                                      | `0`                                   |
-| `autoArchive`          | `boolean`        | Save each change automatically or require manual `archive()`                      | `true`                                |
-| `enableAutoFreeze`     | `boolean`        | Forwarded to Mutative immutability options                                        | `false`                               |
-| `strict`               | `boolean`        | Forwarded to Mutative strict immutability checks                                  | `false`                               |
-| `mark`                 | `Mark<O, F>[]`   | Forwarded to Mutative mark options                                                | `() => void`                          |
-| `patchesOptions`       | `PatchesOptions` | Customize patch output such as `{ pathAsArray: true }`                            | enabled                               |
+| Option                   | Type              | Description                                                                       | Default                               |
+| ------------------------ | ----------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
+| `maxHistory`             | `number`          | Maximum number of history entries to keep                                         | `10`                                  |
+| `history`                | `TravelsHistory`  | Restore validated history returned by `Travels.deserialize(...)`                  | `undefined`                           |
+| `initialPatches`         | `TravelPatches`   | Patch history to restore from persistence                                         | `{ patches: [], inversePatches: [] }` |
+| `strictInitialPatches`   | `boolean`         | Throw when persisted patches are invalid instead of falling back to empty history | `false`                               |
+| `initialPosition`        | `number`          | History position to restore from persistence                                      | `0`                                   |
+| `autoArchive`            | `boolean`         | Save each change automatically or require manual `archive()`                      | `true`                                |
+| `warnOnUnsupportedState` | `boolean`         | Warn in development when state has weak JSON Patch or persistence semantics       | development only                      |
+| `onError`                | `(error) => void` | Receive wrapped Travels operation errors                                          | `undefined`                           |
+| `onBranchDiscard`        | `(event) => void` | Observe redo history discarded by a new edit                                      | `undefined`                           |
+| `devtools`               | `(event) => void` | Observe core Travels events for custom devtools                                   | `undefined`                           |
+| `enableAutoFreeze`       | `boolean`         | Forwarded to Mutative immutability options                                        | `false`                               |
+| `strict`                 | `boolean`         | Forwarded to Mutative strict immutability checks                                  | `false`                               |
+| `mark`                   | `Mark<O, F>[]`    | Forwarded to Mutative mark options                                                | `() => void`                          |
+| `patchesOptions`         | `PatchesOptions`  | Customize patch output such as `{ pathAsArray: true }`                            | enabled                               |
 
 #### Returns
 
@@ -342,7 +348,26 @@ const [state, setState, controls] = useTravel(saved.state, {
 });
 ```
 
-If persisted patch data may be corrupt, set `strictInitialPatches: true` to fail fast instead of silently starting with empty history.
+With `travels@1.3.0` or newer, you can also validate a versioned snapshot before passing it to the hook:
+
+```tsx
+import { Travels, type TravelsSerializedHistory } from 'travels';
+
+const saved: TravelsSerializedHistory<{ count: number }> = {
+  version: 1,
+  state,
+  patches: controls.patches,
+  position: controls.position,
+};
+
+const history = Travels.deserialize(saved);
+
+const [state, setState, controls] = useTravel(history.state, {
+  history,
+});
+```
+
+`history` overrides `initialPatches` and `initialPosition` when both forms are provided. If persisted patch data may be corrupt, set `strictInitialPatches: true` for legacy patch restores or validate snapshots with `Travels.deserialize(...)` before rendering.
 
 ## State Requirements
 

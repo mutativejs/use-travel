@@ -1389,11 +1389,6 @@ describe('useTravel', () => {
             {
               "op": "replace",
               "path": [],
-              "value": 7,
-            },
-            {
-              "op": "replace",
-              "path": [],
               "value": 5,
             },
           ],
@@ -1414,11 +1409,6 @@ describe('useTravel', () => {
             },
           ],
           [
-            {
-              "op": "replace",
-              "path": [],
-              "value": 7,
-            },
             {
               "op": "replace",
               "path": [],

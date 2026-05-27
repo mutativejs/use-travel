@@ -27,6 +27,14 @@ yarn add use-travel travels mutative
 pnpm add use-travel travels mutative
 ```
 
+### Version compatibility
+
+| use-travel | travels                                    |
+| ---------- | ------------------------------------------ |
+| `>= 1.8.1` | `>= 1.3.0` (persistence and metadata APIs) |
+| `1.8.0`    | `>= 1.2.0` (required for `rebase` support) |
+| `< 1.8.0`  | `< 1.2.0`                                  |
+
 ### Features
 
 - Undo/Redo/Reset/Rebase/Go/Archive functionalities
@@ -93,15 +101,20 @@ const App = () => {
 
 ### Parameters
 
-| Parameter          | type          | description                                                                                                              | default                          |
-| ------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
-| `maxHistory`       | number        | The maximum number of history to keep                                                                                    | 10                               |
-| `initialPatches`   | TravelPatches | The initial patches                                                                                                      | {patches: [],inversePatches: []} |
-| `initialPosition`  | number        | The initial position of the state                                                                                        | 0                                |
-| `autoArchive`      | boolean       | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                   | true                             |
-| `enableAutoFreeze` | boolean       | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options) | false                            |
-| `strict`           | boolean       | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | false                            |
-| `mark`             | Mark<O, F>[]  | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | () => void                       |
+| Parameter                | type            | description                                                                                                              | default                          |
+| ------------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------- |
+| `maxHistory`             | number          | The maximum number of history to keep                                                                                    | 10                               |
+| `history`                | TravelsHistory  | Restore validated history returned by `Travels.deserialize(...)`                                                         | undefined                        |
+| `initialPatches`         | TravelPatches   | The initial patches                                                                                                      | {patches: [],inversePatches: []} |
+| `initialPosition`        | number          | The initial position of the state                                                                                        | 0                                |
+| `autoArchive`            | boolean         | Auto archive the state (see [Archive Mode](#archive-mode) for details)                                                   | true                             |
+| `warnOnUnsupportedState` | boolean         | Warn in development when state has weak JSON Patch or persistence semantics                                              | development only                 |
+| `onError`                | (error) => void | Receive wrapped Travels operation errors                                                                                 | undefined                        |
+| `onBranchDiscard`        | (event) => void | Observe redo history discarded by a new edit                                                                             | undefined                        |
+| `devtools`               | (event) => void | Observe core Travels events for custom devtools                                                                          | undefined                        |
+| `enableAutoFreeze`       | boolean         | Enable auto freeze the state, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options) | false                            |
+| `strict`                 | boolean         | Enable strict mode, [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | false                            |
+| `mark`                   | Mark<O, F>[]    | The mark function , [view more](https://github.com/unadlib/mutative?tab=readme-ov-file#createstate-fn-options)           | () => void                       |
 
 ### Returns
 
@@ -243,6 +256,27 @@ const [state, setState, controls] = useTravel(initialState, {
   initialPosition,
 });
 ```
+
+With `travels@1.3.0` or newer, you can also validate a versioned snapshot before passing it to the hook:
+
+```jsx
+import { Travels } from 'travels';
+
+const saved = {
+  version: 1,
+  state,
+  patches: controls.patches,
+  position: controls.position,
+};
+
+const history = Travels.deserialize(saved);
+
+const [state, setState, controls] = useTravel(history.state, {
+  history,
+});
+```
+
+`history` overrides `initialPatches` and `initialPosition` when both forms are provided. If persisted patch data may be corrupt, set `strictInitialPatches: true` for legacy patch restores or validate snapshots with `Travels.deserialize(...)` before rendering.
 
 ## License
 

@@ -125,9 +125,9 @@ export function useTravel<
   }
 
   // Create Travels instance (only once)
-  const travelsRef = useRef<Travels<S, F, A>>();
+  const travelsRef = useRef<Travels<S, F, A, P> | null>(null);
   if (!travelsRef.current) {
-    travelsRef.current = new Travels<S, F, A>(initialState, {
+    travelsRef.current = new Travels<S, F, A, P>(initialState, {
       ..._options,
       mutable: false,
     });
