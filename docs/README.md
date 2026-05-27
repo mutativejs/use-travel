@@ -31,8 +31,7 @@ pnpm add use-travel travels mutative
 
 | use-travel | travels                                             |
 | ---------- | --------------------------------------------------- |
-| `>= 1.8.2` | `>= 1.3.1` (persistence APIs plus 1.3.1 core fixes) |
-| `1.8.1`    | `>= 1.3.0` (persistence and metadata APIs)          |
+| `1.8.1`    | `>= 1.3.1` (persistence and metadata APIs)          |
 | `1.8.0`    | `>= 1.2.0` (required for `rebase` support)          |
 | `< 1.8.0`  | `< 1.2.0`                                           |
 

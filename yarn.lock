@@ -4394,7 +4394,7 @@ tr46@^6.0.0:
 
 travels@^1.3.1:
   version "1.3.1"
-  resolved "https://registry.npmjs.org/travels/-/travels-1.3.1.tgz#b379278316ce2f0583c7ad30d421d334b10dfd85"
+  resolved "https://registry.yarnpkg.com/travels/-/travels-1.3.1.tgz#b379278316ce2f0583c7ad30d421d334b10dfd85"
   integrity sha512-l71Cw0HqoCW9isx1a3pBya8h2jWu2DuzEb9za2xdt0wWAkxzepwj/WSwBrGYgwGJksMcU/V3JB0TY4FmZul9bg==
 
 trim-lines@^3.0.0:
