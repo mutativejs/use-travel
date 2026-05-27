@@ -53,11 +53,12 @@ pnpm add use-travel travels mutative
 
 ### Version compatibility
 
-| use-travel | travels                                    |
-| ---------- | ------------------------------------------ |
-| `>= 1.8.1` | `>= 1.3.0` (persistence and metadata APIs) |
-| `1.8.0`    | `>= 1.2.0` (required for `rebase` support) |
-| `< 1.8.0`  | `< 1.2.0`                                  |
+| use-travel | travels                                             |
+| ---------- | --------------------------------------------------- |
+| `>= 1.8.2` | `>= 1.3.1` (persistence APIs plus 1.3.1 core fixes) |
+| `1.8.1`    | `>= 1.3.0` (persistence and metadata APIs)          |
+| `1.8.0`    | `>= 1.2.0` (required for `rebase` support)          |
+| `< 1.8.0`  | `< 1.2.0`                                           |
 
 ## Quick Start
 
@@ -348,7 +349,7 @@ const [state, setState, controls] = useTravel(saved.state, {
 });
 ```
 
-With `travels@1.3.0` or newer, you can also validate a versioned snapshot before passing it to the hook:
+With `travels@1.3.1` or newer, you can also validate a versioned snapshot before passing it to the hook:
 
 ```tsx
 import { Travels, type TravelsSerializedHistory } from 'travels';
