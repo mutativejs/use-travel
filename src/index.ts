@@ -35,6 +35,19 @@ type StoreControls<
   ? RebasableTravelsControls<S, F, P>
   : RebasableManualTravelsControls<S, F, P>;
 
+/** {@link StoreControls} plus reactive `canUndo` / `canRedo` flags. */
+type StoreControlsWithFlags<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+> = StoreControls<S, F, A, P> & {
+  /** Whether undo is possible. Reactive getter — safe to read during render. */
+  readonly canUndo: boolean;
+  /** Whether redo is possible. Reactive getter — safe to read during render. */
+  readonly canRedo: boolean;
+};
+
 /**
  * Creates a component-scoped {@link Travels} instance with undo/redo support and returns its reactive API.
  *
@@ -237,7 +250,11 @@ export function useTravelStore<
   P extends PatchesOption = {},
 >(
   travels: Travels<S, F, A, P>
-): [Value<S, F>, (updater: Updater<S>) => void, StoreControls<S, F, A, P>] {
+): [
+  Value<S, F>,
+  (updater: Updater<S>) => void,
+  StoreControlsWithFlags<S, F, A, P>,
+] {
   const isMutable = Boolean((travels as any)?.mutable);
 
   if (isMutable) {
@@ -254,9 +271,16 @@ export function useTravelStore<
     (updater: Updater<S>) => travels.setState(updater),
     [travels]
   );
-  const controls = useMemo<StoreControls<S, F, A, P>>(
-    () => travels.getControls(),
-    [travels]
-  );
+  const controls = useMemo<StoreControlsWithFlags<S, F, A, P>>(() => {
+    const base = travels.getControls();
+    // Expose canUndo/canRedo as getters mirroring canBack()/canForward(). Property
+    // reads (unlike method calls) are not memoised by the React Compiler on the stable
+    // `controls` reference, so these stay reactive when read during render — the same
+    // way `controls.position` already does — while `controls` itself stays stable.
+    return Object.create(base, {
+      canUndo: { get: () => base.canBack(), enumerable: true },
+      canRedo: { get: () => base.canForward(), enumerable: true },
+    }) as StoreControlsWithFlags<S, F, A, P>;
+  }, [travels]);
   return [state as Value<S, F>, setState, controls];
 }

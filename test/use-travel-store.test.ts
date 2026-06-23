@@ -46,6 +46,35 @@ describe('useTravelStore', () => {
     expect(controls.getHistory()).toEqual(travels.getHistory());
   });
 
+  it('exposes reactive canUndo/canRedo getters while keeping controls stable', () => {
+    const travels = new Travels({ count: 0 });
+
+    const { result } = renderHook(() => useTravelStore(travels));
+
+    const [, setState, controlsBefore] = result.current;
+    expect(controlsBefore.canUndo).toBe(false);
+    expect(controlsBefore.canRedo).toBe(false);
+
+    act(() =>
+      setState((draft) => {
+        draft.count = 1;
+      })
+    );
+
+    const [, , controlsAfter] = result.current;
+
+    expect(controlsAfter).toBe(controlsBefore);
+    expect(controlsAfter.canUndo).toBe(true);
+    expect(controlsAfter.canRedo).toBe(false);
+    expect(controlsAfter.canBack()).toBe(true);
+
+    act(() => controlsAfter.back());
+    const [, , controlsAfterUndo] = result.current;
+
+    expect(controlsAfterUndo.canUndo).toBe(false);
+    expect(controlsAfterUndo.canRedo).toBe(true);
+  });
+
   it('exposes manual archive controls when autoArchive is disabled', () => {
     const travels = new Travels(
       { todos: [] as string[] },
