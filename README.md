@@ -81,14 +81,11 @@ export function Counter() {
         Increment
       </button>
 
-      <button onClick={() => controls.back()} disabled={!controls.canBack()}>
+      <button onClick={() => controls.back()} disabled={!controls.canUndo}>
         Undo
       </button>
 
-      <button
-        onClick={() => controls.forward()}
-        disabled={!controls.canForward()}
-      >
+      <button onClick={() => controls.forward()} disabled={!controls.canRedo}>
         Redo
       </button>
 
@@ -157,8 +154,10 @@ Common tuple members:
 | `controls.go(position)`     | `(position: number) => void` | Jump to a specific history position                                         |
 | `controls.reset()`          | `() => void`                 | Reset to the initial state and clear history                                |
 | `controls.rebase()`         | `() => void`                 | Make the current state the new baseline and discard past and future history |
-| `controls.canBack()`        | `() => boolean`              | Whether undo is possible                                                    |
-| `controls.canForward()`     | `() => boolean`              | Whether redo is possible                                                    |
+| `controls.canBack()`        | `() => boolean`              | Imperative predicate — whether undo is possible (use in event handlers)     |
+| `controls.canForward()`     | `() => boolean`              | Imperative predicate — whether redo is possible (use in event handlers)     |
+| `controls.canUndo`          | `boolean`                    | Render-safe reactive flag — whether undo is possible (read during render)   |
+| `controls.canRedo`          | `boolean`                    | Render-safe reactive flag — whether redo is possible (read during render)   |
 
 When `autoArchive: false`, the controls also include:
 
@@ -166,6 +165,15 @@ When `autoArchive: false`, the controls also include:
 | ----------------------- | --------------- | ------------------------------------------------------ |
 | `controls.archive()`    | `() => void`    | Commit the current working state as the next undo step |
 | `controls.canArchive()` | `() => boolean` | Whether there are unarchived changes                   |
+
+#### Checking undo/redo availability: getters vs methods
+
+`canUndo` / `canRedo` are reactive **getters** and `canBack()` / `canForward()` are **methods**. They report the same thing, but are meant for different contexts:
+
+- **During render** (e.g. `disabled={!controls.canUndo}`), use the `canUndo` / `canRedo` getters. They are re-read on every render, so they stay correct — including under the [React Compiler](https://react.dev/learn/react-compiler), which memoises method calls on the stable `controls` reference and would otherwise freeze `controls.canBack()` at its first-render value.
+- **In event handlers or outside render** (e.g. `onClick={() => controls.canBack() && controls.back()}`), the `canBack()` / `canForward()` methods are fine.
+
+The methods are kept for backward compatibility and imperative use; the getters are the render-safe form.
 
 ### `useTravelStore(travels)`
 
@@ -198,7 +206,7 @@ export function Counter() {
       >
         Increment
       </button>
-      <button onClick={() => controls.back()} disabled={!controls.canBack()}>
+      <button onClick={() => controls.back()} disabled={!controls.canUndo}>
         Undo
       </button>
     </div>

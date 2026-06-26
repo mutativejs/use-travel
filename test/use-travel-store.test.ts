@@ -75,6 +75,35 @@ describe('useTravelStore', () => {
     expect(controlsAfterUndo.canRedo).toBe(true);
   });
 
+  it('keeps existing controls members own-enumerable (Object.keys / spread)', () => {
+    const travels = new Travels({ count: 0 });
+
+    const { result } = renderHook(() => useTravelStore(travels));
+    const [, , controls] = result.current;
+
+    const keys = Object.keys(controls);
+    for (const member of [
+      'position',
+      'getHistory',
+      'back',
+      'forward',
+      'reset',
+      'go',
+      'canBack',
+      'canForward',
+      'rebase',
+    ]) {
+      expect(keys).toContain(member);
+    }
+    expect(keys).toContain('canUndo');
+    expect(keys).toContain('canRedo');
+
+    const copy = { ...controls } as typeof controls;
+    expect(typeof copy.back).toBe('function');
+    expect(typeof copy.canBack).toBe('function');
+    expect(copy.canUndo).toBe(false);
+  });
+
   it('exposes manual archive controls when autoArchive is disabled', () => {
     const travels = new Travels(
       { todos: [] as string[] },

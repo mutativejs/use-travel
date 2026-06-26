@@ -13,6 +13,14 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 export type { TravelPatches };
 
+/** Adds reactive `canUndo` / `canRedo` availability flags to a controls type. */
+type WithUndoRedoFlags<C> = C & {
+  /** Whether undo is possible. Render-safe reactive getter — read this during render. */
+  readonly canUndo: boolean;
+  /** Whether redo is possible. Render-safe reactive getter — read this during render. */
+  readonly canRedo: boolean;
+};
+
 type Result<
   S,
   F extends boolean,
@@ -21,9 +29,11 @@ type Result<
 > = [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  A extends false
-    ? RebasableManualTravelsControls<S, F, P>
-    : RebasableTravelsControls<S, F, P>,
+  WithUndoRedoFlags<
+    A extends false
+      ? RebasableManualTravelsControls<S, F, P>
+      : RebasableTravelsControls<S, F, P>
+  >,
 ];
 
 type StoreControls<
@@ -41,12 +51,7 @@ type StoreControlsWithFlags<
   F extends boolean,
   A extends boolean,
   P extends PatchesOption = {},
-> = StoreControls<S, F, A, P> & {
-  /** Whether undo is possible. Reactive getter — safe to read during render. */
-  readonly canUndo: boolean;
-  /** Whether redo is possible. Reactive getter — safe to read during render. */
-  readonly canRedo: boolean;
-};
+> = WithUndoRedoFlags<StoreControls<S, F, A, P>>;
 
 /**
  * Creates a component-scoped {@link Travels} instance with undo/redo support and returns its reactive API.
@@ -67,7 +72,11 @@ type StoreControlsWithFlags<
  */
 export function useTravel<S, F extends boolean>(
   initialState: S
-): [Value<S, F>, (updater: Updater<S>) => void, RebasableTravelsControls<S, F>];
+): [
+  Value<S, F>,
+  (updater: Updater<S>) => void,
+  WithUndoRedoFlags<RebasableTravelsControls<S, F>>,
+];
 export function useTravel<
   S,
   F extends boolean,
@@ -81,7 +90,7 @@ export function useTravel<
 ): [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  RebasableTravelsControls<S, F, P>,
+  WithUndoRedoFlags<RebasableTravelsControls<S, F, P>>,
 ];
 export function useTravel<
   S,
@@ -96,7 +105,7 @@ export function useTravel<
 ): [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  RebasableManualTravelsControls<S, F, P>,
+  WithUndoRedoFlags<RebasableManualTravelsControls<S, F, P>>,
 ];
 export function useTravel<
   S,
@@ -204,6 +213,12 @@ export function useTravel<
       go: (position: number) => baseControls.go(position),
       canBack: () => baseControls.canBack(),
       canForward: () => baseControls.canForward(),
+      get canUndo() {
+        return baseControls.canBack();
+      },
+      get canRedo() {
+        return baseControls.canForward();
+      },
       rebase: () => baseControls.rebase(),
       // Always include archive and canArchive methods for compatibility
       // Even in autoArchive mode, archive() can be called (but will warn)
@@ -273,14 +288,16 @@ export function useTravelStore<
   );
   const controls = useMemo<StoreControlsWithFlags<S, F, A, P>>(() => {
     const base = travels.getControls();
-    // Expose canUndo/canRedo as getters mirroring canBack()/canForward(). Property
-    // reads (unlike method calls) are not memoised by the React Compiler on the stable
-    // `controls` reference, so these stay reactive when read during render — the same
-    // way `controls.position` already does — while `controls` itself stays stable.
-    return Object.create(base, {
-      canUndo: { get: () => base.canBack(), enumerable: true },
-      canRedo: { get: () => base.canForward(), enumerable: true },
-    }) as StoreControlsWithFlags<S, F, A, P>;
+    // Copy the base's own descriptors (rather than Object.create / spread) so the existing
+    // methods stay own-enumerable, then add canUndo/canRedo as reactive getters.
+    return Object.defineProperties(
+      {},
+      {
+        ...Object.getOwnPropertyDescriptors(base),
+        canUndo: { get: () => base.canBack(), enumerable: true },
+        canRedo: { get: () => base.canForward(), enumerable: true },
+      }
+    ) as StoreControlsWithFlags<S, F, A, P>;
   }, [travels]);
   return [state as Value<S, F>, setState, controls];
 }
