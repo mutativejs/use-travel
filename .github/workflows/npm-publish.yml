@@ -1,5 +1,6 @@
 name: Publish Package to npmjs
 on:
+  workflow_dispatch:
   release:
     types: [published]
 jobs:
@@ -19,8 +20,10 @@ jobs:
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
+          package-manager-cache: false
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
       - run: pnpm test
+      - run: npm install -g npm@latest
+      - run: npm --version
       - run: npm publish
