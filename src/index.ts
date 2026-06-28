@@ -13,6 +13,14 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 export type { TravelPatches };
 
+/** Adds reactive `canUndo` / `canRedo` availability flags to a controls type. */
+type WithUndoRedoFlags<C> = C & {
+  /** Whether undo is possible. Render-safe reactive getter — read this during render. */
+  readonly canUndo: boolean;
+  /** Whether redo is possible. Render-safe reactive getter — read this during render. */
+  readonly canRedo: boolean;
+};
+
 type Result<
   S,
   F extends boolean,
@@ -21,9 +29,11 @@ type Result<
 > = [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  A extends false
-    ? RebasableManualTravelsControls<S, F, P>
-    : RebasableTravelsControls<S, F, P>,
+  WithUndoRedoFlags<
+    A extends false
+      ? RebasableManualTravelsControls<S, F, P>
+      : RebasableTravelsControls<S, F, P>
+  >,
 ];
 
 type StoreControls<
@@ -34,6 +44,14 @@ type StoreControls<
 > = A extends true
   ? RebasableTravelsControls<S, F, P>
   : RebasableManualTravelsControls<S, F, P>;
+
+/** {@link StoreControls} plus reactive `canUndo` / `canRedo` flags. */
+type StoreControlsWithFlags<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+> = WithUndoRedoFlags<StoreControls<S, F, A, P>>;
 
 /**
  * Creates a component-scoped {@link Travels} instance with undo/redo support and returns its reactive API.
@@ -54,7 +72,11 @@ type StoreControls<
  */
 export function useTravel<S, F extends boolean>(
   initialState: S
-): [Value<S, F>, (updater: Updater<S>) => void, RebasableTravelsControls<S, F>];
+): [
+  Value<S, F>,
+  (updater: Updater<S>) => void,
+  WithUndoRedoFlags<RebasableTravelsControls<S, F>>,
+];
 export function useTravel<
   S,
   F extends boolean,
@@ -68,7 +90,7 @@ export function useTravel<
 ): [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  RebasableTravelsControls<S, F, P>,
+  WithUndoRedoFlags<RebasableTravelsControls<S, F, P>>,
 ];
 export function useTravel<
   S,
@@ -83,7 +105,7 @@ export function useTravel<
 ): [
   Value<S, F>,
   (updater: Updater<S>) => void,
-  RebasableManualTravelsControls<S, F, P>,
+  WithUndoRedoFlags<RebasableManualTravelsControls<S, F, P>>,
 ];
 export function useTravel<
   S,
@@ -191,6 +213,12 @@ export function useTravel<
       go: (position: number) => baseControls.go(position),
       canBack: () => baseControls.canBack(),
       canForward: () => baseControls.canForward(),
+      get canUndo() {
+        return baseControls.canBack();
+      },
+      get canRedo() {
+        return baseControls.canForward();
+      },
       rebase: () => baseControls.rebase(),
       // Always include archive and canArchive methods for compatibility
       // Even in autoArchive mode, archive() can be called (but will warn)
@@ -237,7 +265,11 @@ export function useTravelStore<
   P extends PatchesOption = {},
 >(
   travels: Travels<S, F, A, P>
-): [Value<S, F>, (updater: Updater<S>) => void, StoreControls<S, F, A, P>] {
+): [
+  Value<S, F>,
+  (updater: Updater<S>) => void,
+  StoreControlsWithFlags<S, F, A, P>,
+] {
   const isMutable = Boolean((travels as any)?.mutable);
 
   if (isMutable) {
@@ -254,9 +286,18 @@ export function useTravelStore<
     (updater: Updater<S>) => travels.setState(updater),
     [travels]
   );
-  const controls = useMemo<StoreControls<S, F, A, P>>(
-    () => travels.getControls(),
-    [travels]
-  );
+  const controls = useMemo<StoreControlsWithFlags<S, F, A, P>>(() => {
+    const base = travels.getControls();
+    // Copy the base's own descriptors (rather than Object.create / spread) so the existing
+    // methods stay own-enumerable, then add canUndo/canRedo as reactive getters.
+    return Object.defineProperties(
+      {},
+      {
+        ...Object.getOwnPropertyDescriptors(base),
+        canUndo: { get: () => base.canBack(), enumerable: true },
+        canRedo: { get: () => base.canForward(), enumerable: true },
+      }
+    ) as StoreControlsWithFlags<S, F, A, P>;
+  }, [travels]);
   return [state as Value<S, F>, setState, controls];
 }
