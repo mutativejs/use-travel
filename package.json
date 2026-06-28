@@ -11,7 +11,7 @@
   "react-native": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "source": "src/index.ts",
-  "packageManager": "pnpm@11.8.0",
+  "packageManager": "pnpm@10.34.4",
   "sideEffects": false,
   "files": [
     "dist"
