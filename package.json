@@ -11,6 +11,7 @@
   "react-native": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "source": "src/index.ts",
+  "packageManager": "pnpm@11.8.0",
   "sideEffects": false,
   "files": [
     "dist"
@@ -19,14 +20,14 @@
     "access": "public"
   },
   "scripts": {
-    "test": "yarn test:types && vitest run",
+    "test": "pnpm run test:types && vitest run",
     "test:types": "tsc -p tsconfig.typecheck.json",
-    "test:coverage": "yarn test:types && vitest run --coverage && coveralls < coverage/lcov.info",
+    "test:coverage": "pnpm run test:types && vitest run --coverage && coveralls < coverage/lcov.info",
     "clean": "rimraf dist",
-    "build": "yarn clean && yarn test:types && tsc --skipLibCheck && yarn build:prod",
+    "build": "pnpm run clean && pnpm run test:types && tsc --skipLibCheck && pnpm run build:prod",
     "build:prod": "NODE_ENV=production rollup --config --bundleConfigAsCjs",
     "build:doc": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
-    "commit": "yarn git-cz"
+    "commit": "pnpm exec git-cz"
   },
   "repository": {
     "type": "git",
