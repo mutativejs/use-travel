@@ -14,7 +14,7 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 export type { TravelPatches };
 
 /** Adds reactive `canUndo` / `canRedo` availability flags to a controls type. */
-type WithUndoRedoFlags<C> = C & {
+export type WithUndoRedoFlags<C> = C & {
   /** Whether undo is possible. Render-safe reactive getter — read this during render. */
   readonly canUndo: boolean;
   /** Whether redo is possible. Render-safe reactive getter — read this during render. */
@@ -36,37 +36,31 @@ type Result<
   >,
 ];
 
-type StoreControls<
+/** Controls returned by `useTravelStore`, plus reactive `canUndo` / `canRedo` flags. */
+export type StoreControlsWithFlags<
   S,
   F extends boolean,
   A extends boolean,
   P extends PatchesOption = {},
-> = A extends true
-  ? RebasableTravelsControls<S, F, P>
-  : RebasableManualTravelsControls<S, F, P>;
-
-/** {@link StoreControls} plus reactive `canUndo` / `canRedo` flags. */
-type StoreControlsWithFlags<
-  S,
-  F extends boolean,
-  A extends boolean,
-  P extends PatchesOption = {},
-> = WithUndoRedoFlags<StoreControls<S, F, A, P>>;
+> = WithUndoRedoFlags<
+  A extends true
+    ? RebasableTravelsControls<S, F, P>
+    : RebasableManualTravelsControls<S, F, P>
+>;
 
 /**
- * Creates a component-scoped {@link Travels} instance with undo/redo support and returns its reactive API.
+ * Creates a component-scoped Travels instance with undo/redo support and returns its reactive API.
  *
  * The hook memoises the underlying `Travels` instance per component, wires it to React's lifecycle, and forces
  * re-renders whenever the managed state changes. Consumers receive a tuple containing the current state, a `setState`
  * updater that accepts either a mutative draft function or partial state, and the history controls exposed by
- * {@link Travels}.
+ * Travels.
  *
  * @typeParam S - Shape of the state managed by the travel store.
  * @typeParam F - Whether draft freezing is enabled.
  * @typeParam A - Whether the instance auto-archives changes; determines the controls contract.
  * @typeParam P - Additional patches configuration forwarded to Mutative.
  * @param initialState - Value used to initialise the travel store.
- * @param _options - Optional configuration mirrored from {@link Travels}.
  * @returns A tuple with the current state, typed updater, and history controls.
  * @throws {Error} When `setState` is invoked multiple times within the same render cycle (development-only guard).
  */
@@ -244,7 +238,7 @@ export function useTravel<
 }
 
 /**
- * Subscribes to an existing {@link Travels} store and bridges it into React via `useSyncExternalStore`.
+ * Subscribes to an existing Travels store and bridges it into React via `useSyncExternalStore`.
  *
  * The hook keeps React in sync with the store's state and exposes the same tuple shape as {@link useTravel}, but it
  * does not create or manage the store lifecycle. Mutable Travels instances are rejected because they reuse the same
@@ -254,7 +248,7 @@ export function useTravel<
  * @typeParam F - Whether draft freezing is enabled.
  * @typeParam A - Whether the instance auto-archives changes; determines the controls contract.
  * @typeParam P - Additional patches configuration forwarded to Mutative.
- * @param travels - Existing {@link Travels} instance to bind to React.
+ * @param travels - Existing Travels instance to bind to React.
  * @returns A tuple containing the current state, typed updater, and history controls.
  * @throws {Error} If the provided `Travels` instance was created with `mutable: true`.
  */
