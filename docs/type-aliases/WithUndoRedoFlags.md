@@ -8,7 +8,7 @@
 
 > **WithUndoRedoFlags**\<`C`\>: `C` & `object`
 
-Adds reactive `canUndo` / `canRedo` availability flags to a controls type.
+Adds `canUndo` and `canRedo` flags to a controls type.
 
 ## Type declaration
 
@@ -16,13 +16,13 @@ Adds reactive `canUndo` / `canRedo` availability flags to a controls type.
 
 > `readonly` **canRedo**: `boolean`
 
-Whether redo is possible. Render-safe reactive getter — read this during render.
+Whether redo is currently possible.
 
 ### canUndo
 
 > `readonly` **canUndo**: `boolean`
 
-Whether undo is possible. Render-safe reactive getter — read this during render.
+Whether undo is currently possible.
 
 ## Type Parameters
 

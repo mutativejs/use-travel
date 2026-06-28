@@ -13,11 +13,11 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 export type { TravelPatches };
 
-/** Adds reactive `canUndo` / `canRedo` availability flags to a controls type. */
+/** Adds `canUndo` and `canRedo` flags to a controls type. */
 export type WithUndoRedoFlags<C> = C & {
-  /** Whether undo is possible. Render-safe reactive getter — read this during render. */
+  /** Whether undo is currently possible. */
   readonly canUndo: boolean;
-  /** Whether redo is possible. Render-safe reactive getter — read this during render. */
+  /** Whether redo is currently possible. */
   readonly canRedo: boolean;
 };
 
@@ -36,7 +36,7 @@ type Result<
   >,
 ];
 
-/** Controls returned by `useTravelStore`, plus reactive `canUndo` / `canRedo` flags. */
+/** Controls returned by `useTravelStore`, including `canUndo` and `canRedo`. */
 export type StoreControlsWithFlags<
   S,
   F extends boolean,
@@ -282,8 +282,7 @@ export function useTravelStore<
   );
   const controls = useMemo<StoreControlsWithFlags<S, F, A, P>>(() => {
     const base = travels.getControls();
-    // Copy the base's own descriptors (rather than Object.create / spread) so the existing
-    // methods stay own-enumerable, then add canUndo/canRedo as reactive getters.
+    // Preserve the base controls as own properties so Object.keys and spread keep working.
     return Object.defineProperties(
       {},
       {

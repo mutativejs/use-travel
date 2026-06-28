@@ -8,7 +8,7 @@
 
 > **StoreControlsWithFlags**\<`S`, `F`, `A`, `P`\>: [`WithUndoRedoFlags`](WithUndoRedoFlags.md)\<`A` *extends* `true` ? `RebasableTravelsControls`\<`S`, `F`, `P`\> : `RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>
 
-Controls returned by `useTravelStore`, plus reactive `canUndo` / `canRedo` flags.
+Controls returned by `useTravelStore`, including `canUndo` and `canRedo`.
 
 ## Type Parameters
 
