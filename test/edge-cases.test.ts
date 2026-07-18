@@ -268,7 +268,7 @@ describe('useTravel - Edge Cases', () => {
       [state, setState, controls] = result.current;
 
       expect(controls.position).toBe(3); // Capped by maxHistory
-      expect(controls.patches.patches.length).toBe(4); // includes temp
+      expect(controls.patches.patches.length).toBe(3); // maxHistory includes temp
       expect(controls.getHistory()).toEqual([2, 3, 4, 5]);
       expect(controls.canBack()).toBe(true);
       expect(controls.canForward()).toBe(false);
