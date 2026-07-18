@@ -7,6 +7,7 @@ import type {
   Value,
   Updater,
   PatchesOption,
+  TravelMetadata,
 } from 'travels';
 import { Travels } from 'travels';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
@@ -216,11 +217,11 @@ export function useTravel<
       rebase: () => baseControls.rebase(),
       // Always include archive and canArchive methods for compatibility
       // Even in autoArchive mode, archive() can be called (but will warn)
-      archive: () => {
+      archive: (metadata?: TravelMetadata) => {
         if ('archive' in baseControls) {
-          baseControls.archive();
+          baseControls.archive(metadata);
         } else {
-          travels.archive();
+          travels.archive(metadata);
         }
       },
       canArchive: () => {

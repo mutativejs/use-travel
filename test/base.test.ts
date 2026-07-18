@@ -1,4 +1,4 @@
-import { expect, describe, it } from 'vitest';
+import { expect, describe, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useTravel } from '../src/index';
 
@@ -137,6 +137,42 @@ describe('useTravel', () => {
       { count: 6 },
     ]);
     expect(controls.canArchive()).toBe(false);
+  });
+
+  it('[useTravel]: manual archive metadata is forwarded to Travels events', () => {
+    const devtools = vi.fn();
+    const { result } = renderHook(() =>
+      useTravel(
+        { count: 0 },
+        {
+          autoArchive: false,
+          devtools,
+        }
+      )
+    );
+
+    act(() => {
+      result.current[1]((draft) => {
+        draft.count = 1;
+      });
+    });
+
+    act(() => {
+      result.current[2].archive({
+        label: 'checkpoint',
+        source: 'toolbar',
+      });
+    });
+
+    expect(devtools).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        type: 'archive',
+        state: { count: 1 },
+        position: 1,
+        historyLength: 1,
+        metadata: { label: 'checkpoint', source: 'toolbar' },
+      })
+    );
   });
 
   it('[useTravel]: setState calls after navigation truncate newly added patches incorrectly', () => {
