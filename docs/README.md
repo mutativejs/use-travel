@@ -1,6 +1,6 @@
 **use-travel** • [**Docs**](globals.md)
 
-***
+---
 
 # use-travel
 
@@ -57,11 +57,12 @@ pnpm add use-travel travels mutative
 
 ### Version compatibility
 
-| use-travel | travels                                             |
-| ---------- | --------------------------------------------------- |
-| `1.8.1`    | `>= 1.3.1` (persistence and metadata APIs)          |
-| `1.8.0`    | `>= 1.2.0` (required for `rebase` support)          |
-| `< 1.8.0`  | `< 1.2.0`                                           |
+| use-travel    | travels                                    |
+| ------------- | ------------------------------------------ |
+| Unreleased    | `^2.0.0`                                   |
+| `1.8.1–1.9.0` | `^1.3.1` (persistence and metadata APIs)   |
+| `1.8.0`       | `>= 1.2.0` (required for `rebase` support) |
+| `< 1.8.0`     | `< 1.2.0`                                  |
 
 ## Quick Start
 
@@ -133,10 +134,11 @@ const [state, setState, controls] = useTravel(initialState, options);
 | `strictInitialPatches`   | `boolean`         | Throw when persisted patches are invalid instead of falling back to empty history | `false`                               |
 | `initialPosition`        | `number`          | History position to restore from persistence                                      | `0`                                   |
 | `autoArchive`            | `boolean`         | Save each change automatically or require manual `archive()`                      | `true`                                |
-| `warnOnUnsupportedState` | `boolean`         | Warn in development when state has weak JSON Patch or persistence semantics       | development only                      |
+| `warnOnUnsupportedState` | `boolean`         | Warn in development about weak state, patch, metadata, or persistence semantics   | development only                      |
 | `onError`                | `(error) => void` | Receive wrapped Travels operation errors                                          | `undefined`                           |
 | `onBranchDiscard`        | `(event) => void` | Observe redo history discarded by a new edit                                      | `undefined`                           |
-| `devtools`               | `(event) => void` | Observe core Travels events for custom devtools                                   | `undefined`                           |
+| `onObserverError`        | `(event) => void` | Receive listener, devtools, and observer-hook failures                            | `undefined`                           |
+| `devtools`               | `(event) => void` | Observe unified `TravelsEvent` timeline events                                    | `undefined`                           |
 | `enableAutoFreeze`       | `boolean`         | Forwarded to Mutative immutability options                                        | `false`                               |
 | `strict`                 | `boolean`         | Forwarded to Mutative strict immutability checks                                  | `false`                               |
 | `mark`                   | `Mark<O, F>[]`    | Forwarded to Mutative mark options                                                | `() => void`                          |
@@ -360,7 +362,7 @@ const [state, setState, controls] = useTravel(saved.state, {
 });
 ```
 
-With `travels@1.3.1` or newer, you can also validate a versioned snapshot before passing it to the hook:
+With `travels@2.0.0`, you can semantically validate a versioned snapshot before passing it to the hook:
 
 ```tsx
 import { Travels, type TravelsSerializedHistory } from 'travels';
@@ -372,21 +374,21 @@ const saved: TravelsSerializedHistory<{ count: number }> = {
   position: controls.position,
 };
 
-const history = Travels.deserialize(saved);
+const history = Travels.deserialize(saved, { validation: 'semantic' });
 
 const [state, setState, controls] = useTravel(history.state, {
   history,
 });
 ```
 
-`history` overrides `initialPatches` and `initialPosition` when both forms are provided. If persisted patch data may be corrupt, set `strictInitialPatches: true` for legacy patch restores or validate snapshots with `Travels.deserialize(...)` before rendering.
+`history` overrides `initialPatches` and `initialPosition` when both forms are provided. Travels uses structural validation by default; select `validation: 'semantic'` for unverified or potentially corrupted snapshots so every history entry is replayed in both directions. For legacy patch restores, set `strictInitialPatches: true` to fail instead of discarding invalid patch data.
 
 ## State Requirements
 
 `use-travel` follows the same state rules as [`travels`](https://github.com/mutativejs/travels):
 
-- Prefer plain JSON-serializable data.
-- `Map` and `Set` are supported in immutable mode.
+- Use JSON-shaped state: plain objects, dense arrays, strings, finite numbers other than `-0`, booleans, and `null`.
+- `Map` and `Set` are rejected in both immutable and mutable modes. Normalize them to plain objects or dense arrays before creating the store.
 - Avoid complex mutable objects such as class instances, functions, DOM nodes, or framework-specific reactive proxies.
 
 If you need mutable observable state, use `travels` directly instead of `useTravelStore`.
