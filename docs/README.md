@@ -59,7 +59,7 @@ pnpm add use-travel travels mutative
 
 | use-travel    | travels                                    |
 | ------------- | ------------------------------------------ |
-| Unreleased    | `^2.0.0`                                   |
+| `2.0.0`       | `^2.0.0`                                   |
 | `1.8.1–1.9.0` | `^1.3.1` (persistence and metadata APIs)   |
 | `1.8.0`       | `>= 1.2.0` (required for `rebase` support) |
 | `< 1.8.0`     | `< 1.2.0`                                  |
