@@ -59,10 +59,13 @@ pnpm add use-travel travels mutative
 
 | use-travel    | travels                                    |
 | ------------- | ------------------------------------------ |
-| `>= 2.0.0`    | `^2.0.0`                                   |
+| `2.1.x`       | `^2.1.0`                                   |
+| `2.0.x`       | `^2.0.0`                                   |
 | `1.8.1–1.9.0` | `^1.3.1` (persistence and metadata APIs)   |
 | `1.8.0`       | `>= 1.2.0` (required for `rebase` support) |
 | `< 1.8.0`     | `< 1.2.0`                                  |
+
+Travels 2.1 adds controlled journals for integrations whose runtime already owns state. `useTravel` remains state-owning and does not expose or forward the journal-only `controlledApply` option; build those adapters with `createTravelJournal()` from `travels` directly. Standard timelines used by these hooks never emit the new `recordPatches` event, but `TravelsEvent['type']` is an open union, so devtools handlers should retain a fallback branch for event types added by minor Travels releases.
 
 ## Quick Start
 
@@ -122,7 +125,7 @@ Creates a component-scoped immutable `Travels` instance and returns a tuple:
 const [state, setState, controls] = useTravel(initialState, options);
 ```
 
-`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. `mutable` is intentionally not supported here.
+`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. `mutable` and the controlled-journal-only `controlledApply` option are intentionally not supported here.
 
 #### Options
 

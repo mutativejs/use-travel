@@ -45,7 +45,7 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[src/index.ts:67](https://github.com/mutativejs/use-travel/blob/7f7cdf34d8a220ca3456ce5a3b60945c342e356e/src/index.ts#L67)
+[src/index.ts:68](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L68)
 
 ## useTravel(initialState, options)
 
@@ -65,7 +65,7 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 • **initialState**: `S`
 
-• **options**: `Omit`\<`TravelsOptions`\<`F`, `true`, `P`\>, `"mutable"` \| `"autoArchive"`\> & `object`
+• **options**: `Omit`\<`TravelsOptions`\<`F`, `true`, `P`\>, `"mutable"` \| `"autoArchive"` \| `"controlledApply"`\> & `object`
 
 ### Returns
 
@@ -73,7 +73,7 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[src/index.ts:74](https://github.com/mutativejs/use-travel/blob/7f7cdf34d8a220ca3456ce5a3b60945c342e356e/src/index.ts#L74)
+[src/index.ts:75](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L75)
 
 ## useTravel(initialState, options)
 
@@ -93,7 +93,7 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 • **initialState**: `S`
 
-• **options**: `Omit`\<`TravelsOptions`\<`F`, `false`, `P`\>, `"mutable"` \| `"autoArchive"`\> & `object`
+• **options**: `Omit`\<`TravelsOptions`\<`F`, `false`, `P`\>, `"mutable"` \| `"autoArchive"` \| `"controlledApply"`\> & `object`
 
 ### Returns
 
@@ -101,4 +101,4 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[src/index.ts:89](https://github.com/mutativejs/use-travel/blob/7f7cdf34d8a220ca3456ce5a3b60945c342e356e/src/index.ts#L89)
+[src/index.ts:93](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L93)

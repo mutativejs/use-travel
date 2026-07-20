@@ -30,4 +30,4 @@ Whether undo is currently possible.
 
 ## Defined in
 
-[src/index.ts:17](https://github.com/mutativejs/use-travel/blob/7f7cdf34d8a220ca3456ce5a3b60945c342e356e/src/index.ts#L17)
+[src/index.ts:18](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L18)
