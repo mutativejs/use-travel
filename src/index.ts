@@ -79,7 +79,10 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<TravelsOptions<F, true, P>, 'autoArchive' | 'mutable'> & {
+  options: Omit<
+    TravelsOptions<F, true, P>,
+    'autoArchive' | 'controlledApply' | 'mutable'
+  > & {
     autoArchive?: true;
   }
 ): [
@@ -94,7 +97,10 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<TravelsOptions<F, false, P>, 'autoArchive' | 'mutable'> & {
+  options: Omit<
+    TravelsOptions<F, false, P>,
+    'autoArchive' | 'controlledApply' | 'mutable'
+  > & {
     autoArchive: false;
   }
 ): [
@@ -107,7 +113,10 @@ export function useTravel<
   F extends boolean,
   A extends boolean,
   P extends PatchesOption = {},
->(initialState: S, _options: TravelsOptions<F, A, P> = {}): Result<S, F, A, P> {
+>(
+  initialState: S,
+  _options: Omit<TravelsOptions<F, A, P>, 'controlledApply' | 'mutable'> = {}
+): Result<S, F, A, P> {
   if (__DEV__) {
     const { maxHistory = 10, initialPosition = 0, initialPatches } = _options;
 
@@ -147,6 +156,9 @@ export function useTravel<
     travelsRef.current = new Travels<S, F, A, P>(initialState, {
       ..._options,
       mutable: false,
+      // Controlled journals delegate state ownership to another runtime and
+      // are created exclusively through travels' createTravelJournal().
+      controlledApply: undefined,
     });
   }
 

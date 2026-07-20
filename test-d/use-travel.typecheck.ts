@@ -56,3 +56,11 @@ autoResult[2].canArchive();
 explicitAutoResult[2].archive();
 // @ts-expect-error auto-archived controls should not expose manual archive APIs
 explicitAutoResult[2].canArchive();
+
+useTravel(
+  { count: 0 },
+  {
+    // @ts-expect-error controlledApply is reserved for createTravelJournal
+    controlledApply: ({ state }: { state: { count: number } }) => state,
+  }
+);
