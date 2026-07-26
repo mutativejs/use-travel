@@ -330,8 +330,13 @@ describe('useTravel - Edge Cases', () => {
 
   describe('go() function boundary behavior', () => {
     it('should clamp position when going beyond bounds with autoArchive: true', () => {
+      const warningCodes: string[] = [];
       const { result } = renderHook(() =>
-        useTravel(0, { autoArchive: true, maxHistory: 10 })
+        useTravel(0, {
+          autoArchive: true,
+          maxHistory: 10,
+          onWarning: ({ code }) => warningCodes.push(code),
+        })
       );
 
       let [state, setState, controls] = result.current;
@@ -346,12 +351,10 @@ describe('useTravel - Edge Cases', () => {
       expect(controls.patches.patches.length).toBe(2);
 
       // Try to go beyond forward bound
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
       act(() => controls.go(10));
       [state, setState, controls] = result.current;
 
-      expect(warnSpy).toHaveBeenCalledWith("Can't go forward to position 10");
+      expect(warningCodes).toEqual(['POSITION_CLAMPED']);
       expect(controls.position).toBe(2); // Clamped to patches.length
       expect(state).toBe(2);
 
@@ -359,16 +362,19 @@ describe('useTravel - Edge Cases', () => {
       act(() => controls.go(-5));
       [state, setState, controls] = result.current;
 
-      expect(warnSpy).toHaveBeenCalledWith("Can't go back to position -5");
+      expect(warningCodes).toEqual(['POSITION_CLAMPED', 'POSITION_CLAMPED']);
       expect(controls.position).toBe(0); // Clamped to min
       expect(state).toBe(0);
-
-      warnSpy.mockRestore();
     });
 
     it('should clamp position when going beyond bounds with autoArchive: false and temp patches', () => {
+      const warningCodes: string[] = [];
       const { result } = renderHook(() =>
-        useTravel(0, { autoArchive: false, maxHistory: 10 })
+        useTravel(0, {
+          autoArchive: false,
+          maxHistory: 10,
+          onWarning: ({ code }) => warningCodes.push(code),
+        })
       );
 
       let [state, setState, controls] = result.current;
@@ -389,18 +395,14 @@ describe('useTravel - Edge Cases', () => {
       expect(controls.position).toBe(3);
       expect(controls.patches.patches.length).toBe(3);
 
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
       // Try to go beyond forward bound (should archive first, then clamp)
       act(() => controls.go(10));
       [state, setState, controls] = result.current;
 
-      expect(warnSpy).toHaveBeenCalledWith("Can't go forward to position 10");
+      expect(warningCodes).toEqual(['POSITION_CLAMPED']);
       expect(controls.position).toBe(3); // Clamped to max (after archiving)
       expect(state).toBe(3);
       expect(controls.canArchive()).toBe(false); // Temp was archived
-
-      warnSpy.mockRestore();
     });
 
     it('should handle go(currentPosition) as no-op', () => {

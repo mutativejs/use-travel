@@ -55,11 +55,14 @@ pnpm add use-travel travels mutative
 
 | use-travel    | travels                                    |
 | ------------- | ------------------------------------------ |
+| `2.2.x`       | `^2.2.0`                                   |
 | `2.1.x`       | `^2.1.0`                                   |
 | `2.0.x`       | `^2.0.0`                                   |
 | `1.8.1–1.9.0` | `^1.3.1` (persistence and metadata APIs)   |
 | `1.8.0`       | `>= 1.2.0` (required for `rebase` support) |
 | `< 1.8.0`     | `< 1.2.0`                                  |
+
+Travels 2.2 adds structured warnings with stable codes. Pass `onWarning` to `useTravel` when you need to observe them instead of matching development-only console text.
 
 Travels 2.1 adds controlled journals for integrations whose runtime already owns state. `useTravel` remains state-owning and does not expose or forward the journal-only `controlledApply` option; build those adapters with `createTravelJournal()` from `travels` directly. Standard timelines used by these hooks never emit the new `recordPatches` event, but `TravelsEvent['type']` is an open union, so devtools handlers should retain a fallback branch for event types added by minor Travels releases.
 
@@ -125,23 +128,24 @@ const [state, setState, controls] = useTravel(initialState, options);
 
 #### Options
 
-| Option                   | Type              | Description                                                                       | Default                               |
-| ------------------------ | ----------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
-| `maxHistory`             | `number`          | Maximum number of history entries to keep                                         | `10`                                  |
-| `history`                | `TravelsHistory`  | Restore validated history returned by `Travels.deserialize(...)`                  | `undefined`                           |
-| `initialPatches`         | `TravelPatches`   | Patch history to restore from persistence                                         | `{ patches: [], inversePatches: [] }` |
-| `strictInitialPatches`   | `boolean`         | Throw when persisted patches are invalid instead of falling back to empty history | `false`                               |
-| `initialPosition`        | `number`          | History position to restore from persistence                                      | `0`                                   |
-| `autoArchive`            | `boolean`         | Save each change automatically or require manual `archive()`                      | `true`                                |
-| `warnOnUnsupportedState` | `boolean`         | Warn in development about weak state, patch, metadata, or persistence semantics   | development only                      |
-| `onError`                | `(error) => void` | Receive wrapped Travels operation errors                                          | `undefined`                           |
-| `onBranchDiscard`        | `(event) => void` | Observe redo history discarded by a new edit                                      | `undefined`                           |
-| `onObserverError`        | `(event) => void` | Receive listener, devtools, and observer-hook failures                            | `undefined`                           |
-| `devtools`               | `(event) => void` | Observe unified `TravelsEvent` timeline events                                    | `undefined`                           |
-| `enableAutoFreeze`       | `boolean`         | Forwarded to Mutative immutability options                                        | `false`                               |
-| `strict`                 | `boolean`         | Forwarded to Mutative strict immutability checks                                  | `false`                               |
-| `mark`                   | `Mark<O, F>[]`    | Forwarded to Mutative mark options                                                | `() => void`                          |
-| `patchesOptions`         | `PatchesOptions`  | Customize patch output such as `{ pathAsArray: true }`                            | enabled                               |
+| Option                   | Type                | Description                                                                       | Default                               |
+| ------------------------ | ------------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
+| `maxHistory`             | `number`            | Maximum number of history entries to keep                                         | `10`                                  |
+| `history`                | `TravelsHistory`    | Restore validated history returned by `Travels.deserialize(...)`                  | `undefined`                           |
+| `initialPatches`         | `TravelPatches`     | Patch history to restore from persistence                                         | `{ patches: [], inversePatches: [] }` |
+| `strictInitialPatches`   | `boolean`           | Throw when persisted patches are invalid instead of falling back to empty history | `false`                               |
+| `initialPosition`        | `number`            | History position to restore from persistence                                      | `0`                                   |
+| `autoArchive`            | `boolean`           | Save each change automatically or require manual `archive()`                      | `true`                                |
+| `warnOnUnsupportedState` | `boolean`           | Warn in development about weak state, patch, metadata, or persistence semantics   | development only                      |
+| `onError`                | `(error) => void`   | Receive wrapped Travels operation errors                                          | `undefined`                           |
+| `onBranchDiscard`        | `(event) => void`   | Observe redo history discarded by a new edit                                      | `undefined`                           |
+| `onWarning`              | `(warning) => void` | Receive structured non-fatal Travels warnings                                     | `undefined`                           |
+| `onObserverError`        | `(event) => void`   | Receive listener, devtools, and observer-hook failures                            | `undefined`                           |
+| `devtools`               | `(event) => void`   | Observe unified `TravelsEvent` timeline events                                    | `undefined`                           |
+| `enableAutoFreeze`       | `boolean`           | Forwarded to Mutative immutability options                                        | `false`                               |
+| `strict`                 | `boolean`           | Forwarded to Mutative strict immutability checks                                  | `false`                               |
+| `mark`                   | `Mark<O, F>[]`      | Forwarded to Mutative mark options                                                | `() => void`                          |
+| `patchesOptions`         | `PatchesOptions`    | Customize patch output such as `{ pathAsArray: true }`                            | enabled                               |
 
 #### Returns
 

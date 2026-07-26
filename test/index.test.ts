@@ -1,6 +1,5 @@
 import { expect, describe, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { vi } from 'vitest';
 import { useTravel } from '../src/index';
 
 describe('useTravel', () => {
@@ -274,8 +273,11 @@ describe('useTravel', () => {
   });
 
   it('[useTravel] with normal init state', () => {
+    const warningCodes: string[] = [];
     const { result } = renderHook(() =>
-      useTravel({ todos: [] } as { todos: { name: string }[] })
+      useTravel({ todos: [] } as { todos: { name: string }[] }, {
+        onWarning: ({ code }) => warningCodes.push(code),
+      })
     );
     let [nextState, setState, controls] = result.current;
     expect(nextState).toEqual({ todos: [] });
@@ -382,10 +384,9 @@ describe('useTravel', () => {
       ],
     });
 
-    const fnWarning = vi.spyOn(console, 'warn');
     act(() => controls.go(3));
     [nextState, setState, controls] = result.current;
-    expect(fnWarning).toHaveBeenCalledWith(`Can't go forward to position 3`);
+    expect(warningCodes).toEqual(['POSITION_CLAMPED']);
     expect(nextState).toEqual({
       todos: [
         {
@@ -413,15 +414,16 @@ describe('useTravel', () => {
       todos: [],
     });
 
-    expect(fnWarning).toHaveBeenCalledWith(`Can't go back to position -1`);
+    expect(warningCodes).toEqual(['POSITION_CLAMPED', 'POSITION_CLAMPED']);
 
     //@ts-expect-error
     act(() => controls.archive());
     [nextState, setState, controls] = result.current;
-    expect(fnWarning).toHaveBeenCalledWith(
-      `Auto archive is enabled, no need to archive manually`
-    );
-    fnWarning.mockRestore();
+    expect(warningCodes).toEqual([
+      'POSITION_CLAMPED',
+      'POSITION_CLAMPED',
+      'AUTO_ARCHIVE_ENABLED',
+    ]);
   });
 
   it('[useTravel] with normal init state and disable autoArchive', () => {
