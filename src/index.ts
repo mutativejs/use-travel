@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type {
   TravelPatches,
   Travels,
@@ -172,8 +172,12 @@ export function useTravel<
     });
   }
 
-  // Force re-render when state changes
-  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  const travels = travelsRef.current;
+  const state = useSyncExternalStore(
+    travels.subscribe,
+    travels.getState,
+    travels.getState
+  );
 
   // Track if setState has been called in the current render cycle
   const setStateCalledInRender = useRef(false);
@@ -182,17 +186,6 @@ export function useTravel<
   useEffect(() => {
     setStateCalledInRender.current = false;
   });
-
-  // Subscribe to state changes
-  useEffect(() => {
-    const travels = travelsRef.current!;
-    const unsubscribe = travels.subscribe(() => {
-      forceUpdate();
-    });
-    return unsubscribe;
-  }, []);
-
-  const travels = travelsRef.current;
 
   // Wrap setState to prevent multiple calls in the same render cycle
   const cachedSetState = useCallback(
@@ -207,9 +200,6 @@ export function useTravel<
     },
     [travels]
   );
-
-  // Get the current state
-  const state = travels.getState();
 
   // Create controls object with memoization
   const cachedControls = useMemo(() => {
