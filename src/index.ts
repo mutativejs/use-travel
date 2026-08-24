@@ -78,6 +78,23 @@ export type StoreControlsWithFlags<
     : RebasableManualTravelsControls<S, F, P>
 >;
 
+const useTravelsState = <
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption,
+>(
+  travels: Travels<S, F, A, P>
+): Value<S, F> => {
+  const getTimelineSnapshot = travels.getControls().getHistory;
+  useSyncExternalStore(
+    travels.subscribe,
+    getTimelineSnapshot,
+    getTimelineSnapshot
+  );
+  return travels.getState() as Value<S, F>;
+};
+
 /**
  * Creates a component-scoped Travels instance with undo/redo support and returns its reactive API.
  *
@@ -167,11 +184,7 @@ export function useTravel<
   }
 
   const travels = travelsRef.current;
-  const state = useSyncExternalStore(
-    travels.subscribe,
-    travels.getState,
-    travels.getState
-  );
+  const state = useTravelsState(travels);
 
   // Track if setState has been called in the current render cycle
   const setStateCalledInRender = useRef(false);
@@ -256,11 +269,7 @@ export function useTravelStore<
       'useTravelStore only supports immutable Travels instances. Remove `mutable: true` or use useTravel instead.'
     );
   }
-  const state = useSyncExternalStore(
-    travels.subscribe,
-    travels.getState,
-    travels.getState
-  );
+  const state = useTravelsState(travels);
   const setState: UseTravelSetState<S> = useCallback(
     (updater: Updater<S>, metadata?: TravelMetadata) =>
       travels.setState(updater, metadata),
