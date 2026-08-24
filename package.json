@@ -27,7 +27,7 @@
     "test:types": "tsc -p tsconfig.typecheck.json",
     "test:coverage": "pnpm run test:types && vitest run --coverage && coveralls < coverage/lcov.info",
     "clean": "rimraf dist",
-    "build": "pnpm run clean && pnpm run test:types && tsc --skipLibCheck && pnpm run build:prod",
+    "build": "pnpm run clean && pnpm run test:types && tsc --skipLibCheck && pnpm run build:prod && rimraf dist/index.js",
     "build:prod": "NODE_ENV=production rollup --config --bundleConfigAsCjs",
     "build:doc": "typedoc --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "commit": "pnpm exec git-cz"
