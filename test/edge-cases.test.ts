@@ -1,29 +1,8 @@
-import { expect, describe, it, vi } from 'vitest';
+import { expect, describe, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useTravel } from '../src/index';
 
 describe('useTravel - Edge Cases', () => {
-  it('always creates an owned Travels instance', () => {
-    const controlledApply = vi.fn(({ state }) => state);
-    const { result } = renderHook(() =>
-      useTravel(
-        { count: 0 },
-        // JavaScript callers can still supply fields outside the public type.
-        { controlledApply } as any
-      )
-    );
-
-    act(() => {
-      result.current[1]((draft) => {
-        draft.count = 1;
-      });
-    });
-    act(() => result.current[2].back());
-
-    expect(result.current[0]).toEqual({ count: 0 });
-    expect(controlledApply).not.toHaveBeenCalled();
-  });
-
   describe('canForward and canBack edge cases', () => {
     it('should correctly report canForward/canBack with autoArchive: true at boundaries', () => {
       const { result } = renderHook(() =>

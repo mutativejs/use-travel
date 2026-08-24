@@ -140,7 +140,7 @@ Creates a component-scoped immutable `Travels` instance and returns a tuple:
 const [state, setState, controls] = useTravel(initialState, options);
 ```
 
-`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. `mutable` and the controlled-journal-only `controlledApply` option are intentionally not supported here. It creates a new timeline; use [`useTravelStore`](#usetravelstoretravels) with `restoreTravels()` when restoring persistence.
+`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. It rejects `mutable` and the controlled-journal-only `controlledApply` option instead of silently overriding them. It creates a new timeline; use [`useTravelStore`](#usetravelstoretravels) with `restoreTravels()` when restoring persistence.
 
 #### Options
 

@@ -29,6 +29,8 @@ const removedRestoreOptions = [
   'strictInitialPatches',
 ] as const;
 
+const unsupportedOwnershipOptions = ['controlledApply', 'mutable'] as const;
+
 /** Options accepted by the component-owned `useTravel` timeline. */
 export type UseTravelOptions<
   F extends boolean,
@@ -150,6 +152,16 @@ export function useTravel<
     }
   }
 
+  for (const option of unsupportedOwnershipOptions) {
+    if (Object.prototype.hasOwnProperty.call(_options, option)) {
+      throw new TypeError(
+        option === 'controlledApply'
+          ? 'useTravel: controlledApply is reserved for externally owned journals; use createTravelJournal() from travels directly'
+          : 'useTravel: mutable mode cannot drive React updates; use an immutable timeline or travels directly'
+      );
+    }
+  }
+
   if (__DEV__) {
     const { maxHistory = 10 } = _options;
 
@@ -160,16 +172,11 @@ export function useTravel<
     }
   }
 
-  const ownedOptions = { ..._options } as TravelsOptions<F, A, P> & {
-    controlledApply?: unknown;
-  };
-  Reflect.deleteProperty(ownedOptions, 'controlledApply');
-
   // Create Travels instance (only once)
   const travelsRef = useRef<Travels<S, F, A, P> | null>(null);
   if (!travelsRef.current) {
     travelsRef.current = createOwnedTravels<S, F, A, P>(initialState, {
-      ...ownedOptions,
+      ..._options,
       mutable: false,
     });
   }

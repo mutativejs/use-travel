@@ -72,6 +72,26 @@ describe('useTravel - Input Validation', () => {
     );
   });
 
+  it('rejects mutable mode instead of silently overriding it', () => {
+    expect(() =>
+      renderHook(() => useTravel(0, { mutable: true } as never))
+    ).toThrow(
+      'useTravel: mutable mode cannot drive React updates; use an immutable timeline or travels directly'
+    );
+  });
+
+  it('rejects externally owned journal options', () => {
+    expect(() =>
+      renderHook(() =>
+        useTravel({ count: 0 }, {
+          controlledApply: ({ state }: { state: { count: number } }) => state,
+        } as any)
+      )
+    ).toThrow(
+      'useTravel: controlledApply is reserved for externally owned journals; use createTravelJournal() from travels directly'
+    );
+  });
+
   describe('valid options', () => {
     it('should not log any errors when all options are valid', () => {
       renderHook(() =>
