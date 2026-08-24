@@ -41,11 +41,11 @@ A tuple with the current state, typed updater, and history controls.
 
 ### Throws
 
-When `setState` is invoked multiple times within the same render cycle (development-only guard).
+When `setState` is invoked multiple times within the same render cycle.
 
 ### Defined in
 
-[use-travel/src/index.ts:97](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L97)
+[use-travel/src/index.ts:114](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L114)
 
 ## useTravel(initialState, options)
 
@@ -71,7 +71,7 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[use-travel/src/index.ts:104](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L104)
+[use-travel/src/index.ts:121](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L121)
 
 ## useTravel(initialState, options)
 
@@ -97,7 +97,7 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[use-travel/src/index.ts:114](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L114)
+[use-travel/src/index.ts:131](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L131)
 
 ## useTravel(initialState, options)
 
@@ -125,4 +125,4 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[use-travel/src/index.ts:124](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L124)
+[use-travel/src/index.ts:141](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L141)

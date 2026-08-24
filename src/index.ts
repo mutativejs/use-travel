@@ -109,7 +109,7 @@ const useTravelsState = <
  * @typeParam P - Additional patches configuration forwarded to Mutative.
  * @param initialState - Value used to initialise the travel store.
  * @returns A tuple with the current state, typed updater, and history controls.
- * @throws {Error} When `setState` is invoked multiple times within the same render cycle (development-only guard).
+ * @throws {Error} When `setState` is invoked multiple times within the same render cycle.
  */
 export function useTravel<S, F extends boolean>(
   initialState: S

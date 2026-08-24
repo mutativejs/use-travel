@@ -166,7 +166,7 @@ Common tuple members:
 | Member                          | Type                                | Description                                                                 |
 | ------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
 | `state`                         | `Value<S, F>`                       | Current render snapshot                                                     |
-| `setState`                      | `Updater<S>`                        | Updates state with a value, function, or draft mutation                     |
+| `setState`                      | `UseTravelSetState<S>`              | Updates state with a value or draft function and optional entry metadata    |
 | `controls.position`             | `number`                            | Current position in the history timeline                                    |
 | `controls.getHistory()`         | `() => readonly ReadonlyState<S>[]` | Returns the shared, read-only history view                                  |
 | `controls.getHistorySnapshot()` | `() => S[]`                         | Returns a fully detached, caller-owned history snapshot                     |
@@ -187,6 +187,18 @@ When `autoArchive: false`, the controls also include:
 | ----------------------- | --------------- | ------------------------------------------------------ |
 | `controls.archive()`    | `() => void`    | Commit the current working state as the next undo step |
 | `controls.canArchive()` | `() => boolean` | Whether there are unarchived changes                   |
+
+The setter accepts the same optional metadata as Core, so labels and other
+durable context remain attached to the history entry:
+
+```tsx
+setState(
+  (draft) => {
+    draft.title = 'Reviewed';
+  },
+  { label: 'review-title', source: 'editor' }
+);
+```
 
 #### Checking undo/redo availability: getters vs methods
 
@@ -301,9 +313,9 @@ function save() {
 
 ## Important Behavior
 
-### One `setState` call per synchronous call stack
+### One `setState` call per render cycle
 
-`useTravel` throws if `setState` is called more than once within the same synchronous call stack. If multiple fields need to change together, update them in a single draft mutation.
+`useTravel` enforces this limit in every build. After one call, another is allowed only after React commits a render and the hook effect resets the guard. If multiple fields need to change together, update them in a single draft mutation.
 
 ```tsx
 setState((draft) => {
@@ -312,7 +324,7 @@ setState((draft) => {
 });
 ```
 
-In manual archive mode, you can still make one `setState` call per event or render and archive later when the grouped change is ready.
+Manual archive mode does not relax the limit; combine related changes in one updater, then archive when the grouped change is ready.
 
 ### `initialState` and `options` are read once
 
