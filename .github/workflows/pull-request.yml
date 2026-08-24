@@ -1,4 +1,4 @@
-on: ["pull_request"]
+on: ['pull_request']
 
 name: Test Coverage
 permissions:
@@ -6,30 +6,28 @@ permissions:
   pull-requests: write
 
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
 
-    - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.4
 
-    - uses: pnpm/action-setup@v4
-      with:
-        version: 10.34.4
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: pnpm
 
-    - name: Use Node.js 20.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20.x
-        cache: pnpm
+      - name: pnpm install, pnpm test:coverage
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run test:coverage
 
-    - name: pnpm install, pnpm test:coverage
-      run: |
-        pnpm install --frozen-lockfile
-        pnpm run test:coverage
-
-    - name: Coverage
-      uses: romeovs/lcov-reporter-action@v0.4.0
-      with:
-        lcov-file: ./coverage/lcov.info
+      - name: Coverage
+        uses: romeovs/lcov-reporter-action@v0.4.0
+        with:
+          lcov-file: ./coverage/lcov.info

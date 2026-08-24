@@ -1,25 +1,7 @@
 import { expect, describe, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import * as travelsApi from 'travels';
-import type {
-  Travels,
-  TravelsOptions,
-  TravelsSerializedHistory,
-} from 'travels';
+import { restoreTravels } from 'travels';
 import { useTravel, useTravelStore } from '../src/index';
-
-const restoreSnapshot = (
-  'restoreTravels' in travelsApi
-    ? travelsApi.restoreTravels
-    : (snapshot, options) =>
-        travelsApi.createTravels(snapshot.state, {
-          ...options,
-          history: snapshot,
-        } as never)
-) as <S, A extends boolean>(
-  snapshot: TravelsSerializedHistory<S>,
-  options: TravelsOptions<false, A>
-) => Travels<S, false, A>;
 
 describe('useTravel', () => {
   it('[useTravel] with normal init state', () => {
@@ -434,15 +416,6 @@ describe('useTravel', () => {
     });
 
     expect(warningCodes).toEqual(['POSITION_CLAMPED', 'POSITION_CLAMPED']);
-
-    //@ts-expect-error
-    act(() => controls.archive());
-    [nextState, setState, controls] = result.current;
-    expect(warningCodes).toEqual([
-      'POSITION_CLAMPED',
-      'POSITION_CLAMPED',
-      'AUTO_ARCHIVE_ENABLED',
-    ]);
   });
 
   it('[useTravel] with normal init state and disable autoArchive', () => {
@@ -1244,7 +1217,7 @@ describe('useTravel', () => {
       }
     `);
 
-    const restored = restoreSnapshot(
+    const restored = restoreTravels(
       {
         version: 1,
         state: nextState,

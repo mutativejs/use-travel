@@ -55,7 +55,7 @@ pnpm add use-travel travels mutative
 
 | use-travel    | travels                                    |
 | ------------- | ------------------------------------------ |
-| `3.x`         | `^2.2.0 \|\| ^3.0.0`                       |
+| `3.x`         | `^3.0.0`                                   |
 | `2.2.x`       | `^2.2.0`                                   |
 | `2.1.x`       | `^2.1.0`                                   |
 | `2.0.x`       | `^2.0.0`                                   |
@@ -63,10 +63,10 @@ pnpm add use-travel travels mutative
 | `1.8.0`       | `>= 1.2.0` (required for `rebase` support) |
 | `< 1.8.0`     | `< 1.2.0`                                  |
 
-`use-travel@3` uses the factory-based core API and can therefore be rolled out
-before or after `travels@3`. The atomic `restoreTravels()` persistence path
-requires `travels@3`; applications that still depend on the split Travels 2
-restore options should keep `use-travel@2` until they migrate persistence.
+`use-travel@3` requires `travels@3` so factory overloads, atomic restoration,
+read-only shared views, and controls always follow one core contract. Install
+the core major first, then upgrade this binding. Both require Node.js 22 or
+newer.
 
 ### Upgrading to 3
 

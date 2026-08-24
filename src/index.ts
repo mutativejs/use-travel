@@ -38,19 +38,6 @@ export type UseTravelOptions<
   P extends PatchesOption = {},
 > = Omit<TravelsOptions<F, A, P>, RemovedUseTravelOption>;
 
-// Travels 2.2 already implements the generic factory behavior at runtime, but
-// its declarations only expose literal archive-mode overloads. This shared
-// signature keeps the adapter source verifiable against both release lines.
-const createOwnedTravels = createTravels as <
-  S,
-  F extends boolean,
-  A extends boolean,
-  P extends PatchesOption = {},
->(
-  initialState: S,
-  options: TravelsOptions<F, A, P>
-) => Travels<S, F, A, P>;
-
 /** Adds `canUndo` and `canRedo` flags to a controls type. */
 export type WithUndoRedoFlags<C> = C & {
   /** Whether undo is currently possible. */
@@ -175,7 +162,7 @@ export function useTravel<
   // Create Travels instance (only once)
   const travelsRef = useRef<Travels<S, F, A, P> | null>(null);
   if (!travelsRef.current) {
-    travelsRef.current = createOwnedTravels<S, F, A, P>(initialState, {
+    travelsRef.current = createTravels<S, F, A, P>(initialState, {
       ..._options,
       mutable: false,
     });
@@ -242,7 +229,7 @@ export function useTravel<
     );
   }, [travels]);
 
-  return [state, cachedSetState, cachedControls] as Result<S, F, A>;
+  return [state, cachedSetState, cachedControls] as Result<S, F, A, P>;
 }
 
 /**
@@ -272,7 +259,7 @@ export function useTravelStore<
   (updater: Updater<S>) => void,
   StoreControlsWithFlags<S, F, A, P>,
 ] {
-  const isMutable = Boolean((travels as any)?.mutable);
+  const isMutable = travels.mutable;
 
   if (isMutable) {
     throw new Error(

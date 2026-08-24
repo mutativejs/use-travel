@@ -100,8 +100,8 @@ importers:
         specifier: ^4.52.3
         version: 4.62.2
       travels:
-        specifier: ^2.2.0 || ^3.0.0
-        version: 2.2.0(mutative@1.3.0)
+        specifier: ^3.0.0
+        version: 3.0.0(mutative@1.3.0)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@18.19.130)(typescript@5.9.3)
@@ -2908,9 +2908,9 @@ packages:
     resolution: {integrity: sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==}
     engines: {node: '>=20'}
 
-  travels@2.2.0:
-    resolution: {integrity: sha512-d6VGZkX3fOf5khRqkJhNY1F3TLxwId+rXYefiptTSk4Htsa0jC05+B9TxGel+vOUdk8bQSX2i94T6FUKxbzBww==}
-    engines: {node: '>=20'}
+  travels@3.0.0:
+    resolution: {integrity: sha512-sP+KCjSbwSu0/BxgD0phjU0H+/rxMYzhhQD8BdF5tJYy79vH08TTevxFrxW0pAZRyP1Q+iPGCi3Z34/bbfzL0w==}
+    engines: {node: '>=22'}
     peerDependencies:
       mutative: ^1.3.0
 
@@ -6363,7 +6363,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  travels@2.2.0(mutative@1.3.0):
+  travels@3.0.0(mutative@1.3.0):
     dependencies:
       mutative: 1.3.0
 
