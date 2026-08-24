@@ -8,6 +8,8 @@
 
 - [StoreControlsWithFlags](type-aliases/StoreControlsWithFlags.md)
 - [TravelPatches](type-aliases/TravelPatches.md)
+- [UseTravelOptions](type-aliases/UseTravelOptions.md)
+- [UseTravelResult](type-aliases/UseTravelResult.md)
 - [WithUndoRedoFlags](type-aliases/WithUndoRedoFlags.md)
 
 ## Functions

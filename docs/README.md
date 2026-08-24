@@ -1,6 +1,6 @@
 **use-travel** • [**Docs**](globals.md)
 
----
+***
 
 # use-travel
 
@@ -59,12 +59,28 @@ pnpm add use-travel travels mutative
 
 | use-travel    | travels                                    |
 | ------------- | ------------------------------------------ |
+| `3.x`         | `^3.0.0`                                   |
 | `2.2.x`       | `^2.2.0`                                   |
 | `2.1.x`       | `^2.1.0`                                   |
 | `2.0.x`       | `^2.0.0`                                   |
 | `1.8.1–1.9.0` | `^1.3.1` (persistence and metadata APIs)   |
 | `1.8.0`       | `>= 1.2.0` (required for `rebase` support) |
 | `< 1.8.0`     | `< 1.2.0`                                  |
+
+`use-travel@3` requires `travels@3` so factory overloads, atomic restoration,
+read-only shared views, and controls always follow one core contract. Install
+the core major first, then upgrade this binding. Both require Node.js 22 or
+newer.
+
+### Upgrading to 3
+
+- Replace `new Travels(initialState, options)` with
+  `createTravels(initialState, options)` for shared stores.
+- `useTravel` now creates new timelines only. Remove `history`,
+  `initialPatches`, `initialPosition`, and `strictInitialPatches` from its
+  options.
+- Restore one complete snapshot with `Travels.deserialize()` and
+  `restoreTravels()`, then subscribe with `useTravelStore()`.
 
 Travels 2.2 adds structured warnings with stable codes. Pass `onWarning` to `useTravel` when you need to observe them instead of matching development-only console text.
 
@@ -128,49 +144,46 @@ Creates a component-scoped immutable `Travels` instance and returns a tuple:
 const [state, setState, controls] = useTravel(initialState, options);
 ```
 
-`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. `mutable` and the controlled-journal-only `controlledApply` option are intentionally not supported here.
+`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. It rejects `mutable` and the controlled-journal-only `controlledApply` option instead of silently overriding them. It creates a new timeline; use [`useTravelStore`](#usetravelstoretravels) with `restoreTravels()` when restoring persistence.
 
 #### Options
 
-| Option                   | Type                | Description                                                                       | Default                               |
-| ------------------------ | ------------------- | --------------------------------------------------------------------------------- | ------------------------------------- |
-| `maxHistory`             | `number`            | Maximum number of history entries to keep                                         | `10`                                  |
-| `history`                | `TravelsHistory`    | Restore validated history returned by `Travels.deserialize(...)`                  | `undefined`                           |
-| `initialPatches`         | `TravelPatches`     | Patch history to restore from persistence                                         | `{ patches: [], inversePatches: [] }` |
-| `strictInitialPatches`   | `boolean`           | Throw when persisted patches are invalid instead of falling back to empty history | `false`                               |
-| `initialPosition`        | `number`            | History position to restore from persistence                                      | `0`                                   |
-| `autoArchive`            | `boolean`           | Save each change automatically or require manual `archive()`                      | `true`                                |
-| `warnOnUnsupportedState` | `boolean`           | Warn in development about weak state, patch, metadata, or persistence semantics   | development only                      |
-| `onError`                | `(error) => void`   | Receive wrapped Travels operation errors                                          | `undefined`                           |
-| `onBranchDiscard`        | `(event) => void`   | Observe redo history discarded by a new edit                                      | `undefined`                           |
-| `onWarning`              | `(warning) => void` | Receive structured non-fatal Travels warnings                                     | `undefined`                           |
-| `onObserverError`        | `(event) => void`   | Receive listener, devtools, and observer-hook failures                            | `undefined`                           |
-| `devtools`               | `(event) => void`   | Observe unified `TravelsEvent` timeline events                                    | `undefined`                           |
-| `enableAutoFreeze`       | `boolean`           | Forwarded to Mutative immutability options                                        | `false`                               |
-| `strict`                 | `boolean`           | Forwarded to Mutative strict immutability checks                                  | `false`                               |
-| `mark`                   | `Mark<O, F>[]`      | Forwarded to Mutative mark options                                                | `() => void`                          |
-| `patchesOptions`         | `PatchesOptions`    | Customize patch output such as `{ pathAsArray: true }`                            | enabled                               |
+| Option                   | Type                | Description                                                                     | Default          |
+| ------------------------ | ------------------- | ------------------------------------------------------------------------------- | ---------------- |
+| `maxHistory`             | `number`            | Maximum number of history entries to keep                                       | `10`             |
+| `autoArchive`            | `boolean`           | Save each change automatically or require manual `archive()`                    | `true`           |
+| `warnOnUnsupportedState` | `boolean`           | Warn in development about weak state, patch, metadata, or persistence semantics | development only |
+| `onError`                | `(error) => void`   | Receive wrapped Travels operation errors                                        | `undefined`      |
+| `onBranchDiscard`        | `(event) => void`   | Observe redo history discarded by a new edit                                    | `undefined`      |
+| `onWarning`              | `(warning) => void` | Receive structured non-fatal Travels warnings                                   | `undefined`      |
+| `onObserverError`        | `(event) => void`   | Receive listener, devtools, and observer-hook failures                          | `undefined`      |
+| `devtools`               | `(event) => void`   | Observe unified `TravelsEvent` timeline events                                  | `undefined`      |
+| `enableAutoFreeze`       | `boolean`           | Forwarded to Mutative immutability options                                      | `false`          |
+| `strict`                 | `boolean`           | Forwarded to Mutative strict immutability checks                                | `false`          |
+| `mark`                   | `Mark<O, F>[]`      | Forwarded to Mutative mark options                                              | `() => void`     |
+| `patchesOptions`         | `PatchesOptions`    | Customize patch output such as `{ pathAsArray: true }`                          | enabled          |
 
 #### Returns
 
 Common tuple members:
 
-| Member                      | Type                         | Description                                                                 |
-| --------------------------- | ---------------------------- | --------------------------------------------------------------------------- |
-| `state`                     | `Value<S, F>`                | Current render snapshot                                                     |
-| `setState`                  | `Updater<S>`                 | Updates state with a value, function, or draft mutation                     |
-| `controls.position`         | `number`                     | Current position in the history timeline                                    |
-| `controls.getHistory()`     | `() => Value<S, F>[]`        | Returns the history as state snapshots                                      |
-| `controls.patches`          | `TravelPatches`              | Returns the stored patch history                                            |
-| `controls.back(amount?)`    | `(amount?: number) => void`  | Undo one or more steps                                                      |
-| `controls.forward(amount?)` | `(amount?: number) => void`  | Redo one or more steps                                                      |
-| `controls.go(position)`     | `(position: number) => void` | Jump to a specific history position                                         |
-| `controls.reset()`          | `() => void`                 | Reset to the initial state and clear history                                |
-| `controls.rebase()`         | `() => void`                 | Make the current state the new baseline and discard past and future history |
-| `controls.canBack()`        | `() => boolean`              | Imperative predicate — whether undo is possible (use in event handlers)     |
-| `controls.canForward()`     | `() => boolean`              | Imperative predicate — whether redo is possible (use in event handlers)     |
-| `controls.canUndo`          | `boolean`                    | Render-safe reactive flag — whether undo is possible (read during render)   |
-| `controls.canRedo`          | `boolean`                    | Render-safe reactive flag — whether redo is possible (read during render)   |
+| Member                          | Type                                | Description                                                                 |
+| ------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `state`                         | `Value<S, F>`                       | Current render snapshot                                                     |
+| `setState`                      | `Updater<S>`                        | Updates state with a value, function, or draft mutation                     |
+| `controls.position`             | `number`                            | Current position in the history timeline                                    |
+| `controls.getHistory()`         | `() => readonly ReadonlyState<S>[]` | Returns the shared, read-only history view                                  |
+| `controls.getHistorySnapshot()` | `() => S[]`                         | Returns a fully detached, caller-owned history snapshot                     |
+| `controls.patches`              | `TravelPatches`                     | Returns the stored patch history                                            |
+| `controls.back(amount?)`        | `(amount?: number) => void`         | Undo one or more steps                                                      |
+| `controls.forward(amount?)`     | `(amount?: number) => void`         | Redo one or more steps                                                      |
+| `controls.go(position)`         | `(position: number) => void`        | Jump to a specific history position                                         |
+| `controls.reset()`              | `() => void`                        | Reset to the initial state and clear history                                |
+| `controls.rebase()`             | `() => void`                        | Make the current state the new baseline and discard past and future history |
+| `controls.canBack()`            | `() => boolean`                     | Imperative predicate — whether undo is possible (use in event handlers)     |
+| `controls.canForward()`         | `() => boolean`                     | Imperative predicate — whether redo is possible (use in event handlers)     |
+| `controls.canUndo`              | `boolean`                           | Render-safe reactive flag — whether undo is possible (read during render)   |
+| `controls.canRedo`              | `boolean`                           | Render-safe reactive flag — whether redo is possible (read during render)   |
 
 When `autoArchive: false`, the controls also include:
 
@@ -194,9 +207,9 @@ Subscribes React to an existing immutable `Travels` instance without creating a 
 
 ```tsx
 // store.ts
-import { Travels } from 'travels';
+import { createTravels } from 'travels';
 
-export const travels = new Travels({ count: 0 });
+export const travels = createTravels({ count: 0 });
 ```
 
 ```tsx
@@ -342,53 +355,46 @@ controls.reset(); // { count: 5 }
 
 ## Persistence
 
-`use-travel` re-exports `TravelPatches`, so you can persist both the current state and its history:
+Persist one complete, versioned snapshot from the underlying core instance.
+Restore and validate that snapshot before React subscribes, so state, cursor,
+patches, and metadata cross the boundary atomically:
 
 ```tsx
-import type { TravelPatches } from 'use-travel';
+// store.ts
+import {
+  Travels,
+  createTravels,
+  restoreTravels,
+  type TravelsSerializedHistory,
+} from 'travels';
 
-type SavedTravel = {
-  state: { count: number };
-  patches: TravelPatches;
-  position: number;
-};
+type State = { count: number };
 
-const saved: SavedTravel = {
-  state,
-  patches: controls.patches,
-  position: controls.position,
-};
+const raw = localStorage.getItem('travel-history');
+
+export const travels = raw
+  ? restoreTravels(Travels.deserialize<State>(raw, { validation: 'semantic' }))
+  : createTravels<State>({ count: 0 });
+
+export function saveTravels() {
+  const snapshot: TravelsSerializedHistory<State> = travels.serialize({
+    strict: true,
+  });
+  localStorage.setItem('travel-history', JSON.stringify(snapshot));
+}
 ```
-
-Restore that data by passing the saved state as `initialState` and the saved history as `initialPatches` plus `initialPosition`:
 
 ```tsx
-const [state, setState, controls] = useTravel(saved.state, {
-  initialPatches: saved.patches,
-  initialPosition: saved.position,
-});
+// Counter.tsx
+import { useTravelStore } from 'use-travel';
+import { travels } from './store';
+
+const [state, setState, controls] = useTravelStore(travels);
 ```
 
-With `travels@2.0.0`, you can semantically validate a versioned snapshot before passing it to the hook:
-
-```tsx
-import { Travels, type TravelsSerializedHistory } from 'travels';
-
-const saved: TravelsSerializedHistory<{ count: number }> = {
-  version: 1,
-  state,
-  patches: controls.patches,
-  position: controls.position,
-};
-
-const history = Travels.deserialize(saved, { validation: 'semantic' });
-
-const [state, setState, controls] = useTravel(history.state, {
-  history,
-});
-```
-
-`history` overrides `initialPatches` and `initialPosition` when both forms are provided. Travels uses structural validation by default; select `validation: 'semantic'` for unverified or potentially corrupted snapshots so every history entry is replayed in both directions. For legacy patch restores, set `strictInitialPatches: true` to fail instead of discarding invalid patch data.
+Structural validation is the low-latency default. Select
+`validation: 'semantic'` for untrusted or potentially corrupted snapshots so
+every reachable history entry is replayed in both directions before restore.
 
 ## State Requirements
 

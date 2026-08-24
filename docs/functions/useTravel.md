@@ -45,11 +45,11 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[src/index.ts:68](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L68)
+[src/index.ts:93](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L93)
 
 ## useTravel(initialState, options)
 
-> **useTravel**\<`S`, `F`, `A`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
+> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
 
 ### Type Parameters
 
@@ -57,15 +57,13 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 • **F** *extends* `boolean`
 
-• **A** *extends* `boolean`
-
 • **P** *extends* `object` = `object`
 
 ### Parameters
 
 • **initialState**: `S`
 
-• **options**: `Omit`\<`TravelsOptions`\<`F`, `true`, `P`\>, `"mutable"` \| `"autoArchive"` \| `"controlledApply"`\> & `object`
+• **options**: `Omit`\<[`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `true`, `P`\>, `"autoArchive"`\> & `object`
 
 ### Returns
 
@@ -73,11 +71,37 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[src/index.ts:75](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L75)
+[src/index.ts:100](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L100)
 
 ## useTravel(initialState, options)
 
-> **useTravel**\<`S`, `F`, `A`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+
+### Type Parameters
+
+• **S**
+
+• **F** *extends* `boolean`
+
+• **P** *extends* `object` = `object`
+
+### Parameters
+
+• **initialState**: `S`
+
+• **options**: `Omit`\<[`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `false`, `P`\>, `"autoArchive"`\> & `object`
+
+### Returns
+
+[`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+
+### Defined in
+
+[src/index.ts:110](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L110)
+
+## useTravel(initialState, options)
+
+> **useTravel**\<`S`, `F`, `A`, `P`\>(`initialState`, `options`): [`UseTravelResult`](../type-aliases/UseTravelResult.md)\<`S`, `F`, `A`, `P`\>
 
 ### Type Parameters
 
@@ -93,12 +117,12 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 • **initialState**: `S`
 
-• **options**: `Omit`\<`TravelsOptions`\<`F`, `false`, `P`\>, `"mutable"` \| `"autoArchive"` \| `"controlledApply"`\> & `object`
+• **options**: [`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `A`, `P`\>
 
 ### Returns
 
-[`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+[`UseTravelResult`](../type-aliases/UseTravelResult.md)\<`S`, `F`, `A`, `P`\>
 
 ### Defined in
 
-[src/index.ts:93](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L93)
+[src/index.ts:120](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L120)

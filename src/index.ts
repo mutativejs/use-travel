@@ -14,14 +14,6 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 export type { TravelPatches };
 
-type RemovedUseTravelOption =
-  | 'controlledApply'
-  | 'history'
-  | 'initialPatches'
-  | 'initialPosition'
-  | 'mutable'
-  | 'strictInitialPatches';
-
 const removedRestoreOptions = [
   'history',
   'initialPatches',
@@ -36,7 +28,15 @@ export type UseTravelOptions<
   F extends boolean,
   A extends boolean,
   P extends PatchesOption = {},
-> = Omit<TravelsOptions<F, A, P>, RemovedUseTravelOption>;
+> = Omit<
+  TravelsOptions<F, A, P>,
+  | 'controlledApply'
+  | 'history'
+  | 'initialPatches'
+  | 'initialPosition'
+  | 'mutable'
+  | 'strictInitialPatches'
+>;
 
 /** Adds `canUndo` and `canRedo` flags to a controls type. */
 export type WithUndoRedoFlags<C> = C & {
@@ -46,7 +46,8 @@ export type WithUndoRedoFlags<C> = C & {
   readonly canRedo: boolean;
 };
 
-type Result<
+/** Tuple returned by `useTravel`, specialized to its archive mode. */
+export type UseTravelResult<
   S,
   F extends boolean,
   A extends boolean,
@@ -121,7 +122,10 @@ export function useTravel<
   F extends boolean,
   A extends boolean,
   P extends PatchesOption = {},
->(initialState: S, options: UseTravelOptions<F, A, P>): Result<S, F, A, P>;
+>(
+  initialState: S,
+  options: UseTravelOptions<F, A, P>
+): UseTravelResult<S, F, A, P>;
 export function useTravel<
   S,
   F extends boolean,
@@ -130,7 +134,7 @@ export function useTravel<
 >(
   initialState: S,
   _options: UseTravelOptions<F, A, P> = {}
-): Result<S, F, A, P> {
+): UseTravelResult<S, F, A, P> {
   for (const option of removedRestoreOptions) {
     if (Object.prototype.hasOwnProperty.call(_options, option)) {
       throw new TypeError(
@@ -229,7 +233,7 @@ export function useTravel<
     );
   }, [travels]);
 
-  return [state, cachedSetState, cachedControls] as Result<S, F, A, P>;
+  return [state, cachedSetState, cachedControls] as UseTravelResult<S, F, A, P>;
 }
 
 /**

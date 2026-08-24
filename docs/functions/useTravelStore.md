@@ -50,4 +50,4 @@ If the provided `Travels` instance was created with `mutable: true`.
 
 ## Defined in
 
-[src/index.ts:268](https://github.com/mutativejs/use-travel/blob/7f3591d960ca0f9337e4f7807c5bf3d91effcdf0/src/index.ts#L268)
+[src/index.ts:254](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L254)
