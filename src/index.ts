@@ -157,16 +157,6 @@ export function useTravel<
     }
   }
 
-  if (__DEV__) {
-    const { maxHistory = 10 } = _options;
-
-    if (maxHistory <= 0) {
-      console.error(
-        `useTravel: maxHistory must be a positive number, but got ${maxHistory}`
-      );
-    }
-  }
-
   // Create Travels instance (only once)
   const travelsRef = useRef<Travels<S, F, A, P> | null>(null);
   if (!travelsRef.current) {

@@ -3,10 +3,6 @@ import { renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 import { useTravel } from '../src/index';
 
-// Mock __DEV__ flag to be true for these tests
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-globalThis.__DEV__ = true;
-
 describe('useTravel - Input Validation', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
@@ -22,19 +18,18 @@ describe('useTravel - Input Validation', () => {
   });
 
   describe('maxHistory validation', () => {
-    it('should log error when maxHistory is 0', () => {
-      renderHook(() =>
+    it('accepts maxHistory 0 to disable retained history', () => {
+      const { result } = renderHook(() =>
         useTravel(0, {
           maxHistory: 0,
         })
       );
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'useTravel: maxHistory must be a positive number, but got 0'
-      );
+      expect(result.current[2].getHistory()).toEqual([0]);
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
 
-    it('should log error when maxHistory is negative', () => {
+    it('delegates invalid negative values to core validation', () => {
       expect(() =>
         renderHook(() =>
           useTravel(0, {
@@ -43,7 +38,7 @@ describe('useTravel - Input Validation', () => {
         )
       ).toThrowError('Travels: maxHistory must be non-negative, but got -5');
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect(consoleErrorSpy).not.toHaveBeenCalledWith(
         'useTravel: maxHistory must be a positive number, but got -5'
       );
     });
