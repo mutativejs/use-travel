@@ -1,6 +1,6 @@
 import { createElement, useLayoutEffect } from 'react';
 import { act, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createTravels } from 'travels';
 import { useTravel, useTravelStore } from '../src/index';
 
@@ -93,5 +93,31 @@ describe('useTravel subscription', () => {
     expect(screen.getByLabelText('shared-timeline').textContent).toBe(
       '1:0:false:false'
     );
+  });
+
+  it('does not materialize history to observe timeline changes', () => {
+    const travels = createTravels(
+      { count: 0 },
+      { autoArchive: false as const, maxHistory: 1_000 }
+    );
+    const getHistory = vi.spyOn(travels, 'getHistory');
+
+    const App = () => {
+      const [state, , controls] = useTravelStore(travels);
+      return createElement(
+        'output',
+        { 'aria-label': 'cheap-subscription' },
+        `${state.count}:${controls.canArchive()}`
+      );
+    };
+
+    render(createElement(App));
+    act(() => travels.setState({ count: 1 }));
+    act(() => travels.archive());
+
+    expect(screen.getByLabelText('cheap-subscription').textContent).toBe(
+      '1:false'
+    );
+    expect(getHistory).not.toHaveBeenCalled();
   });
 });

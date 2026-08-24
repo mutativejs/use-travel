@@ -86,11 +86,10 @@ const useTravelsState = <
 >(
   travels: Travels<S, F, A, P>
 ): Value<S, F> => {
-  const getTimelineSnapshot = travels.getControls().getHistory;
   useSyncExternalStore(
     travels.subscribe,
-    getTimelineSnapshot,
-    getTimelineSnapshot
+    travels.getRevision,
+    travels.getRevision
   );
   return travels.getState() as Value<S, F>;
 };
