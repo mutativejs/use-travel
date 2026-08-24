@@ -317,9 +317,12 @@ function save() {
 
 ## Important Behavior
 
-### One `setState` call per render cycle
+### Sequential `setState` calls
 
-`useTravel` enforces this limit in every build. After one call, another is allowed only after React commits a render and the hook effect resets the guard. If multiple fields need to change together, update them in a single draft mutation.
+`useTravel` evaluates every synchronous call against the latest state. Multiple
+calls in one event are supported; in automatic archive mode, every non-no-op
+call becomes its own undo step. Use one draft mutation when several changes
+should be undone together.
 
 ```tsx
 setState((draft) => {
@@ -328,7 +331,8 @@ setState((draft) => {
 });
 ```
 
-Manual archive mode does not relax the limit; combine related changes in one updater, then archive when the grouped change is ready.
+In manual archive mode, sequential calls remain pending until `archive()`
+groups them into one history entry.
 
 ### `initialState` and `options` are read once
 

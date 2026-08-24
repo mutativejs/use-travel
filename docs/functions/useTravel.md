@@ -14,7 +14,7 @@ Creates a component-scoped Travels instance with undo/redo support and returns i
 
 The hook memoises the underlying `Travels` instance per component, wires it to React's lifecycle, and forces
 re-renders whenever the managed state changes. Consumers receive a tuple containing the current state, a `setState`
-updater that accepts either a mutative draft function or partial state, and the history controls exposed by
+updater that accepts either a complete value or mutative draft function, and the history controls exposed by
 Travels.
 
 ### Type Parameters
@@ -39,13 +39,9 @@ Value used to initialise the travel store.
 
 A tuple with the current state, typed updater, and history controls.
 
-### Throws
-
-When `setState` is invoked multiple times within the same render cycle.
-
 ### Defined in
 
-[use-travel/src/index.ts:114](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L114)
+[use-travel/src/index.ts:112](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L112)
 
 ## useTravel(initialState, options)
 
@@ -71,7 +67,7 @@ When `setState` is invoked multiple times within the same render cycle.
 
 ### Defined in
 
-[use-travel/src/index.ts:121](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L121)
+[use-travel/src/index.ts:119](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L119)
 
 ## useTravel(initialState, options)
 
@@ -97,7 +93,7 @@ When `setState` is invoked multiple times within the same render cycle.
 
 ### Defined in
 
-[use-travel/src/index.ts:131](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L131)
+[use-travel/src/index.ts:129](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L129)
 
 ## useTravel(initialState, options)
 
@@ -125,4 +121,4 @@ When `setState` is invoked multiple times within the same render cycle.
 
 ### Defined in
 
-[use-travel/src/index.ts:141](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L141)
+[use-travel/src/index.ts:139](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L139)

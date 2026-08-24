@@ -175,7 +175,7 @@ describe('useTravel', () => {
     );
   });
 
-  it('[useTravel]: setState calls after navigation truncate newly added patches incorrectly', () => {
+  it('[useTravel]: sequential updates after navigation replace redo history', () => {
     const { result } = renderHook(() =>
       useTravel({ count: 0 }, { autoArchive: true })
     );
@@ -204,28 +204,60 @@ describe('useTravel', () => {
     expect(state).toEqual({ count: 1 });
     expect(controls.position).toBe(1);
 
-    expect(() => {
-      act(() => {
-        setState({ count: 10 });
-        setState({ count: 20 });
-      });
-    }).toThrow(
-      'setState cannot be called multiple times in the same render cycle.'
-    );
+    act(() => {
+      setState({ count: 10 });
+      setState({ count: 20 });
+    });
+
+    [state, , controls] = result.current;
+    expect(state).toEqual({ count: 20 });
+    expect(controls.position).toBe(3);
+    expect(controls.getHistory()).toEqual([
+      { count: 0 },
+      { count: 1 },
+      { count: 10 },
+      { count: 20 },
+    ]);
   });
 
-  it('[useTravel]: Multiple rapid setState calls should each increment position correctly', () => {
+  it('[useTravel]: rapid setState calls each increment the position', () => {
     const { result } = renderHook(() => useTravel(0, { autoArchive: true }));
 
     let [state, setState, controls] = result.current;
 
-    expect(() => {
-      act(() => {
-        setState(1);
-        setState(2);
-      });
-    }).toThrow(
-      'setState cannot be called multiple times in the same render cycle.'
+    act(() => {
+      setState(1);
+      setState(2);
+    });
+
+    [state, , controls] = result.current;
+    expect(state).toBe(2);
+    expect(controls.position).toBe(2);
+    expect(controls.getHistory()).toEqual([0, 1, 2]);
+  });
+
+  it('[useTravel]: no-op and failed updates do not block the next update', () => {
+    const { result } = renderHook(() => useTravel({ count: 0 }));
+
+    act(() => result.current[1](() => undefined));
+    expect(() =>
+      act(() =>
+        result.current[1](() => {
+          throw new Error('failed update');
+        })
+      )
+    ).toThrow('failed update');
+
+    act(() =>
+      result.current[1]((draft) => {
+        draft.count += 1;
+      })
     );
+
+    expect(result.current[0]).toEqual({ count: 1 });
+    expect(result.current[2].getHistory()).toEqual([
+      { count: 0 },
+      { count: 1 },
+    ]);
   });
 });

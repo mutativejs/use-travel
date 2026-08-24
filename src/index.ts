@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import type {
   TravelPatches,
   Travels,
@@ -99,7 +99,7 @@ const useTravelsState = <
  *
  * The hook memoises the underlying `Travels` instance per component, wires it to React's lifecycle, and forces
  * re-renders whenever the managed state changes. Consumers receive a tuple containing the current state, a `setState`
- * updater that accepts either a mutative draft function or partial state, and the history controls exposed by
+ * updater that accepts either a complete value or mutative draft function, and the history controls exposed by
  * Travels.
  *
  * @typeParam S - Shape of the state managed by the travel store.
@@ -108,7 +108,6 @@ const useTravelsState = <
  * @typeParam P - Additional patches configuration forwarded to Mutative.
  * @param initialState - Value used to initialise the travel store.
  * @returns A tuple with the current state, typed updater, and history controls.
- * @throws {Error} When `setState` is invoked multiple times within the same render cycle.
  */
 export function useTravel<S, F extends boolean>(
   initialState: S
@@ -185,25 +184,9 @@ export function useTravel<
   const travels = travelsRef.current;
   const state = useTravelsState(travels);
 
-  // Track if setState has been called in the current render cycle
-  const setStateCalledInRender = useRef(false);
-
-  // Reset the flag at the start of each render cycle
-  useEffect(() => {
-    setStateCalledInRender.current = false;
-  });
-
-  // Wrap setState to prevent multiple calls in the same render cycle
   const cachedSetState: UseTravelSetState<S> = useCallback(
-    (updater: Updater<S>, metadata?: TravelMetadata) => {
-      if (setStateCalledInRender.current) {
-        throw new Error(
-          'setState cannot be called multiple times in the same render cycle.'
-        );
-      }
-      setStateCalledInRender.current = true;
-      travels.setState(updater, metadata);
-    },
+    (updater: Updater<S>, metadata?: TravelMetadata) =>
+      travels.setState(updater, metadata),
     [travels]
   );
 
