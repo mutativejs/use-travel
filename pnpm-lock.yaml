@@ -2909,7 +2909,7 @@ packages:
     engines: {node: '>=20'}
 
   travels@3.0.0:
-    resolution: {integrity: sha512-sP+KCjSbwSu0/BxgD0phjU0H+/rxMYzhhQD8BdF5tJYy79vH08TTevxFrxW0pAZRyP1Q+iPGCi3Z34/bbfzL0w==}
+    resolution: {integrity: sha512-q6M6LjFlgnEZVQgUX946VNqftkev4Y9v0Zi/2ijqjeJphIJ5Mhsi4sC/CSCWftg07dik7DkmbsfnJCJDgguWUw==}
     engines: {node: '>=22'}
     peerDependencies:
       mutative: ^1.3.0
