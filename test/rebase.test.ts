@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { Travels } from 'travels';
+import { createTravels } from 'travels';
 import { useTravel, useTravelStore } from '../src/index';
 
 describe('rebase support', () => {
@@ -111,7 +111,7 @@ describe('rebase support', () => {
   });
 
   it('useTravelStore exposes rebase and keeps React in sync after rebasing a shared store', () => {
-    const travels = new Travels({ count: 0 });
+    const travels = createTravels({ count: 0 });
     const { result } = renderHook(() => useTravelStore(travels));
 
     let [state, setState, controls] = result.current;

@@ -1,6 +1,25 @@
 import { expect, describe, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { useTravel } from '../src/index';
+import * as travelsApi from 'travels';
+import type {
+  Travels,
+  TravelsOptions,
+  TravelsSerializedHistory,
+} from 'travels';
+import { useTravel, useTravelStore } from '../src/index';
+
+const restoreSnapshot = (
+  'restoreTravels' in travelsApi
+    ? travelsApi.restoreTravels
+    : (snapshot, options) =>
+        travelsApi.createTravels(snapshot.state, {
+          ...options,
+          history: snapshot,
+        } as never)
+) as <S, A extends boolean>(
+  snapshot: TravelsSerializedHistory<S>,
+  options: TravelsOptions<false, A>
+) => Travels<S, false, A>;
 
 describe('useTravel', () => {
   it('[useTravel] with normal init state', () => {
@@ -1225,14 +1244,16 @@ describe('useTravel', () => {
       }
     `);
 
-    result = renderHook(() =>
-      useTravel(nextState, {
-        maxHistory: 3,
-        autoArchive: false,
-        initialPatches: controls.patches,
-        initialPosition: controls.position,
-      })
-    ).result;
+    const restored = restoreSnapshot(
+      {
+        version: 1,
+        state: nextState,
+        patches: controls.patches,
+        position: controls.position,
+      },
+      { maxHistory: 3, autoArchive: false }
+    );
+    result = renderHook(() => useTravelStore(restored)).result;
     [nextState, setState, controls] = result.current;
 
     act(() => controls.back());
@@ -1559,10 +1580,6 @@ describe('useTravel', () => {
     const { result } = renderHook(() =>
       useTravel(0, {
         maxHistory: 10,
-        initialPatches: {
-          patches: [],
-          inversePatches: [],
-        },
         autoArchive: false,
       })
     );
@@ -1720,10 +1737,6 @@ describe('useTravel', () => {
     const { result } = renderHook(() =>
       useTravel(0, {
         maxHistory: 10,
-        initialPatches: {
-          patches: [],
-          inversePatches: [],
-        },
         autoArchive: false,
       })
     );
@@ -1782,10 +1795,6 @@ describe('useTravel', () => {
         { count: 0 },
         {
           maxHistory: 10,
-          initialPatches: {
-            patches: [],
-            inversePatches: [],
-          },
           autoArchive: false,
         }
       )

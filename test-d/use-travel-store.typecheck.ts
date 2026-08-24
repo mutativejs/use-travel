@@ -4,11 +4,11 @@ import type {
   Updater,
   Value,
 } from 'travels';
-import { Travels } from 'travels';
+import { createTravels } from 'travels';
 import { type StoreControlsWithFlags, useTravelStore } from '../index';
 
-const autoTravels = new Travels({ count: 0 });
-const manualTravels = new Travels(
+const autoTravels = createTravels({ count: 0 });
+const manualTravels = createTravels(
   { count: 0 },
   { autoArchive: false as const }
 );

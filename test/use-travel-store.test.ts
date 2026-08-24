@@ -1,21 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { Travels } from 'travels';
+import { createTravels } from 'travels';
 import { useTravelStore } from '../src/index';
 
 describe('useTravelStore', () => {
   it('throws when used with a mutable Travels instance', () => {
-    const travels = new Travels({ count: 0 }, { mutable: true });
+    const travels = createTravels({ count: 0 }, { mutable: true });
 
-    expect(() =>
-      renderHook(() => useTravelStore(travels))
-    ).toThrowError(
+    expect(() => renderHook(() => useTravelStore(travels))).toThrowError(
       /useTravelStore only supports immutable Travels instances/
     );
   });
 
   it('syncs state and controls with an immutable Travels instance', () => {
-    const travels = new Travels({ count: 0 });
+    const travels = createTravels({ count: 0 });
 
     const { result } = renderHook(() => useTravelStore(travels));
 
@@ -47,7 +45,7 @@ describe('useTravelStore', () => {
   });
 
   it('exposes reactive canUndo/canRedo getters while keeping controls stable', () => {
-    const travels = new Travels({ count: 0 });
+    const travels = createTravels({ count: 0 });
 
     const { result } = renderHook(() => useTravelStore(travels));
 
@@ -76,7 +74,7 @@ describe('useTravelStore', () => {
   });
 
   it('keeps existing controls members own-enumerable (Object.keys / spread)', () => {
-    const travels = new Travels({ count: 0 });
+    const travels = createTravels({ count: 0 });
 
     const { result } = renderHook(() => useTravelStore(travels));
     const [, , controls] = result.current;
@@ -85,6 +83,7 @@ describe('useTravelStore', () => {
     for (const member of [
       'position',
       'getHistory',
+      'getHistorySnapshot',
       'back',
       'forward',
       'reset',
@@ -105,7 +104,7 @@ describe('useTravelStore', () => {
   });
 
   it('exposes manual archive controls when autoArchive is disabled', () => {
-    const travels = new Travels(
+    const travels = createTravels(
       { todos: [] as string[] },
       { autoArchive: false as const }
     );

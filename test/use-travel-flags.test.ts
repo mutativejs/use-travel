@@ -38,6 +38,7 @@ describe('useTravel canUndo / canRedo flags', () => {
     for (const member of [
       'position',
       'getHistory',
+      'getHistorySnapshot',
       'back',
       'forward',
       'reset',

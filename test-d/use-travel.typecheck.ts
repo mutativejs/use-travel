@@ -64,3 +64,11 @@ useTravel(
     controlledApply: ({ state }: { state: { count: number } }) => state,
   }
 );
+
+useTravel(
+  { count: 0 },
+  {
+    // @ts-expect-error split persistence options were removed in use-travel 3
+    initialPosition: 0,
+  }
+);

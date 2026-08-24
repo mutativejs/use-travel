@@ -4,7 +4,7 @@ import { act, render, screen } from '@testing-library/react';
 import reactCompiler from 'babel-plugin-react-compiler';
 import * as React from 'react';
 import * as ReactCompilerRuntime from 'react-compiler-runtime';
-import { Travels } from 'travels';
+import { createTravels, type Travels } from 'travels';
 import { describe, expect, it } from 'vitest';
 import { useTravelStore } from '../src/index';
 
@@ -76,7 +76,7 @@ function compileCounter() {
 describe('React Compiler integration', () => {
   it('keeps canUndo and canRedo reactive in a compiled component', () => {
     const CompiledCounter = compileCounter();
-    const store = new Travels({ count: 0 });
+    const store = createTravels({ count: 0 });
 
     render(React.createElement(CompiledCounter, { store }));
 

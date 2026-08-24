@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import type {
   TravelPatches,
+  Travels,
   TravelsOptions,
   RebasableManualTravelsControls,
   RebasableTravelsControls,
@@ -9,10 +10,45 @@ import type {
   PatchesOption,
   TravelMetadata,
 } from 'travels';
-import { Travels } from 'travels';
+import { createTravels } from 'travels';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 export type { TravelPatches };
+
+type RemovedUseTravelOption =
+  | 'controlledApply'
+  | 'history'
+  | 'initialPatches'
+  | 'initialPosition'
+  | 'mutable'
+  | 'strictInitialPatches';
+
+const removedRestoreOptions = [
+  'history',
+  'initialPatches',
+  'initialPosition',
+  'strictInitialPatches',
+] as const;
+
+/** Options accepted by the component-owned `useTravel` timeline. */
+export type UseTravelOptions<
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+> = Omit<TravelsOptions<F, A, P>, RemovedUseTravelOption>;
+
+// Travels 2.2 already implements the generic factory behavior at runtime, but
+// its declarations only expose literal archive-mode overloads. This shared
+// signature keeps the adapter source verifiable against both release lines.
+const createOwnedTravels = createTravels as <
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+>(
+  initialState: S,
+  options: TravelsOptions<F, A, P>
+) => Travels<S, F, A, P>;
 
 /** Adds `canUndo` and `canRedo` flags to a controls type. */
 export type WithUndoRedoFlags<C> = C & {
@@ -79,10 +115,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<
-    TravelsOptions<F, true, P>,
-    'autoArchive' | 'controlledApply' | 'mutable'
-  > & {
+  options: Omit<UseTravelOptions<F, true, P>, 'autoArchive'> & {
     autoArchive?: true;
   }
 ): [
@@ -97,10 +130,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<
-    TravelsOptions<F, false, P>,
-    'autoArchive' | 'controlledApply' | 'mutable'
-  > & {
+  options: Omit<UseTravelOptions<F, false, P>, 'autoArchive'> & {
     autoArchive: false;
   }
 ): [
@@ -115,50 +145,37 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  _options: Omit<TravelsOptions<F, A, P>, 'controlledApply' | 'mutable'> = {}
+  _options: UseTravelOptions<F, A, P> = {}
 ): Result<S, F, A, P> {
+  for (const option of removedRestoreOptions) {
+    if (Object.prototype.hasOwnProperty.call(_options, option)) {
+      throw new TypeError(
+        `useTravel: ${option} was removed; restore a complete snapshot with restoreTravels() and pass that instance to useTravelStore()`
+      );
+    }
+  }
+
   if (__DEV__) {
-    const { maxHistory = 10, initialPosition = 0, initialPatches } = _options;
+    const { maxHistory = 10 } = _options;
 
     if (maxHistory <= 0) {
       console.error(
         `useTravel: maxHistory must be a positive number, but got ${maxHistory}`
       );
     }
-
-    if (initialPosition < 0) {
-      console.error(
-        `useTravel: initialPosition must be non-negative, but got ${initialPosition}`
-      );
-    }
-
-    if (initialPatches) {
-      if (
-        !Array.isArray(initialPatches.patches) ||
-        !Array.isArray(initialPatches.inversePatches)
-      ) {
-        console.error(
-          `useTravel: initialPatches must have 'patches' and 'inversePatches' arrays`
-        );
-      } else if (
-        initialPatches.patches.length !== initialPatches.inversePatches.length
-      ) {
-        console.error(
-          `useTravel: initialPatches.patches and initialPatches.inversePatches must have the same length`
-        );
-      }
-    }
   }
+
+  const ownedOptions = { ..._options } as TravelsOptions<F, A, P> & {
+    controlledApply?: unknown;
+  };
+  Reflect.deleteProperty(ownedOptions, 'controlledApply');
 
   // Create Travels instance (only once)
   const travelsRef = useRef<Travels<S, F, A, P> | null>(null);
   if (!travelsRef.current) {
-    travelsRef.current = new Travels<S, F, A, P>(initialState, {
-      ..._options,
+    travelsRef.current = createOwnedTravels<S, F, A, P>(initialState, {
+      ...ownedOptions,
       mutable: false,
-      // Controlled journals delegate state ownership to another runtime and
-      // are created exclusively through travels' createTravelJournal().
-      controlledApply: undefined,
     });
   }
 
@@ -205,46 +222,39 @@ export function useTravel<
   const cachedControls = useMemo(() => {
     const baseControls = travels.getControls();
 
-    // Create a proxy-like object that always gets fresh values
-    const controls: any = {
-      get position() {
-        return travels.getPosition();
-      },
-      getHistory: () => baseControls.getHistory(),
-      get patches() {
-        return travels.getPatches();
-      },
-      back: (amount?: number) => baseControls.back(amount),
-      forward: (amount?: number) => baseControls.forward(amount),
-      reset: () => baseControls.reset(),
-      go: (position: number) => baseControls.go(position),
-      canBack: () => baseControls.canBack(),
-      canForward: () => baseControls.canForward(),
-      get canUndo() {
-        return baseControls.canBack();
-      },
-      get canRedo() {
-        return baseControls.canForward();
-      },
-      rebase: () => baseControls.rebase(),
-      // Always include archive and canArchive methods for compatibility
-      // Even in autoArchive mode, archive() can be called (but will warn)
-      archive: (metadata?: TravelMetadata) => {
-        if ('archive' in baseControls) {
-          baseControls.archive(metadata);
-        } else {
-          travels.archive(metadata);
-        }
-      },
-      canArchive: () => {
-        if ('canArchive' in baseControls) {
-          return baseControls.canArchive();
-        }
-        return travels.canArchive();
-      },
-    };
-
-    return controls;
+    // Preserve the core control surface (including future additions) while
+    // adding React-friendly live flags and the historical archive aliases.
+    return Object.defineProperties(
+      {},
+      {
+        ...Object.getOwnPropertyDescriptors(baseControls),
+        canUndo: {
+          get: () => baseControls.canBack(),
+          enumerable: true,
+        },
+        canRedo: {
+          get: () => baseControls.canForward(),
+          enumerable: true,
+        },
+        archive: {
+          value: (metadata?: TravelMetadata) => {
+            if ('archive' in baseControls) {
+              baseControls.archive(metadata);
+            } else {
+              travels.archive(metadata);
+            }
+          },
+          enumerable: true,
+        },
+        canArchive: {
+          value: () =>
+            'canArchive' in baseControls
+              ? baseControls.canArchive()
+              : travels.canArchive(),
+          enumerable: true,
+        },
+      }
+    );
   }, [travels]);
 
   return [state, cachedSetState, cachedControls] as Result<S, F, A>;
