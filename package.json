@@ -2,15 +2,29 @@
   "name": "use-travel",
   "version": "3.0.0",
   "description": "A React hook for state time travel with undo, redo, reset, rebase and archive functionalities.",
-  "main": "dist/index.cjs.js",
-  "unpkg": "dist/index.umd.js",
-  "types": "dist/index.d.ts",
-  "umd:main": "dist/index.umd.js",
-  "module": "dist/index.esm.js",
-  "jsnext:main": "dist/index.esm.js",
-  "react-native": "dist/index.esm.js",
-  "typings": "dist/index.d.ts",
-  "source": "src/index.ts",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "unpkg": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "umd:main": "./dist/index.umd.js",
+  "module": "./dist/index.esm.js",
+  "jsnext:main": "./dist/index.esm.js",
+  "react-native": "./dist/index.esm.js",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.esm.js"
+      }
+    }
+  },
+  "source": "./src/index.ts",
   "packageManager": "pnpm@10.34.4",
   "sideEffects": false,
   "engines": {
@@ -24,6 +38,7 @@
   },
   "scripts": {
     "test": "pnpm run test:types && vitest run",
+    "test:package": "node test/package-exports-smoke.js",
     "test:types": "tsc -p tsconfig.typecheck.json",
     "test:coverage": "pnpm run test:types && vitest run --coverage && coveralls < coverage/lcov.info",
     "clean": "rimraf dist",
