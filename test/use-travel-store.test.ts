@@ -103,6 +103,21 @@ describe('useTravelStore', () => {
     expect(copy.canUndo).toBe(false);
   });
 
+  it('keeps the controls capability surface immutable', () => {
+    const travels = createTravels({ count: 0 });
+    const { result } = renderHook(() => useTravelStore(travels));
+    const [, , controls] = result.current;
+    const controlsWithInjectedArchive = controls as typeof controls & {
+      archive?: () => void;
+    };
+
+    expect(Object.isFrozen(controls)).toBe(true);
+    expect(() => {
+      controlsWithInjectedArchive.archive = () => undefined;
+    }).toThrow(TypeError);
+    expect('archive' in controls).toBe(false);
+  });
+
   it('exposes manual archive controls when autoArchive is disabled', () => {
     const travels = createTravels(
       { todos: [] as string[] },

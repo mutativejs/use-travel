@@ -68,4 +68,18 @@ describe('useTravel canUndo / canRedo flags', () => {
     expect(Object.keys(controls)).toContain('archive');
     expect(Object.keys(controls)).toContain('canArchive');
   });
+
+  it('keeps the controls capability surface immutable', () => {
+    const { result } = renderHook(() => useTravel({ count: 0 }));
+    const [, , controls] = result.current;
+    const controlsWithInjectedArchive = controls as typeof controls & {
+      archive?: () => void;
+    };
+
+    expect(Object.isFrozen(controls)).toBe(true);
+    expect(() => {
+      controlsWithInjectedArchive.archive = () => undefined;
+    }).toThrow(TypeError);
+    expect('archive' in controls).toBe(false);
+  });
 });

@@ -207,19 +207,21 @@ export function useTravel<
 
     // Preserve the exact core capability surface (including future additions)
     // while adding React-friendly live flags.
-    return Object.defineProperties(
-      {},
-      {
-        ...Object.getOwnPropertyDescriptors(baseControls),
-        canUndo: {
-          get: () => baseControls.canBack(),
-          enumerable: true,
-        },
-        canRedo: {
-          get: () => baseControls.canForward(),
-          enumerable: true,
-        },
-      }
+    return Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          ...Object.getOwnPropertyDescriptors(baseControls),
+          canUndo: {
+            get: () => baseControls.canBack(),
+            enumerable: true,
+          },
+          canRedo: {
+            get: () => baseControls.canForward(),
+            enumerable: true,
+          },
+        }
+      )
     );
   }, [travels]);
 
@@ -272,13 +274,15 @@ export function useTravelStore<
   const controls = useMemo<StoreControlsWithFlags<S, F, A, P>>(() => {
     const base = travels.getControls();
     // Preserve the base controls as own properties so Object.keys and spread keep working.
-    return Object.defineProperties(
-      {},
-      {
-        ...Object.getOwnPropertyDescriptors(base),
-        canUndo: { get: () => base.canBack(), enumerable: true },
-        canRedo: { get: () => base.canForward(), enumerable: true },
-      }
+    return Object.freeze(
+      Object.defineProperties(
+        {},
+        {
+          ...Object.getOwnPropertyDescriptors(base),
+          canUndo: { get: () => base.canBack(), enumerable: true },
+          canRedo: { get: () => base.canForward(), enumerable: true },
+        }
+      )
     ) as StoreControlsWithFlags<S, F, A, P>;
   }, [travels]);
   return [state as Value<S, F>, setState, controls];
