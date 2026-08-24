@@ -31,6 +31,7 @@ export default {
       globals: {
         mutative: 'Mutative',
         react: 'React',
+        travels: 'Travels',
       },
       exports: 'named',
     },
@@ -44,5 +45,5 @@ export default {
     }),
     terser(),
   ],
-  external: ['mutative', 'react'],
+  external: ['mutative', 'react', 'travels'],
 };
