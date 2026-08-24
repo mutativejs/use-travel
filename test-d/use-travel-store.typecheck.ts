@@ -47,6 +47,12 @@ const manualCanRedo: boolean = manualResult[2].canRedo;
 autoTuple[2].rebase();
 manualTuple[2].archive();
 manualTuple[2].canArchive();
+autoResult[1]({ count: 1 }, { label: 'shared store update' });
+
+// @ts-expect-error shared-store callbacks must be synchronous
+autoResult[1](async (draft) => {
+  draft.count = 1;
+});
 
 // @ts-expect-error auto-archived controls should not expose manual archive APIs
 autoResult[2].archive();

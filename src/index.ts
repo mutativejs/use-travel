@@ -8,6 +8,7 @@ import type {
   Value,
   Updater,
   PatchesOption,
+  TravelMetadata,
 } from 'travels';
 import { createTravels } from 'travels';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
@@ -46,6 +47,9 @@ export type WithUndoRedoFlags<C> = C & {
   readonly canRedo: boolean;
 };
 
+/** Core-compatible synchronous state setter exposed by the React hooks. */
+export type UseTravelSetState<S> = Travels<S>['setState'];
+
 /** Tuple returned by `useTravel`, specialized to its archive mode. */
 export type UseTravelResult<
   S,
@@ -54,7 +58,7 @@ export type UseTravelResult<
   P extends PatchesOption = {},
 > = [
   Value<S, F>,
-  (updater: Updater<S>) => void,
+  UseTravelSetState<S>,
   WithUndoRedoFlags<
     A extends false
       ? RebasableManualTravelsControls<S, F, P>
@@ -94,7 +98,7 @@ export function useTravel<S, F extends boolean>(
   initialState: S
 ): [
   Value<S, F>,
-  (updater: Updater<S>) => void,
+  UseTravelSetState<S>,
   WithUndoRedoFlags<RebasableTravelsControls<S, F>>,
 ];
 export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
@@ -104,7 +108,7 @@ export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
   }
 ): [
   Value<S, F>,
-  (updater: Updater<S>) => void,
+  UseTravelSetState<S>,
   WithUndoRedoFlags<RebasableTravelsControls<S, F, P>>,
 ];
 export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
@@ -114,7 +118,7 @@ export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
   }
 ): [
   Value<S, F>,
-  (updater: Updater<S>) => void,
+  UseTravelSetState<S>,
   WithUndoRedoFlags<RebasableManualTravelsControls<S, F, P>>,
 ];
 export function useTravel<
@@ -188,15 +192,15 @@ export function useTravel<
   });
 
   // Wrap setState to prevent multiple calls in the same render cycle
-  const cachedSetState = useCallback(
-    (updater: Updater<S>) => {
+  const cachedSetState: UseTravelSetState<S> = useCallback(
+    (updater: Updater<S>, metadata?: TravelMetadata) => {
       if (setStateCalledInRender.current) {
         throw new Error(
           'setState cannot be called multiple times in the same render cycle.'
         );
       }
       setStateCalledInRender.current = true;
-      travels.setState(updater);
+      travels.setState(updater, metadata);
     },
     [travels]
   );
@@ -252,7 +256,7 @@ export function useTravelStore<
   travels: Travels<S, F, A, P>
 ): [
   Value<S, F>,
-  (updater: Updater<S>) => void,
+  UseTravelSetState<S>,
   StoreControlsWithFlags<S, F, A, P>,
 ] {
   const isMutable = travels.mutable;
@@ -267,8 +271,9 @@ export function useTravelStore<
     travels.getState,
     travels.getState
   );
-  const setState = useCallback(
-    (updater: Updater<S>) => travels.setState(updater),
+  const setState: UseTravelSetState<S> = useCallback(
+    (updater: Updater<S>, metadata?: TravelMetadata) =>
+      travels.setState(updater, metadata),
     [travels]
   );
   const controls = useMemo<StoreControlsWithFlags<S, F, A, P>>(() => {
