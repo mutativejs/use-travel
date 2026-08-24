@@ -9,6 +9,11 @@ import { type WithUndoRedoFlags, useTravel } from '../index';
 const autoResult = useTravel({ count: 0 });
 const explicitAutoResult = useTravel({ count: 0 }, { autoArchive: true });
 const manualResult = useTravel({ count: 0 }, { autoArchive: false });
+declare const dynamicArchiveMode: boolean;
+const dynamicResult = useTravel(
+  { count: 0 },
+  { autoArchive: dynamicArchiveMode }
+);
 
 const autoTuple: [
   Value<{ count: number }, false>,
@@ -34,6 +39,10 @@ const autoControlsWithFlags: WithUndoRedoFlags<
 const manualControlsWithFlags: WithUndoRedoFlags<
   RebasableManualTravelsControls<{ count: number }, false>
 > = manualResult[2];
+const dynamicControlsWithFlags: WithUndoRedoFlags<
+  | RebasableTravelsControls<{ count: number }, false>
+  | RebasableManualTravelsControls<{ count: number }, false>
+> = dynamicResult[2];
 
 const autoCanUndo: boolean = autoResult[2].canUndo;
 const autoCanRedo: boolean = autoResult[2].canRedo;
@@ -41,6 +50,8 @@ const explicitAutoCanUndo: boolean = explicitAutoResult[2].canUndo;
 const explicitAutoCanRedo: boolean = explicitAutoResult[2].canRedo;
 const manualCanUndo: boolean = manualResult[2].canUndo;
 const manualCanRedo: boolean = manualResult[2].canRedo;
+const dynamicCanUndo: boolean = dynamicControlsWithFlags.canUndo;
+const dynamicCanRedo: boolean = dynamicControlsWithFlags.canRedo;
 
 autoTuple[2].rebase();
 explicitAutoTuple[2].rebase();

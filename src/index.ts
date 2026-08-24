@@ -111,7 +111,6 @@ export function useTravel<S, F extends boolean>(
 export function useTravel<
   S,
   F extends boolean,
-  A extends boolean,
   P extends PatchesOption = {},
 >(
   initialState: S,
@@ -126,7 +125,6 @@ export function useTravel<
 export function useTravel<
   S,
   F extends boolean,
-  A extends boolean,
   P extends PatchesOption = {},
 >(
   initialState: S,
@@ -138,6 +136,15 @@ export function useTravel<
   (updater: Updater<S>) => void,
   WithUndoRedoFlags<RebasableManualTravelsControls<S, F, P>>,
 ];
+export function useTravel<
+  S,
+  F extends boolean,
+  A extends boolean,
+  P extends PatchesOption = {},
+>(
+  initialState: S,
+  options: UseTravelOptions<F, A, P>
+): Result<S, F, A, P>;
 export function useTravel<
   S,
   F extends boolean,
