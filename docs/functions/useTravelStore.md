@@ -6,7 +6,7 @@
 
 # Function: useTravelStore()
 
-> **useTravelStore**\<`S`, `F`, `A`, `P`\>(`travels`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`StoreControlsWithFlags`](../type-aliases/StoreControlsWithFlags.md)\<`S`, `F`, `A`, `P`\>]
+> **useTravelStore**\<`S`, `F`, `A`, `P`\>(`travels`): [`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`StoreControlsWithFlags`](../type-aliases/StoreControlsWithFlags.md)\<`S`, `F`, `A`, `P`\>]
 
 Subscribes to an existing Travels store and bridges it into React via `useSyncExternalStore`.
 
@@ -40,7 +40,7 @@ Existing Travels instance to bind to React.
 
 ## Returns
 
-[`Value`\<`S`, `F`\>, (`updater`) => `void`, [`StoreControlsWithFlags`](../type-aliases/StoreControlsWithFlags.md)\<`S`, `F`, `A`, `P`\>]
+[`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`StoreControlsWithFlags`](../type-aliases/StoreControlsWithFlags.md)\<`S`, `F`, `A`, `P`\>]
 
 A tuple containing the current state, typed updater, and history controls.
 
@@ -50,4 +50,4 @@ If the provided `Travels` instance was created with `mutable: true`.
 
 ## Defined in
 
-[src/index.ts:254](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L254)
+[use-travel/src/index.ts:240](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L240)

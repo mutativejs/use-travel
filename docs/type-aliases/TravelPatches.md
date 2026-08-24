@@ -28,4 +28,4 @@ JSON Pointer strings or dense arrays of strings/non-negative integers.
 
 ## Defined in
 
-../../../../private/var/folders/gm/4n31vt151yg76r6cnn1m3p740000gn/T/tmp.daWkvssfsf/package/dist/type.d.ts:7
+travels/dist/type.d.ts:7

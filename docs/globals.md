@@ -10,6 +10,7 @@
 - [TravelPatches](type-aliases/TravelPatches.md)
 - [UseTravelOptions](type-aliases/UseTravelOptions.md)
 - [UseTravelResult](type-aliases/UseTravelResult.md)
+- [UseTravelSetState](type-aliases/UseTravelSetState.md)
 - [WithUndoRedoFlags](type-aliases/WithUndoRedoFlags.md)
 
 ## Functions

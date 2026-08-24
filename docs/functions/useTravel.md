@@ -8,7 +8,7 @@
 
 ## useTravel(initialState)
 
-> **useTravel**\<`S`, `F`\>(`initialState`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`\>\>]
+> **useTravel**\<`S`, `F`\>(`initialState`): [`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`\>\>]
 
 Creates a component-scoped Travels instance with undo/redo support and returns its reactive API.
 
@@ -35,7 +35,7 @@ Value used to initialise the travel store.
 
 ### Returns
 
-[`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`\>\>]
+[`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`\>\>]
 
 A tuple with the current state, typed updater, and history controls.
 
@@ -45,11 +45,11 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[src/index.ts:93](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L93)
+[use-travel/src/index.ts:97](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L97)
 
 ## useTravel(initialState, options)
 
-> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
+> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
 
 ### Type Parameters
 
@@ -67,15 +67,15 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Returns
 
-[`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
+[`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
 
 ### Defined in
 
-[src/index.ts:100](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L100)
+[use-travel/src/index.ts:104](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L104)
 
 ## useTravel(initialState, options)
 
-> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
 
 ### Type Parameters
 
@@ -93,11 +93,11 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Returns
 
-[`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+[`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
 
 ### Defined in
 
-[src/index.ts:110](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L110)
+[use-travel/src/index.ts:114](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L114)
 
 ## useTravel(initialState, options)
 
@@ -125,4 +125,4 @@ When `setState` is invoked multiple times within the same render cycle (developm
 
 ### Defined in
 
-[src/index.ts:120](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L120)
+[use-travel/src/index.ts:124](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L124)

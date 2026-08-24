@@ -6,7 +6,7 @@
 
 # Type Alias: UseTravelResult\<S, F, A, P\>
 
-> **UseTravelResult**\<`S`, `F`, `A`, `P`\>: [`Value`\<`S`, `F`\>, (`updater`) => `void`, [`WithUndoRedoFlags`](WithUndoRedoFlags.md)\<`A` *extends* `false` ? `RebasableManualTravelsControls`\<`S`, `F`, `P`\> : `RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
+> **UseTravelResult**\<`S`, `F`, `A`, `P`\>: [`Value`\<`S`, `F`\>, [`UseTravelSetState`](UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](WithUndoRedoFlags.md)\<`A` *extends* `false` ? `RebasableManualTravelsControls`\<`S`, `F`, `P`\> : `RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
 
 Tuple returned by `useTravel`, specialized to its archive mode.
 
@@ -22,4 +22,4 @@ Tuple returned by `useTravel`, specialized to its archive mode.
 
 ## Defined in
 
-[src/index.ts:50](https://github.com/mutativejs/use-travel/blob/e45a6fa3283342ebc619ed9665e8f1b65407eb0e/src/index.ts#L50)
+[use-travel/src/index.ts:54](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L54)
