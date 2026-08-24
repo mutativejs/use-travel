@@ -8,7 +8,6 @@ import type {
   Value,
   Updater,
   PatchesOption,
-  TravelMetadata,
 } from 'travels';
 import { createTravels } from 'travels';
 import { useSyncExternalStore } from 'use-sync-external-store/shim';
@@ -108,11 +107,7 @@ export function useTravel<S, F extends boolean>(
   (updater: Updater<S>) => void,
   WithUndoRedoFlags<RebasableTravelsControls<S, F>>,
 ];
-export function useTravel<
-  S,
-  F extends boolean,
-  P extends PatchesOption = {},
->(
+export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
   initialState: S,
   options: Omit<UseTravelOptions<F, true, P>, 'autoArchive'> & {
     autoArchive?: true;
@@ -122,11 +117,7 @@ export function useTravel<
   (updater: Updater<S>) => void,
   WithUndoRedoFlags<RebasableTravelsControls<S, F, P>>,
 ];
-export function useTravel<
-  S,
-  F extends boolean,
-  P extends PatchesOption = {},
->(
+export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
   initialState: S,
   options: Omit<UseTravelOptions<F, false, P>, 'autoArchive'> & {
     autoArchive: false;
@@ -141,10 +132,7 @@ export function useTravel<
   F extends boolean,
   A extends boolean,
   P extends PatchesOption = {},
->(
-  initialState: S,
-  options: UseTravelOptions<F, A, P>
-): Result<S, F, A, P>;
+>(initialState: S, options: UseTravelOptions<F, A, P>): Result<S, F, A, P>;
 export function useTravel<
   S,
   F extends boolean,
@@ -229,8 +217,8 @@ export function useTravel<
   const cachedControls = useMemo(() => {
     const baseControls = travels.getControls();
 
-    // Preserve the core control surface (including future additions) while
-    // adding React-friendly live flags and the historical archive aliases.
+    // Preserve the exact core capability surface (including future additions)
+    // while adding React-friendly live flags.
     return Object.defineProperties(
       {},
       {
@@ -241,23 +229,6 @@ export function useTravel<
         },
         canRedo: {
           get: () => baseControls.canForward(),
-          enumerable: true,
-        },
-        archive: {
-          value: (metadata?: TravelMetadata) => {
-            if ('archive' in baseControls) {
-              baseControls.archive(metadata);
-            } else {
-              travels.archive(metadata);
-            }
-          },
-          enumerable: true,
-        },
-        canArchive: {
-          value: () =>
-            'canArchive' in baseControls
-              ? baseControls.canArchive()
-              : travels.canArchive(),
           enumerable: true,
         },
       }

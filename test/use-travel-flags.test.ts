@@ -51,9 +51,21 @@ describe('useTravel canUndo / canRedo flags', () => {
     }
     expect(keys).toContain('canUndo');
     expect(keys).toContain('canRedo');
+    expect(keys).not.toContain('archive');
+    expect(keys).not.toContain('canArchive');
 
     const copy = { ...controls } as typeof controls;
     expect(typeof copy.back).toBe('function');
     expect(typeof copy.canBack).toBe('function');
+  });
+
+  it('preserves manual-only archive capabilities', () => {
+    const { result } = renderHook(() =>
+      useTravel({ count: 0 }, { autoArchive: false })
+    );
+    const [, , controls] = result.current;
+
+    expect(Object.keys(controls)).toContain('archive');
+    expect(Object.keys(controls)).toContain('canArchive');
   });
 });
