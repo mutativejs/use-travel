@@ -7,8 +7,10 @@ import type {
 import { type WithUndoRedoFlags, useTravel } from '../index';
 
 const autoResult = useTravel({ count: 0 });
+const defaultOptionsResult = useTravel({ count: 0 }, {});
 const explicitAutoResult = useTravel({ count: 0 }, { autoArchive: true });
 const manualResult = useTravel({ count: 0 }, { autoArchive: false });
+const frozenResult = useTravel({ count: 0 }, { enableAutoFreeze: true });
 declare const dynamicArchiveMode: boolean;
 const dynamicResult = useTravel(
   { count: 0 },
@@ -52,6 +54,13 @@ const manualCanUndo: boolean = manualResult[2].canUndo;
 const manualCanRedo: boolean = manualResult[2].canRedo;
 const dynamicCanUndo: boolean = dynamicControlsWithFlags.canUndo;
 const dynamicCanRedo: boolean = dynamicControlsWithFlags.canRedo;
+
+autoResult[0].count = 1;
+defaultOptionsResult[0].count = 1;
+explicitAutoResult[0].count = 1;
+manualResult[0].count = 1;
+// @ts-expect-error explicitly frozen state is deeply read-only
+frozenResult[0].count = 1;
 
 autoTuple[2].rebase();
 explicitAutoTuple[2].rebase();

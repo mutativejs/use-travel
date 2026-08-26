@@ -26,8 +26,8 @@ const unsupportedOwnershipOptions = ['controlledApply', 'mutable'] as const;
 
 /** Options accepted by the component-owned `useTravel` timeline. */
 export type UseTravelOptions<
-  F extends boolean,
-  A extends boolean,
+  F extends boolean = false,
+  A extends boolean = true,
   P extends PatchesOption = {},
 > = Omit<
   TravelsOptions<F, A, P>,
@@ -53,8 +53,8 @@ export type UseTravelSetState<S> = Travels<S>['setState'];
 /** Tuple returned by `useTravel`, specialized to its archive mode. */
 export type UseTravelResult<
   S,
-  F extends boolean,
-  A extends boolean,
+  F extends boolean = false,
+  A extends boolean = true,
   P extends PatchesOption = {},
 > = [
   Value<S, F>,
@@ -69,8 +69,8 @@ export type UseTravelResult<
 /** Controls returned by `useTravelStore`, including `canUndo` and `canRedo`. */
 export type StoreControlsWithFlags<
   S,
-  F extends boolean,
-  A extends boolean,
+  F extends boolean = false,
+  A extends boolean = true,
   P extends PatchesOption = {},
 > = WithUndoRedoFlags<
   A extends true
@@ -109,14 +109,18 @@ const useTravelsState = <
  * @param initialState - Value used to initialise the travel store.
  * @returns A tuple with the current state, typed updater, and history controls.
  */
-export function useTravel<S, F extends boolean>(
+export function useTravel<S, F extends boolean = false>(
   initialState: S
 ): [
   Value<S, F>,
   UseTravelSetState<S>,
   WithUndoRedoFlags<RebasableTravelsControls<S, F>>,
 ];
-export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
+export function useTravel<
+  S,
+  F extends boolean = false,
+  P extends PatchesOption = {},
+>(
   initialState: S,
   options: Omit<UseTravelOptions<F, true, P>, 'autoArchive'> & {
     autoArchive?: true;
@@ -126,7 +130,11 @@ export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
   UseTravelSetState<S>,
   WithUndoRedoFlags<RebasableTravelsControls<S, F, P>>,
 ];
-export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
+export function useTravel<
+  S,
+  F extends boolean = false,
+  P extends PatchesOption = {},
+>(
   initialState: S,
   options: Omit<UseTravelOptions<F, false, P>, 'autoArchive'> & {
     autoArchive: false;
@@ -138,8 +146,8 @@ export function useTravel<S, F extends boolean, P extends PatchesOption = {}>(
 ];
 export function useTravel<
   S,
-  F extends boolean,
-  A extends boolean,
+  F extends boolean = false,
+  A extends boolean = true,
   P extends PatchesOption = {},
 >(
   initialState: S,
@@ -147,8 +155,8 @@ export function useTravel<
 ): UseTravelResult<S, F, A, P>;
 export function useTravel<
   S,
-  F extends boolean,
-  A extends boolean,
+  F extends boolean = false,
+  A extends boolean = true,
   P extends PatchesOption = {},
 >(
   initialState: S,
