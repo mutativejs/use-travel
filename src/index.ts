@@ -24,6 +24,20 @@ const removedRestoreOptions = [
 
 const unsupportedOwnershipOptions = ['controlledApply', 'mutable'] as const;
 
+function assertOptionsObject(
+  options: unknown
+): asserts options is Record<PropertyKey, unknown> {
+  if (
+    options === null ||
+    typeof options !== 'object' ||
+    Array.isArray(options)
+  ) {
+    throw new TypeError(
+      'useTravel: options must be a non-null, non-array object'
+    );
+  }
+}
+
 /** Options accepted by the component-owned `useTravel` timeline. */
 export type UseTravelOptions<
   F extends boolean = false,
@@ -162,6 +176,7 @@ export function useTravel<
   initialState: S,
   _options: UseTravelOptions<F, A, P> = {}
 ): UseTravelResult<S, F, A, P> {
+  assertOptionsObject(_options);
   for (const option of removedRestoreOptions) {
     if (Object.prototype.hasOwnProperty.call(_options, option)) {
       throw new TypeError(

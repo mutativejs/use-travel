@@ -17,6 +17,18 @@ describe('useTravel - Input Validation', () => {
     consoleWarnSpy.mockRestore();
   });
 
+  it.each([
+    ['null', null],
+    ['a number', 0],
+    ['a string', 'options'],
+    ['an array', []],
+    ['a function', () => undefined],
+  ])('rejects %s as an options container', (_description, options) => {
+    expect(() => renderHook(() => useTravel(0, options as never))).toThrow(
+      'useTravel: options must be a non-null, non-array object'
+    );
+  });
+
   describe('maxHistory validation', () => {
     it('accepts maxHistory 0 to disable retained history', () => {
       const { result } = renderHook(() =>
