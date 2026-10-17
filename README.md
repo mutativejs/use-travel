@@ -66,7 +66,7 @@ pnpm add use-travel travels mutative
 `use-travel@3` requires `travels@3` so factory overloads, atomic restoration,
 read-only shared views, and controls always follow one core contract. Install
 the core major first, then upgrade this binding. Both require Node.js 22 or
-newer.
+newer, and both declare `mutative@^2.0.0` as their peer dependency.
 
 ### Upgrading to 3
 
@@ -77,6 +77,8 @@ newer.
   options.
 - Restore one complete snapshot with `Travels.deserialize()` and
   `restoreTravels()`, then subscribe with `useTravelStore()`.
+- Upgrade `mutative` to 2 together with `travels@3`; Mutative 1.x is no longer
+  supported.
 
 Travels 2.2 adds structured warnings with stable codes. Pass `onWarning` to `useTravel` when you need to observe them instead of matching development-only console text.
 
