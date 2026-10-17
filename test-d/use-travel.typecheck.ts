@@ -1,6 +1,7 @@
 import type {
   RebasableManualTravelsControls,
   RebasableTravelsControls,
+  TravelsEvent,
   Updater,
 } from 'travels';
 import {
@@ -108,4 +109,33 @@ useTravel(
     // @ts-expect-error split persistence options were removed in use-travel 3
     initialPosition: 0,
   }
+);
+
+useTravel(
+  { count: 0 },
+  {
+    devtools(event) {
+      const _count: number = event.state.count;
+      // @ts-expect-error devtools events carry the hook state type
+      void event.state.missing;
+    },
+  }
+);
+
+useTravel(
+  { count: 0 },
+  {
+    autoArchive: false,
+    devtools(event) {
+      const _count: number = event.state.count;
+      // @ts-expect-error manual-mode devtools events carry the hook state type
+      void event.state.missing;
+    },
+  }
+);
+
+useTravel(
+  { count: 0 },
+  // A hook written for any state still fits every timeline.
+  { devtools: (event: TravelsEvent<unknown>) => void event }
 );

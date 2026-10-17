@@ -43,8 +43,9 @@ export type UseTravelOptions<
   F extends boolean = false,
   A extends boolean = true,
   P extends PatchesOption = {},
+  S = any,
 > = Omit<
-  TravelsOptions<F, A, P>,
+  TravelsOptions<F, A, P, S>,
   | 'controlledApply'
   | 'history'
   | 'initialPatches'
@@ -141,7 +142,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<UseTravelOptions<F, true, P>, 'autoArchive'> & {
+  options: Omit<UseTravelOptions<F, true, P, S>, 'autoArchive'> & {
     autoArchive?: true;
   }
 ): [
@@ -155,7 +156,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: Omit<UseTravelOptions<F, false, P>, 'autoArchive'> & {
+  options: Omit<UseTravelOptions<F, false, P, S>, 'autoArchive'> & {
     autoArchive: false;
   }
 ): [
@@ -170,7 +171,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  options: UseTravelOptions<F, A, P>
+  options: UseTravelOptions<F, A, P, S>
 ): UseTravelResult<S, F, A, P>;
 export function useTravel<
   S,
@@ -179,7 +180,7 @@ export function useTravel<
   P extends PatchesOption = {},
 >(
   initialState: S,
-  _options: UseTravelOptions<F, A, P> = {}
+  _options: UseTravelOptions<F, A, P, S> = {}
 ): UseTravelResult<S, F, A, P> {
   assertOptionsObject(_options);
   for (const option of removedRestoreOptions) {
