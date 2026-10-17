@@ -5,7 +5,7 @@ import type {
   TravelsOptions,
   RebasableManualTravelsControls,
   RebasableTravelsControls,
-  Value,
+  ReadonlyState,
   Updater,
   PatchesOption,
   TravelMetadata,
@@ -53,6 +53,11 @@ export type UseTravelOptions<
   | 'strictInitialPatches'
 >;
 
+/** Hook state: deeply read-only when `enableAutoFreeze` is enabled. */
+export type UseTravelState<S, F extends boolean = false> = F extends true
+  ? ReadonlyState<S>
+  : S;
+
 /** Adds `canUndo` and `canRedo` flags to a controls type. */
 export type WithUndoRedoFlags<C> = C & {
   /** Whether undo is currently possible. */
@@ -71,12 +76,12 @@ export type UseTravelResult<
   A extends boolean = true,
   P extends PatchesOption = {},
 > = [
-  Value<S, F>,
+  UseTravelState<S, F>,
   UseTravelSetState<S>,
   WithUndoRedoFlags<
     A extends false
-      ? RebasableManualTravelsControls<S, F, P>
-      : RebasableTravelsControls<S, F, P>
+      ? RebasableManualTravelsControls<S, P>
+      : RebasableTravelsControls<S, P>
   >,
 ];
 
@@ -88,8 +93,8 @@ export type StoreControlsWithFlags<
   P extends PatchesOption = {},
 > = WithUndoRedoFlags<
   A extends true
-    ? RebasableTravelsControls<S, F, P>
-    : RebasableManualTravelsControls<S, F, P>
+    ? RebasableTravelsControls<S, P>
+    : RebasableManualTravelsControls<S, P>
 >;
 
 const useTravelsState = <
@@ -99,13 +104,13 @@ const useTravelsState = <
   P extends PatchesOption,
 >(
   travels: Travels<S, F, A, P>
-): Value<S, F> => {
+): UseTravelState<S, F> => {
   useSyncExternalStore(
     travels.subscribe,
     travels.getRevision,
     travels.getRevision
   );
-  return travels.getState() as Value<S, F>;
+  return travels.getState() as UseTravelState<S, F>;
 };
 
 /**
@@ -126,9 +131,9 @@ const useTravelsState = <
 export function useTravel<S, F extends boolean = false>(
   initialState: S
 ): [
-  Value<S, F>,
+  UseTravelState<S, F>,
   UseTravelSetState<S>,
-  WithUndoRedoFlags<RebasableTravelsControls<S, F>>,
+  WithUndoRedoFlags<RebasableTravelsControls<S>>,
 ];
 export function useTravel<
   S,
@@ -140,9 +145,9 @@ export function useTravel<
     autoArchive?: true;
   }
 ): [
-  Value<S, F>,
+  UseTravelState<S, F>,
   UseTravelSetState<S>,
-  WithUndoRedoFlags<RebasableTravelsControls<S, F, P>>,
+  WithUndoRedoFlags<RebasableTravelsControls<S, P>>,
 ];
 export function useTravel<
   S,
@@ -154,9 +159,9 @@ export function useTravel<
     autoArchive: false;
   }
 ): [
-  Value<S, F>,
+  UseTravelState<S, F>,
   UseTravelSetState<S>,
-  WithUndoRedoFlags<RebasableManualTravelsControls<S, F, P>>,
+  WithUndoRedoFlags<RebasableManualTravelsControls<S, P>>,
 ];
 export function useTravel<
   S,
@@ -263,7 +268,7 @@ export function useTravelStore<
 >(
   travels: Travels<S, F, A, P>
 ): [
-  Value<S, F>,
+  UseTravelState<S, F>,
   UseTravelSetState<S>,
   StoreControlsWithFlags<S, F, A, P>,
 ] {
@@ -294,5 +299,5 @@ export function useTravelStore<
       )
     ) as StoreControlsWithFlags<S, F, A, P>;
   }, [travels]);
-  return [state as Value<S, F>, setState, controls];
+  return [state as UseTravelState<S, F>, setState, controls];
 }

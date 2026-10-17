@@ -2,9 +2,12 @@ import type {
   RebasableManualTravelsControls,
   RebasableTravelsControls,
   Updater,
-  Value,
 } from 'travels';
-import { type WithUndoRedoFlags, useTravel } from '../index';
+import {
+  type UseTravelState,
+  type WithUndoRedoFlags,
+  useTravel,
+} from '../index';
 
 const autoResult = useTravel({ count: 0 });
 const defaultOptionsResult = useTravel({ count: 0 }, {});
@@ -18,32 +21,32 @@ const dynamicResult = useTravel(
 );
 
 const autoTuple: [
-  Value<{ count: number }, false>,
+  UseTravelState<{ count: number }, false>,
   (updater: Updater<{ count: number }>) => void,
-  RebasableTravelsControls<{ count: number }, false>,
+  RebasableTravelsControls<{ count: number }>,
 ] = autoResult;
 
 const explicitAutoTuple: [
-  Value<{ count: number }, false>,
+  UseTravelState<{ count: number }, false>,
   (updater: Updater<{ count: number }>) => void,
-  RebasableTravelsControls<{ count: number }, false>,
+  RebasableTravelsControls<{ count: number }>,
 ] = explicitAutoResult;
 
 const manualTuple: [
-  Value<{ count: number }, false>,
+  UseTravelState<{ count: number }, false>,
   (updater: Updater<{ count: number }>) => void,
-  RebasableManualTravelsControls<{ count: number }, false>,
+  RebasableManualTravelsControls<{ count: number }>,
 ] = manualResult;
 
 const autoControlsWithFlags: WithUndoRedoFlags<
-  RebasableTravelsControls<{ count: number }, false>
+  RebasableTravelsControls<{ count: number }>
 > = autoResult[2];
 const manualControlsWithFlags: WithUndoRedoFlags<
-  RebasableManualTravelsControls<{ count: number }, false>
+  RebasableManualTravelsControls<{ count: number }>
 > = manualResult[2];
 const dynamicControlsWithFlags: WithUndoRedoFlags<
-  | RebasableTravelsControls<{ count: number }, false>
-  | RebasableManualTravelsControls<{ count: number }, false>
+  | RebasableTravelsControls<{ count: number }>
+  | RebasableManualTravelsControls<{ count: number }>
 > = dynamicResult[2];
 
 const autoCanUndo: boolean = autoResult[2].canUndo;

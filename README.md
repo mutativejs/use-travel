@@ -165,12 +165,12 @@ Common tuple members:
 
 | Member                          | Type                                | Description                                                                 |
 | ------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
-| `state`                         | `Value<S, F>`                       | Current render snapshot                                                     |
+| `state`                         | `UseTravelState<S, F>`              | Current render snapshot                                                     |
 | `setState`                      | `UseTravelSetState<S>`              | Updates state with a value or draft function and optional entry metadata    |
 | `controls.position`             | `number`                            | Current position in the history timeline                                    |
 | `controls.getHistory()`         | `() => readonly ReadonlyState<S>[]` | Returns the shared, read-only history view                                  |
 | `controls.getHistorySnapshot()` | `() => S[]`                         | Returns a fully detached, caller-owned history snapshot                     |
-| `controls.patches`              | `TravelPatches`                     | Returns the stored patch history                                            |
+| `controls.patches`              | `ReadonlyTravelPatches`             | Cached read-only view of the stored patch history                           |
 | `controls.back(amount?)`        | `(amount?: number) => void`         | Undo one or more steps                                                      |
 | `controls.forward(amount?)`     | `(amount?: number) => void`         | Redo one or more steps                                                      |
 | `controls.go(position)`         | `(position: number) => void`        | Jump to a specific history position                                         |

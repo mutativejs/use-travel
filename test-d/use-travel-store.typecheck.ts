@@ -2,10 +2,13 @@ import type {
   RebasableManualTravelsControls,
   RebasableTravelsControls,
   Updater,
-  Value,
 } from 'travels';
 import { createTravels } from 'travels';
-import { type StoreControlsWithFlags, useTravelStore } from '../index';
+import {
+  type StoreControlsWithFlags,
+  type UseTravelState,
+  useTravelStore,
+} from '../index';
 
 const autoTravels = createTravels({ count: 0 });
 const manualTravels = createTravels(
@@ -17,15 +20,15 @@ const autoResult = useTravelStore(autoTravels);
 const manualResult = useTravelStore(manualTravels);
 
 const autoTuple: [
-  Value<{ count: number }, false>,
+  UseTravelState<{ count: number }, false>,
   (updater: Updater<{ count: number }>) => void,
-  RebasableTravelsControls<{ count: number }, false>,
+  RebasableTravelsControls<{ count: number }>,
 ] = autoResult;
 
 const manualTuple: [
-  Value<{ count: number }, false>,
+  UseTravelState<{ count: number }, false>,
   (updater: Updater<{ count: number }>) => void,
-  RebasableManualTravelsControls<{ count: number }, false>,
+  RebasableManualTravelsControls<{ count: number }>,
 ] = manualResult;
 
 const autoControlsWithFlags: StoreControlsWithFlags<
