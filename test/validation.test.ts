@@ -79,13 +79,16 @@ describe('useTravel - Input Validation', () => {
     );
   });
 
-  it('rejects mutable mode instead of silently overriding it', () => {
-    expect(() =>
-      renderHook(() => useTravel(0, { mutable: true } as never))
-    ).toThrow(
-      'useTravel: mutable mode cannot drive React updates; use an immutable timeline or travels directly'
-    );
-  });
+  it.each([true, false])(
+    'rejects mutable: %s instead of silently overriding it',
+    (mutable) => {
+      expect(() =>
+        renderHook(() => useTravel(0, { mutable } as never))
+      ).toThrow(
+        'useTravel: the mutable option is not supported, because mutable mode cannot drive React updates; remove it or use travels directly'
+      );
+    }
+  );
 
   it('rejects externally owned journal options', () => {
     expect(() =>

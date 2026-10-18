@@ -196,7 +196,7 @@ export function useTravel<
       throw new TypeError(
         option === 'controlledApply'
           ? 'useTravel: controlledApply is reserved for externally owned journals; use createTravelJournal() from travels directly'
-          : 'useTravel: mutable mode cannot drive React updates; use an immutable timeline or travels directly'
+          : 'useTravel: the mutable option is not supported, because mutable mode cannot drive React updates; remove it or use travels directly'
       );
     }
   }
