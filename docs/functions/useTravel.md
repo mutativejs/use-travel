@@ -8,7 +8,7 @@
 
 ## useTravel(initialState)
 
-> **useTravel**\<`S`, `F`\>(`initialState`): [`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`\>\>]
+> **useTravel**\<`S`, `F`\>(`initialState`): [[`UseTravelState`](../type-aliases/UseTravelState.md)\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`\>\>]
 
 Creates a component-scoped Travels instance with undo/redo support and returns its reactive API.
 
@@ -23,7 +23,7 @@ Travels.
 
 Shape of the state managed by the travel store.
 
-• **F** *extends* `boolean`
+• **F** *extends* `boolean` = `false`
 
 Whether draft freezing is enabled.
 
@@ -35,23 +35,23 @@ Value used to initialise the travel store.
 
 ### Returns
 
-[`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`\>\>]
+[[`UseTravelState`](../type-aliases/UseTravelState.md)\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`\>\>]
 
 A tuple with the current state, typed updater, and history controls.
 
 ### Defined in
 
-[use-travel/src/index.ts:112](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L112)
+[src/index.ts:132](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L132)
 
 ## useTravel(initialState, options)
 
-> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
+> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [[`UseTravelState`](../type-aliases/UseTravelState.md)\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `P`\>\>]
 
 ### Type Parameters
 
 • **S**
 
-• **F** *extends* `boolean`
+• **F** *extends* `boolean` = `false`
 
 • **P** *extends* `object` = `object`
 
@@ -59,25 +59,25 @@ A tuple with the current state, typed updater, and history controls.
 
 • **initialState**: `S`
 
-• **options**: `Omit`\<[`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `true`, `P`\>, `"autoArchive"`\> & `object`
+• **options**: `Omit`\<[`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `true`, `P`, `S`\>, `"autoArchive"`\> & `object`
 
 ### Returns
 
-[`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
+[[`UseTravelState`](../type-aliases/UseTravelState.md)\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableTravelsControls`\<`S`, `P`\>\>]
 
 ### Defined in
 
-[use-travel/src/index.ts:119](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L119)
+[src/index.ts:139](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L139)
 
 ## useTravel(initialState, options)
 
-> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+> **useTravel**\<`S`, `F`, `P`\>(`initialState`, `options`): [[`UseTravelState`](../type-aliases/UseTravelState.md)\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `P`\>\>]
 
 ### Type Parameters
 
 • **S**
 
-• **F** *extends* `boolean`
+• **F** *extends* `boolean` = `false`
 
 • **P** *extends* `object` = `object`
 
@@ -85,15 +85,15 @@ A tuple with the current state, typed updater, and history controls.
 
 • **initialState**: `S`
 
-• **options**: `Omit`\<[`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `false`, `P`\>, `"autoArchive"`\> & `object`
+• **options**: `Omit`\<[`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `false`, `P`, `S`\>, `"autoArchive"`\> & `object`
 
 ### Returns
 
-[`Value`\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `F`, `P`\>\>]
+[[`UseTravelState`](../type-aliases/UseTravelState.md)\<`S`, `F`\>, [`UseTravelSetState`](../type-aliases/UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](../type-aliases/WithUndoRedoFlags.md)\<`RebasableManualTravelsControls`\<`S`, `P`\>\>]
 
 ### Defined in
 
-[use-travel/src/index.ts:129](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L129)
+[src/index.ts:153](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L153)
 
 ## useTravel(initialState, options)
 
@@ -103,9 +103,9 @@ A tuple with the current state, typed updater, and history controls.
 
 • **S**
 
-• **F** *extends* `boolean`
+• **F** *extends* `boolean` = `false`
 
-• **A** *extends* `boolean`
+• **A** *extends* `boolean` = `true`
 
 • **P** *extends* `object` = `object`
 
@@ -113,7 +113,7 @@ A tuple with the current state, typed updater, and history controls.
 
 • **initialState**: `S`
 
-• **options**: [`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `A`, `P`\>
+• **options**: [`UseTravelOptions`](../type-aliases/UseTravelOptions.md)\<`F`, `A`, `P`, `S`\>
 
 ### Returns
 
@@ -121,4 +121,4 @@ A tuple with the current state, typed updater, and history controls.
 
 ### Defined in
 
-[use-travel/src/index.ts:139](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L139)
+[src/index.ts:167](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L167)

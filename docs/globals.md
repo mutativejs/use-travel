@@ -11,6 +11,7 @@
 - [UseTravelOptions](type-aliases/UseTravelOptions.md)
 - [UseTravelResult](type-aliases/UseTravelResult.md)
 - [UseTravelSetState](type-aliases/UseTravelSetState.md)
+- [UseTravelState](type-aliases/UseTravelState.md)
 - [WithUndoRedoFlags](type-aliases/WithUndoRedoFlags.md)
 
 ## Functions

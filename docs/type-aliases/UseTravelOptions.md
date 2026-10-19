@@ -4,20 +4,22 @@
 
 [use-travel](../globals.md) / UseTravelOptions
 
-# Type Alias: UseTravelOptions\<F, A, P\>
+# Type Alias: UseTravelOptions\<F, A, P, S\>
 
-> **UseTravelOptions**\<`F`, `A`, `P`\>: `Omit`\<`TravelsOptions`\<`F`, `A`, `P`\>, `"controlledApply"` \| `"history"` \| `"initialPatches"` \| `"initialPosition"` \| `"mutable"` \| `"strictInitialPatches"`\>
+> **UseTravelOptions**\<`F`, `A`, `P`, `S`\>: `Omit`\<`TravelsOptions`\<`F`, `A`, `P`, `S`\>, `"controlledApply"` \| `"history"` \| `"initialPatches"` \| `"initialPosition"` \| `"mutable"` \| `"strictInitialPatches"`\>
 
 Options accepted by the component-owned `useTravel` timeline.
 
 ## Type Parameters
 
-• **F** *extends* `boolean`
+• **F** *extends* `boolean` = `false`
 
-• **A** *extends* `boolean`
+• **A** *extends* `boolean` = `true`
 
 • **P** *extends* `PatchesOption` = `object`
 
+• **S** = `any`
+
 ## Defined in
 
-[use-travel/src/index.ts:28](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L28)
+[src/index.ts:42](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L42)

@@ -6,7 +6,7 @@
 
 # Type Alias: UseTravelResult\<S, F, A, P\>
 
-> **UseTravelResult**\<`S`, `F`, `A`, `P`\>: [`Value`\<`S`, `F`\>, [`UseTravelSetState`](UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](WithUndoRedoFlags.md)\<`A` *extends* `false` ? `RebasableManualTravelsControls`\<`S`, `F`, `P`\> : `RebasableTravelsControls`\<`S`, `F`, `P`\>\>]
+> **UseTravelResult**\<`S`, `F`, `A`, `P`\>: [[`UseTravelState`](UseTravelState.md)\<`S`, `F`\>, [`UseTravelSetState`](UseTravelSetState.md)\<`S`\>, [`WithUndoRedoFlags`](WithUndoRedoFlags.md)\<`A` *extends* `false` ? `RebasableManualTravelsControls`\<`S`, `P`\> : `RebasableTravelsControls`\<`S`, `P`\>\>]
 
 Tuple returned by `useTravel`, specialized to its archive mode.
 
@@ -14,12 +14,12 @@ Tuple returned by `useTravel`, specialized to its archive mode.
 
 • **S**
 
-• **F** *extends* `boolean`
+• **F** *extends* `boolean` = `false`
 
-• **A** *extends* `boolean`
+• **A** *extends* `boolean` = `true`
 
 • **P** *extends* `PatchesOption` = `object`
 
 ## Defined in
 
-[use-travel/src/index.ts:54](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L54)
+[src/index.ts:74](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L74)
