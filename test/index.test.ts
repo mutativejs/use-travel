@@ -1,6 +1,6 @@
 import { expect, describe, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { restoreTravels } from 'travels';
+import { Travels, restoreTravels } from 'travels';
 import { useTravel, useTravelStore } from '../src/index';
 
 describe('useTravel', () => {
@@ -1217,15 +1217,16 @@ describe('useTravel', () => {
       }
     `);
 
-    const restored = restoreTravels(
-      {
-        version: 1,
-        state: nextState,
-        patches: controls.patches,
-        position: controls.position,
-      },
-      { maxHistory: 3, autoArchive: false }
-    );
+    const stored = JSON.stringify({
+      version: 1,
+      state: nextState,
+      patches: controls.patches,
+      position: controls.position,
+    });
+    const restored = restoreTravels(Travels.deserialize<number>(stored), {
+      maxHistory: 3,
+      autoArchive: false,
+    });
     result = renderHook(() => useTravelStore(restored)).result;
     [nextState, setState, controls] = result.current;
 
