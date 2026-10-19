@@ -6,6 +6,38 @@ import vm from 'node:vm';
 import manifest from '../package.json' with { type: 'json' };
 
 const require = createRequire(import.meta.url);
+const { createElement } = require('react');
+const { renderToString } = require('react-dom/server');
+const { Travels, createTravels, restoreTravels } = require('travels');
+
+const assertTimelines = (label, { useTravel, useTravelStore }) => {
+  const Created = () => {
+    const [state, , controls] = useTravel({ count: 0 });
+    return createElement('output', null, `${state.count}:${controls.canUndo}`);
+  };
+  assert.equal(
+    renderToString(createElement(Created)),
+    '<output>0:false</output>',
+    `${label} new timeline`
+  );
+
+  const source = createTravels({ count: 0 });
+  source.setState({ count: 1 });
+  source.back();
+  const restored = restoreTravels(
+    Travels.deserialize(JSON.stringify(source.serialize()))
+  );
+  const Restored = () => {
+    const [state, , controls] = useTravelStore(restored);
+    return createElement('output', null, `${state.count}:${controls.canRedo}`);
+  };
+  assert.equal(
+    renderToString(createElement(Restored)),
+    '<output>0:true</output>',
+    `${label} restored timeline`
+  );
+};
+
 const artifacts = [
   manifest.main,
   manifest.module,
@@ -33,6 +65,7 @@ for (const [label, api] of [
     'function',
     `${label} useTravelStore export`
   );
+  assertTimelines(label, api);
 }
 
 for (const artifact of [
@@ -62,5 +95,8 @@ const umdContext = {
 vm.runInNewContext(umdSource, umdContext);
 assert.equal(typeof umdContext.UseTravel.useTravel, 'function');
 assert.equal(typeof umdContext.UseTravel.useTravelStore, 'function');
+assertTimelines('UMD', umdContext.UseTravel);
 
-console.log('Verified use-travel CJS, ESM, and UMD package entries.');
+console.log(
+  'Verified new and restored timelines through use-travel CJS, ESM, and UMD package entries.'
+);
