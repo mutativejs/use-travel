@@ -22,4 +22,4 @@ Tuple returned by `useTravel`, specialized to its archive mode.
 
 ## Defined in
 
-[src/index.ts:74](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L74)
+[src/index.ts:66](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L66)

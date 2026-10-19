@@ -22,4 +22,4 @@ Controls returned by `useTravelStore`, including `canUndo` and `canRedo`.
 
 ## Defined in
 
-[src/index.ts:90](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L90)
+[src/index.ts:82](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L82)

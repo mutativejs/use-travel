@@ -18,4 +18,4 @@ Hook state: deeply read-only when `enableAutoFreeze` is enabled.
 
 ## Defined in
 
-[src/index.ts:58](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L58)
+[src/index.ts:50](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L50)

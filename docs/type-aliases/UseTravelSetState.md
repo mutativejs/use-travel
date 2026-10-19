@@ -16,4 +16,4 @@ Core-compatible synchronous state setter exposed by the React hooks.
 
 ## Defined in
 
-[src/index.ts:71](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L71)
+[src/index.ts:63](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L63)

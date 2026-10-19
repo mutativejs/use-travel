@@ -6,7 +6,7 @@
 
 # Type Alias: UseTravelOptions\<F, A, P, S\>
 
-> **UseTravelOptions**\<`F`, `A`, `P`, `S`\>: `Omit`\<`TravelsOptions`\<`F`, `A`, `P`, `S`\>, `"controlledApply"` \| `"history"` \| `"initialPatches"` \| `"initialPosition"` \| `"mutable"` \| `"strictInitialPatches"`\>
+> **UseTravelOptions**\<`F`, `A`, `P`, `S`\>: `Omit`\<`TravelsOptions`\<`F`, `A`, `P`, `S`\>, `"mutable"`\>
 
 Options accepted by the component-owned `useTravel` timeline.
 

@@ -106,6 +106,14 @@ useTravel(
 useTravel(
   { count: 0 },
   {
+    // @ts-expect-error useTravel always creates immutable timelines
+    mutable: false,
+  }
+);
+
+useTravel(
+  { count: 0 },
+  {
     // @ts-expect-error split persistence options were removed in use-travel 3
     initialPosition: 0,
   }

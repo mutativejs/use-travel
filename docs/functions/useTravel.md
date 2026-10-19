@@ -41,7 +41,7 @@ A tuple with the current state, typed updater, and history controls.
 
 ### Defined in
 
-[src/index.ts:132](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L132)
+[src/index.ts:124](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L124)
 
 ## useTravel(initialState, options)
 
@@ -67,7 +67,7 @@ A tuple with the current state, typed updater, and history controls.
 
 ### Defined in
 
-[src/index.ts:139](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L139)
+[src/index.ts:131](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L131)
 
 ## useTravel(initialState, options)
 
@@ -93,7 +93,7 @@ A tuple with the current state, typed updater, and history controls.
 
 ### Defined in
 
-[src/index.ts:153](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L153)
+[src/index.ts:145](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L145)
 
 ## useTravel(initialState, options)
 
@@ -121,4 +121,4 @@ A tuple with the current state, typed updater, and history controls.
 
 ### Defined in
 
-[src/index.ts:167](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L167)
+[src/index.ts:159](https://github.com/mutativejs/use-travel/blob/main/src/index.ts#L159)

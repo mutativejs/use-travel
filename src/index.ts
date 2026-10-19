@@ -44,15 +44,7 @@ export type UseTravelOptions<
   A extends boolean = true,
   P extends PatchesOption = {},
   S = any,
-> = Omit<
-  TravelsOptions<F, A, P, S>,
-  | 'controlledApply'
-  | 'history'
-  | 'initialPatches'
-  | 'initialPosition'
-  | 'mutable'
-  | 'strictInitialPatches'
->;
+> = Omit<TravelsOptions<F, A, P, S>, 'mutable'>;
 
 /** Hook state: deeply read-only when `enableAutoFreeze` is enabled. */
 export type UseTravelState<S, F extends boolean = false> = F extends true
