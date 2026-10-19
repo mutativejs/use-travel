@@ -102,6 +102,17 @@ describe('useTravel - Input Validation', () => {
     );
   });
 
+  it.each([
+    ['apply', 'Travels: apply is only available to externally owned journals'],
+    ['target', 'Travels: target is only available when restoring a snapshot'],
+  ] as const)('lets Travels reject the %s option', (option, message) => {
+    expect(() =>
+      renderHook(() =>
+        useTravel({ count: 0 }, { [option]: undefined } as never)
+      )
+    ).toThrow(message);
+  });
+
   describe('valid options', () => {
     it('should not log any errors when all options are valid', () => {
       renderHook(() =>
