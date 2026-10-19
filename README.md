@@ -418,6 +418,10 @@ Structural validation is the low-latency default. Select
 `validation: 'semantic'` for untrusted or potentially corrupted snapshots so
 every reachable history entry is replayed in both directions before restore.
 
+A snapshot that fails validation makes `Travels.deserialize()` throw a
+`TravelsPersistenceError`. Pass a `fallback` snapshot when starting over is the
+intended recovery.
+
 ## State Requirements
 
 `use-travel` follows the same state rules as [`travels`](https://github.com/mutativejs/travels):
