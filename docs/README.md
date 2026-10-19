@@ -80,9 +80,20 @@ newer, and both declare `mutative@^2.0.0` as their peer dependency.
   `initialPatches`, `initialPosition`, and `strictInitialPatches` from its
   options.
 - Restore one complete snapshot with `Travels.deserialize()` and
-  `restoreTravels()`, then subscribe with `useTravelStore()`.
+  `restoreTravels()`, then subscribe with `useTravelStore()`. Malformed
+  snapshots now throw instead of being discarded.
 - Upgrade `mutative` to 2 together with `travels@3`; Mutative 1.x is no longer
   supported.
+- Treat `controls.getHistory()` and `controls.patches` as shared, frozen views;
+  `controls.patches` is no longer a fresh copy on every read. Use
+  `controls.getHistorySnapshot()` for states you can change, and
+  `travels.getPatches()` for a patch copy from a shared store.
+- With `autoArchive: false`, navigating with pending changes archives them in a
+  single `go` event instead of an `archive` event followed by `go`. Persist from
+  `devtools` on every event rather than only on `archive`.
+- See the
+  [Travels 3 migration guide](https://github.com/mutativejs/travels/blob/main/docs/migration-guide.md#from-2x-to-30)
+  for every core change.
 
 Travels 2.2 adds structured warnings with stable codes. Pass `onWarning` to `useTravel` when you need to observe them instead of matching development-only console text.
 
