@@ -344,6 +344,14 @@ groups them into one history entry.
 
 Updates that do not produce actual changes do not create history entries.
 
+### Treat `state` as read-only
+
+Change state only through `setState` and the controls. With Mutative 2, the
+objects of each new state are also the values of its history patches, so
+writing to `state`, or to a value kept from an earlier render, rewrites what
+redo replays. Enable `enableAutoFreeze` to make such writes throw and to type
+`state` as deeply read-only.
+
 ## Rebase
 
 `controls.rebase()` discards all past and future history and makes the current state the new baseline.
