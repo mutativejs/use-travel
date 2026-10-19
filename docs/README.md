@@ -189,10 +189,10 @@ Common tuple members:
 
 When `autoArchive: false`, the controls also include:
 
-| Member                  | Type            | Description                                            |
-| ----------------------- | --------------- | ------------------------------------------------------ |
-| `controls.archive()`    | `() => void`    | Commit the current working state as the next undo step |
-| `controls.canArchive()` | `() => boolean` | Whether there are unarchived changes                   |
+| Member                        | Type                                  | Description                                            |
+| ----------------------------- | ------------------------------------- | ------------------------------------------------------ |
+| `controls.archive(metadata?)` | `(metadata?: TravelMetadata) => void` | Commit the current working state as the next undo step |
+| `controls.canArchive()`       | `() => boolean`                       | Whether there are unarchived changes                   |
 
 The setter accepts the same optional metadata as Core, so labels and other
 durable context remain attached to the history entry:
