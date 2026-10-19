@@ -86,7 +86,7 @@ newer, and both declare `mutative@^2.0.0` as their peer dependency.
 
 Travels 2.2 adds structured warnings with stable codes. Pass `onWarning` to `useTravel` when you need to observe them instead of matching development-only console text.
 
-Travels 2.1 adds controlled journals for integrations whose runtime already owns state. `useTravel` remains state-owning and does not expose or forward the journal-only `controlledApply` option; build those adapters with `createTravelJournal()` from `travels` directly. Standard timelines used by these hooks never emit the new `recordPatches` event, but `TravelsEvent['type']` is an open union, so devtools handlers should retain a fallback branch for event types added by minor Travels releases.
+Travels 2.1 adds controlled journals for integrations whose runtime already owns state. `useTravel` remains state-owning and rejects journal options such as `apply`; build those adapters with `createTravelJournal(initialState, { apply })` from `travels` directly. Standard timelines used by these hooks never emit the new `recordPatches` event, but `TravelsEvent['type']` is an open union, so devtools handlers should retain a fallback branch for event types added by minor Travels releases.
 
 ## Quick Start
 
@@ -146,7 +146,7 @@ Creates a component-scoped immutable `Travels` instance and returns a tuple:
 const [state, setState, controls] = useTravel(initialState, options);
 ```
 
-`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. It rejects `mutable` and the controlled-journal-only `controlledApply` option instead of silently overriding them. It creates a new timeline; use [`useTravelStore`](#usetravelstoretravels) with `restoreTravels()` when restoring persistence.
+`useTravel` always uses immutable mode internally so React can observe state changes through reference updates. It rejects `mutable`, the journal-only `apply` option, and the removed `controlledApply` option instead of silently overriding or dropping them. It creates a new timeline; use [`useTravelStore`](#usetravelstoretravels) with `restoreTravels()` when restoring persistence.
 
 #### Options
 
