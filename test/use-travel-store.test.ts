@@ -84,6 +84,7 @@ describe('useTravelStore', () => {
       'position',
       'getHistory',
       'getHistorySnapshot',
+      'patches',
       'back',
       'forward',
       'reset',

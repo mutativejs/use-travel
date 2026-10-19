@@ -39,6 +39,7 @@ describe('useTravel canUndo / canRedo flags', () => {
       'position',
       'getHistory',
       'getHistorySnapshot',
+      'patches',
       'back',
       'forward',
       'reset',
@@ -57,6 +58,20 @@ describe('useTravel canUndo / canRedo flags', () => {
     const copy = { ...controls } as typeof controls;
     expect(typeof copy.back).toBe('function');
     expect(typeof copy.canBack).toBe('function');
+  });
+
+  it('shares the cached read-only patches view until history changes', () => {
+    const { result } = renderHook(() => useTravel({ count: 0 }));
+    const patches = result.current[2].patches;
+
+    expect(Object.isFrozen(patches)).toBe(true);
+    expect(Object.isFrozen(patches.patches)).toBe(true);
+    expect(result.current[2].patches).toBe(patches);
+
+    act(() => result.current[1]({ count: 1 }));
+
+    expect(result.current[2].patches).not.toBe(patches);
+    expect(result.current[2].patches.patches).toHaveLength(1);
   });
 
   it('preserves manual-only archive capabilities', () => {
