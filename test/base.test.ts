@@ -175,6 +175,26 @@ describe('useTravel', () => {
     );
   });
 
+  it('[useTravel]: navigation archives pending changes in one go event', () => {
+    const devtools = vi.fn();
+    const { result } = renderHook(() =>
+      useTravel({ count: 0 }, { autoArchive: false, devtools })
+    );
+
+    act(() => result.current[1]({ count: 1 }));
+    devtools.mockClear();
+
+    act(() => result.current[2].back());
+
+    expect(devtools.mock.calls.map(([event]) => event.type)).toEqual(['go']);
+    expect(result.current[0]).toEqual({ count: 0 });
+    expect(result.current[2].getHistory()).toEqual([
+      { count: 0 },
+      { count: 1 },
+    ]);
+    expect(result.current[2].canArchive()).toBe(false);
+  });
+
   it('[useTravel]: sequential updates after navigation replace redo history', () => {
     const { result } = renderHook(() =>
       useTravel({ count: 0 }, { autoArchive: true })
